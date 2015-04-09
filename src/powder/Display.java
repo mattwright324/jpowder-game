@@ -79,14 +79,17 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		
 		b2d.setColor(Color.BLACK);
 		b2d.fillRect(0, 0, getWidth(), getHeight());
+		size = 0;
 		for(int w=0; w<width; w++)
 			for(int h=0; h<height; h++)
 				draw_cell(Game.cells[w][h]);
 		
 		b2d.setColor(Color.LIGHT_GRAY);
-		b2d.drawRect(mstart.x*img_scale, mstart.y*img_scale, (mstop.x-mstart.x)*img_scale, (mstop.y-mstart.y)*img_scale);
+		int sx = mstart.x * img_scale; int ex = (mstop.x-mstart.x) * img_scale;
+		int sy = mstart.y * img_scale; int ey = (mstop.y-mstart.y) * img_scale;
+		b2d.drawRect(sx, sy, ex, ey);
 		b2d.setColor(new Color(244,244,244,32));
-		b2d.fillRect(mstart.x*img_scale, mstart.y*img_scale, (mstop.x-mstart.x)*img_scale, (mstop.y-mstart.y)*img_scale);
+		b2d.fillRect(sx, sy, ex, ey);
 		
 		w2d.drawImage(img, null, 0, 0);
 		w2d.setColor(Color.WHITE);
@@ -94,21 +97,24 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		int line = 1;
 		w2d.drawString("FramesPS: "+dfps.average(), 5, 15*line++);
 		w2d.drawString("UpdatesPS: "+Game.gfps.fps(), 5, 15*line++);
-		w2d.drawString("'0' to '6' Place: "+left.shortName, 5, 15*line++);
+		w2d.drawString("'0' to '7' Place: "+left.shortName, 5, 15*line++);
 		w2d.drawString("'S'        Size: "+(small ? "Default" : "Large"), 5, 15*line++);
 		w2d.drawString("'Space'    Game: "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
+		w2d.drawString("Parts: "+size, 5, 15*line++);
 		
 		Particle p = Game.getParticleAt(mouse.x, mouse.y);
 		w2d.drawString("X: "+mouse.x+" Y:"+mouse.y, 5, getHeight()-30);
-		w2d.drawString(p!=null ? p.el.shortName : "Empty", 5, getHeight()-15);
+		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.celcius+", Life: "+p.life) : "Empty", 5, getHeight()-15);
 		dfps.add();
 	}
 	
+	public int size = 0;
 	public void draw_cell(Cell c) {
-		if(c.part!=null && c.part.el!=Game.none) {
-			if(c.part.remove)
+		if(c.part!=null) {
+			if(c.part.el.remove)
 				c.part = null;
 			else {
+				size++;
 				b2d.setColor(c.part.getColor());
 				b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
 			}
@@ -119,7 +125,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public Element right = Game.none;
 	
 	public void place(Element e) {
-		Game.setParticleAt(mouse.x, mouse.y, new Particle(e, mouse.x, mouse.y), e==Game.none);
+		for(int x=mstart.x; x<=mstop.x; x++)
+			for(int y=mstart.y; y<=mstop.y; y++)
+				Game.setParticleAt(x, y, new Particle(e, x, y), e==Game.none);
 	}
 	
 	public void mouseDragged(MouseEvent e) {
@@ -184,12 +192,13 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(key=='7') left = Game.phot;
 	}
 	
-	public int draw_size = 10;
+	public int draw_size = 0;
 	
 	public Point mstart = new Point(0,0), mstop = new Point(0,0);
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		draw_size-=e.getWheelRotation();
+		if(draw_size<0) draw_size = 0;
 		mstart = new Point(mouse.x-draw_size/2,mouse.y-draw_size/2);
 		mstop = new Point(mstart.x+draw_size, mstart.y+draw_size);
 	}

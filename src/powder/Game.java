@@ -57,11 +57,11 @@ public class Game extends Thread {
 		}
 		
 		public int screen_x() {
-			return x / Display.img_scale;
+			return x * Display.img_scale;
 		}
 		
 		public int screen_y() {
-			return y / Display.img_scale;
+			return y * Display.img_scale;
 		}
 		
 		public int x, y;
@@ -87,6 +87,7 @@ public class Game extends Thread {
 	}
 	
 	static void setParticleAt(int x, int y, Particle p, boolean insert) {
+		if(!valid(x, y)) return;
 		if(!insert && particleAt(x, y)) return;
 		if(p!=null) {
 			p.x = x;
@@ -133,11 +134,9 @@ public class Game extends Thread {
 	};
 	
 	static ElementMovement em_phot = new ElementMovement() {
-		public int vx = r.nextInt(3) - 1 + 3;
-		public int vy = r.nextInt(3) - 1 + 3;
 		public void move(Particle p) {
-			int ny = p.y + vx;
-			int nx = p.x + vy;
+			int ny = p.y + (int) p.vx;
+			int nx = p.x + (int) p.vy;
 			p.tryMove(nx, ny);
 		}
 	};
@@ -149,26 +148,31 @@ public class Game extends Thread {
 	
 	static {
 		none = new Element(0, "NONE", Color.BLACK);
+		none.remove = true;
 		none.weight = -Integer.MAX_VALUE;
 		
 		dust = new Element(1, "DUST", "Dust", new Color(180, 180, 30));
 		dust.weight = 100;
+		dust.sandEffect = true;
 		dust.setMovement(em_powder);
 		
 		dmnd = new Element(2, "DMND", "Diamond", new Color(204, 204, 248));
-		dust.weight = Integer.MAX_VALUE;
+		dmnd.weight = Integer.MAX_VALUE;
 		dmnd.setMovement(null);
 		
 		gas = new Element(3, "GAS", new Color(208, 180, 208));
 		gas.weight = 5;
+		gas.sandEffect = true;
 		gas.setMovement(em_gas);
 		
 		warp = new Element(4, "WARP", new Color(32, 32, 32));
 		warp.weight = Integer.MAX_VALUE;
+		warp.life = 250 + r.nextInt(100);
 		warp.setMovement(em_gas);
 		
 		salt = new Element(5, "SALT", new Color(244, 243, 243));
 		salt.weight = 100;
+		salt.sandEffect = true;
 		salt.setMovement(em_powder);
 		
 		metl = new Element(6, "METL", new Color(64, 64, 224));
@@ -176,6 +180,7 @@ public class Game extends Thread {
 		metl.setMovement(null);
 		
 		phot = new Element(7, "PHOT", Color.WHITE);
+		phot.life = 1000;
 		phot.setMovement(em_phot);
 	}
 	
@@ -209,7 +214,13 @@ public class Game extends Thread {
 		public String shortName = "ELEM";
 		public String longName = "Element";
 		public String description = "Element description.";
+		
 		public int weight = 10;
+		public long life = 0;
+		public double celcius = 0.0;
+		public boolean remove = false;
+		
+		public boolean sandEffect = false;
 		
 		public boolean heavierThan(Element e) {
 			return e.weight > weight;
@@ -219,25 +230,14 @@ public class Game extends Thread {
 			return e.weight < weight;
 		}
 		
-		public static boolean sandEffect = false;
 		public Color color = new Color(180, 180, 30);
-		public Color sand = color;
-		public Color deco; // For possible future decoration editor.
-		
-		public void setDeco(Color c) {
-			deco = c;
-		}
 		
 		public void setColor(Color c) {
 			color = c;
-			/*int red = 255 % (color.getRed() + (r.nextInt(19)-10));
-			int green = 255 % (color.getGreen() + (r.nextInt(19)-10));
-			int blue = 255 % (color.getBlue() + (r.nextInt(19)-10));
-			sand = new Color(red, green, blue, color.getAlpha());*/
 		}
 		
 		public Color getColor() {
-			return deco != null ? deco : sandEffect ? sand : color;
+			return color;
 		}
 		
 		public ElementMovement movement;
@@ -253,14 +253,17 @@ public class Game extends Thread {
 			el = e;
 			this.x = x;
 			this.y = y;
-			this.life = 0;
-			this.celcius = 0.0;
+			this.life = el.life;
+			this.celcius = el.celcius;
+			setRemove(el.remove);
+			if(el.sandEffect) addSandEffect();
 		}
 		
 		public Particle(Element e, int x, int y, long life, double celcius) {
 			this(e, x, y);
 			this.life = life;
 			this.celcius = celcius;
+			setRemove(el.remove);
 		}
 		
 		public Element el;
@@ -275,13 +278,24 @@ public class Game extends Thread {
 		}
 		
 		public Color getColor() {
-			return el.getColor();
+			return deco!=null ? deco : el.getColor();
 		}
 		
-		public void setColor(Color c) {
-			el.deco = c;
+		public Color deco;
+		
+		public void setDeco(Color c) {
+			deco = c;
 		}
 		
+		public void addSandEffect() {
+			Color color = el.getColor();
+			int red = (color.getRed() + (r.nextInt(19)-10));
+			int green = (color.getGreen() + (r.nextInt(19)-10));
+			int blue = (color.getBlue() + (r.nextInt(19)-10));
+			setDeco(new Color(Math.abs(red) % 256, Math.abs(green) % 256, Math.abs(blue) % 256, color.getAlpha()));
+		}
+		
+		public double vx = 0, vy = 0;
 		public long life = 0;
 		public double celcius = 0.0;
 		
@@ -293,7 +307,7 @@ public class Game extends Thread {
 			return remove;
 		}
 		
-		public long update = 100;
+		public long update = 50;
 		public long last_update = System.currentTimeMillis();
 		
 		public boolean ready() {
@@ -304,7 +318,9 @@ public class Game extends Thread {
 			if(ready()) {
 				if(el.movement!=null)
 					el.movement.move(this);
-				if(!validGame(x, y)) setRemove(true);
+				
+				if(life>=1) life--;
+				if(!validGame(x, y) || life-1==0) setRemove(true);
 				last_update = System.currentTimeMillis();
 			}
 		}
