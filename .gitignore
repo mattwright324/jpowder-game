@@ -7,3 +7,4 @@
 
 # Gradle junk
 build/
+.gradle
