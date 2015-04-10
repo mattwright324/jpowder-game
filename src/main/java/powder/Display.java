@@ -23,8 +23,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	static Graphics2D b2d = img.createGraphics();
 	static Font typeface = new Font("Monospaced", Font.PLAIN, 12);
-	static Element left = Game.dust;
-	static Element right = Game.none;
+	static Element left = Element.dust; // Hacky as fuck.
+	static Element right = Element.none;
 	static FPS dfps = new FPS();
 	public Timer timer = new Timer(5, this);
 	public Point mouse = new Point(0,0);
@@ -129,7 +129,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void place(Element e) {
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
-				Cells.setParticleAt(x, y, new Particle(e, x, y), e == Game.none || (Cells.particleAt(x, y) && Cells.getParticleAt(x, y).el.conducts && left == Game.sprk));
+				Cells.setParticleAt(x, y, new Particle(e, x, y), e == Element.none);
 			}
 		}
 	}
@@ -209,7 +209,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			if(draw_size<0) draw_size = 0;
 		}
 
-		if(key=='0') left = Game.none;
+		/*if(key=='0') left = Game.none;
 		if(key=='1') left = Game.dust;
 		if(key=='2') left = Game.salt;
 		if(key=='3') left = Game.dmnd;
@@ -218,7 +218,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(key=='6') left = Game.sprk;
 		if(key=='7') left = Game.phot;
 		if(key=='8') left = Game.fire;
-		if(key=='9') left = Game.wood;
+		if(key=='9') left = Game.wood;*/ // I cannot be frucked to changed this right now
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {

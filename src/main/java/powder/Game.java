@@ -1,7 +1,5 @@
 package powder;
 
-import powder.elements.Element;
-
 import java.util.Random;
 
 
@@ -9,12 +7,6 @@ public class Game extends Thread {
 	static boolean paused = false;
 	static Display.FPS gfps = new Display.FPS();
 	static Random r = new Random();
-
-	static Element dust, salt;
-	static Element none, dmnd, metl, wood, sprk;
-	static Element gas, warp, fire;
-	static Element phot;
-
 
 	static void update() {
 		for (int w = 0; w < Display.width; w++) {
