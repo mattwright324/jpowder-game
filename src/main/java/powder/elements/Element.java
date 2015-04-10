@@ -13,8 +13,8 @@ public class Element {
     public final static Map<Integer, Element> el_map = new HashMap<Integer, Element>();
     // Declare elements
     public static Element none = new Element(0, "NONE", Color.BLACK);
-    public static Element dust = new Element(1, "DUST", "Dust", new Color(180, 180, 30));
-    public static Element dmnd = new Element(2, "DMND", "Diamond", new Color(204, 204, 248));
+    public static Element dust = new Element(1, "DUST", "Dust", new Color(162, 168, 9));
+    public static Element dmnd = new Element(2, "DMND", "Diamond", new Color(32, 248, 228));
     public static Element gas = new Element(3, "GAS", new Color(208, 180, 208));
     public static Element warp = new Element(4, "WARP", new Color(32, 32, 32));
     public static Element salt = new Element(5, "SALT", new Color(243, 243, 243));
@@ -25,8 +25,8 @@ public class Element {
     public static Element sprk = new Element(10, "SPRK", "Spark", Color.YELLOW);
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
-            int ny = p.y + (int) p.vx;
-            int nx = p.x + (int) p.vy;
+            int ny = p.y + (int) p.vy;
+            int nx = p.x + (int) p.vx;
             if (!Cells.particleAt(nx, ny))
                 Cells.moveTo(p.x, p.y, nx, ny);
             else
@@ -128,12 +128,10 @@ public class Element {
         });
         el_map.put(8, fire);
 
-        wood = new Element(9, "WOOD", Color.ORANGE.darker());
         wood.flammibility = 0.5;
         wood.weight = 500;
         el_map.put(9, wood);
 
-        sprk = new Element(10, "SPRK", "Spark", Color.YELLOW);
         sprk.life = 4;
         sprk.life_dmode = 2;
         sprk.setParticleBehaviour(new ParticleBehaviour() {

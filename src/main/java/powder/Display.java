@@ -115,7 +115,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void draw_cell(Cell c) {
 		if(c.part!=null) {
 			if(c.part.remove()) {
-				c.part = null;
+				c.part = null; // Why?
 			} else {
 				size++;
 				if(c.part!=null) {

@@ -54,11 +54,11 @@ public class Particle {
         return el.weight < p.el.weight;
     }
 
-    public Color getColor() {
+    public Color getColor() { // EW
         return deco != null ? deco : el.getColor();
     }
 
-    public void setDeco(Color c) {
+    public void setDeco(Color c) { // EW
         deco = c;
     }
 
