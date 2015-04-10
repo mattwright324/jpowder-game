@@ -1,7 +1,6 @@
 package powder.particles;
 
 import powder.Cells;
-import powder.Game;
 import powder.elements.Element;
 
 import java.awt.*;
@@ -29,7 +28,7 @@ public class Particle {
         this.celcius = el.celcius;
         setRemove(el.remove);
         if (el.sandEffect) addSandEffect();
-        if (el.init != null) el.init.init(this);
+        if (el.behaviour != null) el.behaviour.init(this);
     }
 
     public Particle(Element e, int x, int y, long life, double celcius) {
@@ -40,7 +39,7 @@ public class Particle {
         this.celcius = celcius;
         setRemove(el.remove);
         if (el.sandEffect) addSandEffect();
-        if (el.init != null) el.init.init(this);
+        if (el.behaviour != null) el.behaviour.init(this);
     }
 
     public boolean burn() {
@@ -85,15 +84,15 @@ public class Particle {
 
     public void update() {
         if (ready()) {
-            if (el.update != null)
-                el.update.update(this);
+            if (el.behaviour != null)
+                el.behaviour.update(this);
             if (el.movement != null)
                 el.movement.move(this);
 
             if (life > 0) life--;
             if (life - 1 == 0) {
                 if (el.life_dmode == 1) setRemove(true);
-                if (el.life_dmode == 2) Cells.setParticleAt(x, y, new Particle(Game.el_map.get(ctype), x, y), true);
+                if (el.life_dmode == 2) Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
             }
             if (!Cells.validGame(x, y)) setRemove(true);
             last_update = System.currentTimeMillis();

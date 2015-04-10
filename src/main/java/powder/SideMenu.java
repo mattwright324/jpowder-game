@@ -44,9 +44,9 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 		b2d.setColor(Color.GRAY);
 		b2d.setPaint(new GradientPaint(0, 0, Color.WHITE, width, height*2, Color.WHITE.darker()));
 		b2d.fillRect(0, 0, width, height);
-		
-		for(int key : Game.el_map.keySet()) {
-			Element e = Game.el_map.get(key);
+
+		for (int key : Element.el_map.keySet()) {
+			Element e = Element.el_map.get(key);
 			b2d.setPaintMode();
 			b2d.setColor(e.getColor());
 			b2d.fillRect(5, 5+key*20, getWidth()-10, 15);
@@ -77,7 +77,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 
 	public void mousePressed(MouseEvent e) {
 		int id = (e.getPoint().y-5)/20;
-		if(Game.el_map.containsKey(id)) Display.left = Game.el_map.get(id);
+		if (Element.el_map.containsKey(id)) Display.left = Element.el_map.get(id);
 	}
 
 	public void mouseReleased(MouseEvent e) {
