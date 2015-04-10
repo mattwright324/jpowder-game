@@ -1,7 +1,7 @@
-package powder;
+package main.java.powder;
 
-import powder.elements.Element;
-import powder.particles.Particle;
+import main.java.powder.elements.Element;
+import main.java.powder.particles.Particle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +26,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	static Element left = Element.dust; // Hacky as fuck.
 	static Element right = Element.none;
 	static FPS dfps = new FPS();
+	static int view = 0;
+	static String viewName = "Default";
+	
 	public Timer timer = new Timer(5, this);
 	public Point mouse = new Point(0,0);
 	public Game game = new Game();
@@ -86,10 +89,13 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		int sy = mstart.y * img_scale; int h = (mstop.y-mstart.y) * img_scale;
 		b2d.drawRect(sx, sy, w, h);
 		//b2d.drawOval(sx, sy, w, h);
-		b2d.drawLine(mouse.x, 0, mouse.x, 4); b2d.drawLine(mouse.x, getHeight()-4, mouse.x, getHeight());
-		b2d.drawLine(0, mouse.y, 4, mouse.y);
-		b2d.drawLine(getWidth() - 4, mouse.y, getWidth(), mouse.y);
-		b2d.drawRect(sx + w / 2, sy + h / 2, img_scale - 1, img_scale - 1);
+		int mx = sx + w / 2;
+		int my = sy + h / 2;
+		b2d.drawRect(mx, my, img_scale - 1, img_scale - 1);
+		b2d.drawLine(mx, 0, mx, 4); 
+		b2d.drawLine(mx, getHeight()-4,mx, getHeight());
+		b2d.drawLine(0, my, 4, my);
+		b2d.drawLine(getWidth() - 4, my, getWidth(), my);
 		b2d.setColor(new Color(244, 244, 244, 32));
 		b2d.fillRect(sx, sy, w, h);
 
@@ -100,15 +106,16 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		int line = 1;
 		w2d.drawString("FramesPS    "+dfps.fps(), 5, 15*line++);
 		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, 15*line++);
-		w2d.drawString("'0' to '9'  Place: "+left.shortName, 5, 15*line++);
-		w2d.drawString("'S'         Size: "+(small ? "Default" : "Large"), 5, 15*line++);
-		w2d.drawString("'Space'     Game: "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
+		w2d.drawString("Selected    "+left.shortName, 5, 15*line++);
+		w2d.drawString("'S'ize      "+(small ? "Default" : "Large"), 5, 15*line++);
+		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
 		w2d.drawString("'F'         Frame", 5, 15*line++);
+		w2d.drawString("Display '1' or '2' "+viewName, 5, 15*line++);
 		w2d.drawString("Parts       " + size, 5, 15 * line++);
 
 		Particle p = Cells.getParticleAt(mouse.x, mouse.y);
 		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
-		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.celcius+", Life: "+p.life) : "Empty", 5, getHeight()-10);
+		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.temp()+", Life: "+p.life) : "Empty", 5, getHeight()-10);
 		dfps.add();
 	}
 	
@@ -118,10 +125,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				c.part = null; // Why?
 			} else {
 				size++;
-				if(c.part!=null) {
+				try {
 					b2d.setColor(c.part.getColor());
+					if(view==1) b2d.setColor(c.part.getTempColor());
 					b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
-				}
+				} catch (NullPointerException e) {}
 			}
 		}
 	}
@@ -208,17 +216,20 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			draw_size+=2; updateMouse(mouse);
 			if(draw_size<0) draw_size = 0;
 		}
-
-		/*if(key=='0') left = Game.none;
-		if(key=='1') left = Game.dust;
-		if(key=='2') left = Game.salt;
-		if(key=='3') left = Game.dmnd;
-		if(key=='4') left = Game.metl;
-		if(key=='5') left = Game.gas;
-		if(key=='6') left = Game.sprk;
-		if(key=='7') left = Game.phot;
-		if(key=='8') left = Game.fire;
-		if(key=='9') left = Game.wood;*/ // I cannot be frucked to changed this right now
+		
+		if(key=='1') setView(0); // Default
+		if(key=='2') setView(1); // Temperature Display
+	}
+	
+	public void setView(int i) {
+		if(i==0) {
+			view = 0;
+			viewName = "Default";
+		}
+		if(i==1) {
+			view = 1;
+			viewName = "Temperature";
+		}
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {

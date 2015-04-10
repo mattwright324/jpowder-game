@@ -1,6 +1,6 @@
-package powder.elements;
+package main.java.powder.elements;
 
-import powder.particles.Particle;
+import main.java.powder.particles.Particle;
 
 public interface IElementMovement {
     void move(Particle p);

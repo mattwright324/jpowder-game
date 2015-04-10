@@ -1,7 +1,7 @@
-package powder.particles;
+package main.java.powder.particles;
 
-import powder.Cells;
-import powder.elements.Element;
+import main.java.powder.Cells;
+import main.java.powder.elements.Element;
 
 import java.awt.*;
 import java.util.Random;
@@ -45,7 +45,11 @@ public class Particle {
     public boolean burn() {
         return Math.random() < el.flammibility;
     }
-
+    
+    public boolean warmerThan(Particle p) {
+    	return celcius > p.celcius;
+    }
+    
     public boolean heavierThan(Particle p) {
         return el.weight > p.el.weight;
     }
@@ -53,11 +57,20 @@ public class Particle {
     public boolean lighterThan(Particle p) {
         return el.weight < p.el.weight;
     }
-
+    
+    public double temp() {
+    	 return Math.round(celcius * 10000.0) / 10000.0;
+    }
+    
     public Color getColor() { // EW
         return deco != null ? deco : el.getColor();
     }
-
+    
+    public Color getTempColor() {
+    	int c = (int) (Math.pow(10, String.valueOf((int) temp()).length()) / celcius % 200) + 55;
+    	return new Color(c, c, c);
+    }
+    
     public void setDeco(Color c) { // EW
         deco = c;
     }
@@ -88,8 +101,20 @@ public class Particle {
                 el.behaviour.update(this);
             if (el.movement != null)
                 el.movement.move(this);
-
-            if (life > 0) life--;
+            
+            for(int w=-1; w<2; w++)
+            	for(int h=-1; h<2; h++)
+            		if(Cells.particleAt(x+w, y+h) && !(w==0 && h==0)) {
+            			// Heat transfer? Doesn't work too well at the moment. Temperature view added but not good on fps.
+            			Particle p = Cells.getParticleAt(x+w, y+h);
+            			double diff = (celcius - p.celcius);
+            			p.celcius += (diff * 0.8);
+        				celcius = celcius - (diff * 0.1);
+        				if(celcius < -273.25) celcius = -273.25;
+        				if(celcius > 9725.85) celcius = 9725.85;
+            		}
+            
+            if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {
                 if (el.life_dmode == 1) setRemove(true);
                 if (el.life_dmode == 2) Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);

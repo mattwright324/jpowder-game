@@ -1,8 +1,8 @@
-package powder.elements;
+package main.java.powder.elements;
 
-import powder.Cells;
-import powder.particles.Particle;
-import powder.particles.ParticleBehaviour;
+import main.java.powder.Cells;
+import main.java.powder.particles.Particle;
+import main.java.powder.particles.ParticleBehaviour;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -14,15 +14,19 @@ public class Element {
     // Declare elements
     public static Element none = new Element(0, "NONE", Color.BLACK);
     public static Element dust = new Element(1, "DUST", "Dust", new Color(162, 168, 9));
-    public static Element dmnd = new Element(2, "DMND", "Diamond", new Color(32, 248, 228));
-    public static Element gas = new Element(3, "GAS", new Color(208, 180, 208));
-    public static Element warp = new Element(4, "WARP", new Color(32, 32, 32));
-    public static Element salt = new Element(5, "SALT", new Color(243, 243, 243));
-    public static Element metl = new Element(6, "METL", new Color(64, 64, 224));
-    public static Element phot = new Element(7, "PHOT", Color.WHITE);
-    public static Element fire = new Element(8, "FIRE", Color.RED);
-    public static Element wood = new Element(9, "WOOD", Color.ORANGE.darker());
+    public static Element dmnd = new Element(2, "DMND", "Diamond, indestructable!", new Color(32, 248, 228));
+    public static Element gas = new Element(3, "GAS", "Gas, flammable!",new Color(208, 180, 208));
+    public static Element warp = new Element(4, "WARP", "Warp", new Color(32, 32, 32));
+    public static Element salt = new Element(5, "SALT", "Salt", new Color(243, 243, 243));
+    public static Element metl = new Element(6, "METL", "Metal", new Color(64, 64, 224));
+    public static Element phot = new Element(7, "PHOT", "Light", Color.WHITE);
+    public static Element fire = new Element(8, "FIRE", "Fire", Color.RED);
+    public static Element wood = new Element(9, "WOOD", "Wood", Color.ORANGE.darker());
     public static Element sprk = new Element(10, "SPRK", "Spark", Color.YELLOW);
+    public static Element watr = new Element(11, "WATR", "Water", Color.BLUE);
+    public static Element plsm = new Element(12, "PLSM", "Plasma", new Color(180, 80, 180));
+    public static Element lava = new Element(13, "LAVA", "Molten material.", Color.ORANGE);
+    
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
             int ny = p.y + (int) p.vy;
@@ -49,19 +53,15 @@ public class Element {
             p.tryMove(nx, ny);
         }
     };
-    static IElementMovement em_fire = new IElementMovement() {
+    static IElementMovement em_liquid = new IElementMovement() {
         public void move(Particle p) {
-            int nx = p.x + (int) (p.vx = r.nextInt(3) - 1);
-            int ny = p.y + (int) (p.vy = r.nextInt(5) - 2 - r.nextInt(2));
-            Particle o = Cells.getParticleAt(nx, ny);
-            if (o != null) {
-                if (o.burn())
-                    Cells.setParticleAt(nx, ny, new Particle(p.el, nx, ny), true);
-                else if (p.heavierThan(o)) Cells.swap(p.x, p.y, nx, ny);
-            } else Cells.moveTo(p.x, p.y, nx, ny);
-            p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+            int nx = p.x + r.nextInt(5) - 2;
+            p.tryMove(nx, p.y);
+            int ny = p.y + r.nextInt(2);
+            p.tryMove(nx, ny);
         }
     };
+    
     // Element properties - fun!
     static {
         none.remove = true;
@@ -97,7 +97,8 @@ public class Element {
         metl.weight = 1000;
         metl.conducts = true;
         el_map.put(6, metl);
-
+        
+        phot.celcius = 922;
         phot.life = 1000;
         phot.life_dmode = 1;
         phot.setParticleBehaviour(new ParticleBehaviour() {
@@ -116,14 +117,23 @@ public class Element {
 
         fire.life = 120;
         fire.life_dmode = 1;
-        fire.setMovement(em_fire);
+        fire.celcius = 400;
+        fire.setMovement(em_gas);
         fire.setParticleBehaviour(new ParticleBehaviour() {
             public void init(Particle p) {
                 p.life += r.nextInt(50);
-                p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+                p.celcius += r.nextInt(20);
             }
 
             public void update(Particle p) {
+            	if(p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
+            	p.tryMove(p.x, p.y - (r.nextInt(4)-1));
+            	for(int w=0; w<3; w++)
+            		for(int h=0; h<3; h++)
+            			if(Cells.getParticleAt(p.x+(w-1), p.y+(h-1))!=null && Cells.getParticleAt(p.x+(w-1), p.y+(h-1)).burn()) {
+            				Cells.setParticleAt(p.x+(w-1), p.y+(h-1), new Particle(fire, p.y+(h-1), p.y+(h-1)), true);
+            			}
+            	p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
             }
         });
         el_map.put(8, fire);
@@ -157,6 +167,38 @@ public class Element {
             }
         });
         el_map.put(10, sprk);
+        
+        watr.setMovement(em_liquid);
+        watr.weight = 50;
+        watr.conducts = true;
+        el_map.put(11, watr);
+        
+        plsm.celcius = 9000;
+        plsm.life = 120;
+        plsm.life_dmode = 1;
+        plsm.sandEffect = true;
+        plsm.setParticleBehaviour(new ParticleBehaviour() {
+            public void init(Particle p) {
+                p.life += r.nextInt(50);
+                p.celcius += r.nextInt(20);
+            }
+
+            public void update(Particle p) {
+            	p.tryMove(p.x, p.y - (r.nextInt(4)-1));
+            	for(int w=0; w<3; w++)
+            		for(int h=0; h<3; h++)
+            			if(Cells.getParticleAt(p.x+(w-1), p.y+(h-1))!=null && Cells.getParticleAt(p.x+(w-1), p.y+(h-1)).burn()) {
+            				Cells.setParticleAt(p.x+(w-1), p.y+(h-1), new Particle(fire, p.y+(h-1), p.y+(h-1)), true);
+            			}
+            }
+        });
+        el_map.put(12, plsm);
+        
+        lava.setMovement(em_liquid);
+        lava.weight = 50;
+        lava.celcius = 1100;
+        lava.conducts = true;
+        el_map.put(13, lava);
     }
 
     public int id = 0;
