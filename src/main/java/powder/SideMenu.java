@@ -1,6 +1,6 @@
-package powder;
+package main.java.powder;
 
-import powder.elements.Element;
+import main.java.powder.elements.Element;
 
 import javax.swing.*;
 import java.awt.*;

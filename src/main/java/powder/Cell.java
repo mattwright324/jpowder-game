@@ -1,6 +1,6 @@
-package powder;
+package main.java.powder;
 
-import powder.particles.Particle;
+import main.java.powder.particles.Particle;
 
 public class Cell {
     public int x, y;

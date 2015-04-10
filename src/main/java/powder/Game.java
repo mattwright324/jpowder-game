@@ -1,9 +1,10 @@
-package powder;
+package main.java.powder;
 
 import java.util.Random;
 
 
 public class Game extends Thread {
+	
 	static boolean paused = false;
 	static Display.FPS gfps = new Display.FPS();
 	static Random r = new Random();
@@ -11,11 +12,10 @@ public class Game extends Thread {
 	static void update() {
 		for (int w = 0; w < Display.width; w++) {
 			for (int h = 0; h < Display.height; h++) {
-				if (Cells.getParticleAt(w, h) != null) {
+				if (Cells.particleAt(w, h)) {
 					try {
 						Cells.cells[w][h].part.update();
-					} catch (NullPointerException ignored) {
-					}
+					} catch (NullPointerException e) {}
 				}
 			}
 		}
@@ -35,22 +35,13 @@ public class Game extends Thread {
 		start();
 	}
 
-	@SuppressWarnings("deprecation") // Ew
-	public void stopUpdateThread() {
-		stop();
-	}
-
 	public void run() {
 		gfps.start();
 		while (isAlive()) {
-			if (Cells.cells != null && !paused) {
-				update();
-				gfps.add();
-			}
+			if(Cells.cells[0][0] != null && !paused) update();
 			try {
 				Thread.sleep(25);
-			} catch (InterruptedException ignored) {
-			}
+			} catch (InterruptedException e) {}
 		}
 	}
 
