@@ -35,6 +35,33 @@ public class Element {
     };
     private static Random r = new Random();
 
+    static IElementMovement em_powder = new IElementMovement() {
+        public void move(Particle p) {
+            int ny = p.y + 1;
+            int nx = p.x + r.nextInt(3) - 1;
+            p.tryMove(nx, ny);
+        }
+    };
+    static IElementMovement em_gas = new IElementMovement() {
+        public void move(Particle p) {
+            int ny = p.y + (r.nextInt(3) - 1) + (int) p.vy;
+            int nx = p.x + (r.nextInt(3) - 1) + (int) p.vx;
+            p.tryMove(nx, ny);
+        }
+    };
+    static IElementMovement em_fire = new IElementMovement() {
+        public void move(Particle p) {
+            int nx = p.x + (int) (p.vx = r.nextInt(3) - 1);
+            int ny = p.y + (int) (p.vy = r.nextInt(5) - 2 - r.nextInt(2));
+            Particle o = Cells.getParticleAt(nx, ny);
+            if (o != null) {
+                if (o.burn())
+                    Cells.setParticleAt(nx, ny, new Particle(p.el, nx, ny), true);
+                else if (p.heavierThan(o)) Cells.swap(p.x, p.y, nx, ny);
+            } else Cells.moveTo(p.x, p.y, nx, ny);
+            p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+        }
+    };
     // Element properties - fun!
     static {
         none.remove = true;
@@ -138,37 +165,11 @@ public class Element {
     public String shortName = "ELEM";
     public String description = "Element description.";
     public int weight = 10;
-    static IElementMovement em_powder = new IElementMovement() {
-        public void move(Particle p) {
-            int ny = p.y + 1;
-            int nx = p.x + r.nextInt(3) - 1;
-            p.tryMove(nx, ny);
-        }
-    };
-    static IElementMovement em_gas = new IElementMovement() {
-        public void move(Particle p) {
-            int ny = p.y + (r.nextInt(3) - 1) + (int) p.vy;
-            int nx = p.x + (r.nextInt(3) - 1) + (int) p.vx;
-            p.tryMove(nx, ny);
-        }
-    };
+
     public long life = 0;
     public double celcius = 0.0;
     public boolean remove = false;
     public double flammibility = 0;
-    static IElementMovement em_fire = new IElementMovement() {
-        public void move(Particle p) {
-            int nx = p.x + (int) (p.vx = r.nextInt(3) - 1);
-            int ny = p.y + (int) (p.vy = r.nextInt(5) - 2 - r.nextInt(2));
-            Particle o = Cells.getParticleAt(nx, ny);
-            if (o != null) {
-                if (o.burn())
-                    Cells.setParticleAt(nx, ny, new Particle(p.el, nx, ny), true);
-                else if (p.heavierThan(o)) Cells.swap(p.x, p.y, nx, ny);
-            } else Cells.moveTo(p.x, p.y, nx, ny);
-            p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
-        }
-    };
     public boolean conducts = false;
     public boolean sandEffect = false;
     public boolean life_decay = true;
