@@ -1,11 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'application'
-// For future usage.
+sourceCompatibility = 1.5
+version = '0.0.1'
+
 repositories {
     mavenCentral()
 }
-jar {
-    baseName = 'jpowder-game'
-    version =  '0.0.1'
-}
-mainClassName = 'powder.Window' //wtf
+
+mainClassName = "powder.Main"

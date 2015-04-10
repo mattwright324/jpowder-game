@@ -8,3 +8,8 @@
 # Gradle junk
 build/
 .gradle
+
+# Idea junk
+.idea
+jpowder-game.iml
+

@@ -1,9 +1,7 @@
 package powder;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
 import javax.swing.*;
+import java.awt.*;
 
 public class Window extends JFrame {
 	
@@ -13,9 +11,6 @@ public class Window extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public static Window window = new Window();
-	public static void main(String[] args) {
-		window.setVisible(true);
-	}
 	
 	public Display game;
 	public SideMenu menu;
