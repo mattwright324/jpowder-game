@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'application'
+// For future usage.
+repositories {
+    mavenCentral()
+}
+jar {
+    baseName = 'jpowder-game'
+    version =  '0.0.1'
+}
+mainClassName = 'powder.Window' //wtf
