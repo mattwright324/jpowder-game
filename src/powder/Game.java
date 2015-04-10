@@ -1,6 +1,8 @@
 package powder;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import powder.Display.FPS;
@@ -24,11 +26,7 @@ public class Game extends Thread {
 		gfps.start();
 		while(isAlive()) {
 			if(cells!=null && !paused) {
-				for(int w=0; w<Display.width; w++) {
-					for(int h=0; h<Display.height; h++) {
-						if(getParticleAt(w, h)!=null) cells[w][h].part.update();
-					}
-				}
+				update();
 				gfps.add();
 			}
 			try {
@@ -37,12 +35,20 @@ public class Game extends Thread {
 		}
 	}
 	
+	static void update() {
+		for(int w=0; w<Display.width; w++) {
+			for(int h=0; h<Display.height; h++) {
+				if(getParticleAt(w, h)!=null) try{cells[w][h].part.update();}catch(NullPointerException e){};
+			}
+		}
+		gfps.add();
+	}
+	
 	static Random r = new Random();
 	
-	static Cell[][] cells = new Cell[Display.width][Display.height];
+	final static Cell[][] cells = new Cell[Display.width][Display.height];;
 	
 	static void make_cells() {
-		cells = new Cell[Display.width][Display.height];
 		for(int w=0; w<Display.width; w++) {
 			for(int h=0; h<Display.height; h++) {
 				cells[w][h] = new Cell(w, h);
@@ -127,8 +133,8 @@ public class Game extends Thread {
 	
 	static ElementMovement em_gas = new ElementMovement() {
 		public void move(Particle p) {
-			int ny = p.y + r.nextInt(3) - 1;
-			int nx = p.x + r.nextInt(3) - 1;
+			int ny = p.y + (r.nextInt(3) - 1) + (int)p.vy;
+			int nx = p.x + (r.nextInt(3) - 1) + (int)p.vx;
 			p.tryMove(nx, ny);
 		}
 	};
@@ -137,51 +143,129 @@ public class Game extends Thread {
 		public void move(Particle p) {
 			int ny = p.y + (int) p.vx;
 			int nx = p.x + (int) p.vy;
-			p.tryMove(nx, ny);
+			if(!particleAt(nx, ny))
+				moveTo(p.x, p.y, nx, ny);
+			else
+				p.setRemove(true);
 		}
 	};
 	
+	static ElementMovement em_fire = new ElementMovement() {
+		public void move(Particle p) {
+			int nx = p.x + (int) (p.vx = r.nextInt(3)-1);
+			int ny = p.y + (int) (p.vy = r.nextInt(5)-2 - r.nextInt(2));
+			Particle o = getParticleAt(nx, ny);
+			if(o!=null) {
+				if(o.burn())
+					setParticleAt(nx, ny, new Particle(p.el, nx, ny), true);
+				else if(p.heavierThan(o)) swap(p.x, p.y, nx, ny);
+			} else moveTo(p.x, p.y, nx, ny);
+			p.setDeco(new Color((int)p.life, r.nextInt(20), r.nextInt(20)));
+		}
+	};
+	
+	final static Map<Integer, Element> el_map = new HashMap<Integer, Element>();
+	
 	static Element dust, salt;
-	static Element none, dmnd, metl;
-	static Element gas, warp;
+	static Element none, dmnd, metl, wood, sprk;
+	static Element gas, warp, fire;
 	static Element phot;
 	
 	static {
 		none = new Element(0, "NONE", Color.BLACK);
 		none.remove = true;
 		none.weight = -Integer.MAX_VALUE;
+		el_map.put(0, none);
 		
 		dust = new Element(1, "DUST", "Dust", new Color(180, 180, 30));
 		dust.weight = 100;
+		dust.flammibility = 0.6;
 		dust.sandEffect = true;
 		dust.setMovement(em_powder);
+		el_map.put(1, dust);
 		
 		dmnd = new Element(2, "DMND", "Diamond", new Color(204, 204, 248));
 		dmnd.weight = Integer.MAX_VALUE;
-		dmnd.setMovement(null);
+		el_map.put(2, dmnd);
 		
 		gas = new Element(3, "GAS", new Color(208, 180, 208));
 		gas.weight = 5;
+		gas.flammibility = 0.8;
 		gas.sandEffect = true;
 		gas.setMovement(em_gas);
+		el_map.put(3, gas);
 		
 		warp = new Element(4, "WARP", new Color(32, 32, 32));
 		warp.weight = Integer.MAX_VALUE;
-		warp.life = 250 + r.nextInt(100);
+		warp.life = 300;
+		warp.life_dmode = 1;
 		warp.setMovement(em_gas);
+		el_map.put(4, warp);
 		
 		salt = new Element(5, "SALT", new Color(244, 243, 243));
 		salt.weight = 100;
 		salt.sandEffect = true;
 		salt.setMovement(em_powder);
+		el_map.put(5, salt);
 		
 		metl = new Element(6, "METL", new Color(64, 64, 224));
 		metl.weight = 1000;
-		metl.setMovement(null);
+		metl.conducts = true;
+		el_map.put(6, metl);
 		
 		phot = new Element(7, "PHOT", Color.WHITE);
 		phot.life = 1000;
+		phot.life_dmode = 1;
+		phot.setParticleInit(new ParticleInit(){
+			public void init(Particle p) {
+				while(p.vx==0 && p.vy==0) {
+					p.vx = 3 * (r.nextInt(3)-1);
+					p.vy = 3 * (r.nextInt(3)-1);
+				}
+			}
+		});
 		phot.setMovement(em_phot);
+		el_map.put(7, phot);
+		
+		fire = new Element(8, "FIRE", Color.RED);
+		fire.life = 120;
+		fire.life_dmode = 1;
+		fire.setMovement(em_fire);
+		fire.setParticleInit(new ParticleInit(){
+			public void init(Particle p) {
+				p.life += r.nextInt(50);
+				p.setDeco(new Color((int)p.life, r.nextInt(20), r.nextInt(20)));
+			}
+		});
+		el_map.put(8, fire);
+		
+		wood = new Element(9, "WOOD", Color.ORANGE.darker());
+		wood.flammibility = 0.5;
+		wood.weight = 500;
+		el_map.put(9, wood);
+		
+		sprk = new Element(10, "SPRK", "Spark", Color.YELLOW);
+		sprk.life = 4;
+		sprk.life_dmode = 2;
+		sprk.setParticleUpdate(new ParticleUpdate(){
+			public void update(Particle p) {
+				if(p.life==4)
+				for(int w=0; w<5; w++)
+					for(int h=0; h<5; h++) {
+						int x = p.x - (w-2);
+						int y = p.y - (h-2);
+						if(valid(x, y)) {
+							Particle o = getParticleAt(x, y);
+							if(o!=null) {
+								Particle s = new Particle(sprk, x, y);
+								s.ctype = o.el.id;
+								if(o.el.conducts && o.life==0) setParticleAt(x, y, s, true);
+							}
+						}
+					}
+			}
+		});
+		el_map.put(10, sprk);
 	}
 	
 	static class Element {
@@ -212,15 +296,18 @@ public class Game extends Thread {
 		
 		public int id = 0;
 		public String shortName = "ELEM";
-		public String longName = "Element";
 		public String description = "Element description.";
 		
 		public int weight = 10;
 		public long life = 0;
 		public double celcius = 0.0;
 		public boolean remove = false;
-		
+		public double flammibility = 0;
+		public boolean conducts = false;
 		public boolean sandEffect = false;
+		
+		public boolean life_decay = true;
+		public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
 		
 		public boolean heavierThan(Element e) {
 			return e.weight > weight;
@@ -241,9 +328,18 @@ public class Game extends Thread {
 		}
 		
 		public ElementMovement movement;
-		
 		public void setMovement(ElementMovement em) {
 			movement = em;
+		}
+		
+		public ParticleInit init;
+		public void setParticleInit(ParticleInit pi) {
+			init = pi;
+		}
+		
+		public ParticleUpdate update;
+		public void setParticleUpdate(ParticleUpdate pu) {
+			update = pu; 
 		}
 	}
 	
@@ -257,17 +353,28 @@ public class Game extends Thread {
 			this.celcius = el.celcius;
 			setRemove(el.remove);
 			if(el.sandEffect) addSandEffect();
+			if(el.init!=null) el.init.init(this);
 		}
 		
 		public Particle(Element e, int x, int y, long life, double celcius) {
-			this(e, x, y);
+			el = e;
+			this.x = x;
+			this.y = y;
 			this.life = life;
 			this.celcius = celcius;
 			setRemove(el.remove);
+			if(el.sandEffect) addSandEffect();
+			if(el.init!=null) el.init.init(this);
 		}
 		
 		public Element el;
 		public int x, y;
+		
+		public int ctype = 0;
+		
+		public boolean burn() {
+			return Math.random() < el.flammibility;
+		}
 		
 		public boolean heavierThan(Particle p) {
 			return  el.weight > p.el.weight;
@@ -282,7 +389,6 @@ public class Game extends Thread {
 		}
 		
 		public Color deco;
-		
 		public void setDeco(Color c) {
 			deco = c;
 		}
@@ -316,11 +422,17 @@ public class Game extends Thread {
 		
 		public void update() {
 			if(ready()) {
+				if(el.update!=null)
+					el.update.update(this);
 				if(el.movement!=null)
 					el.movement.move(this);
 				
-				if(life>=1) life--;
-				if(!validGame(x, y) || life-1==0) setRemove(true);
+				if(life>0) life--;
+				if(life-1==0) {
+					if(el.life_dmode == 1) setRemove(true);
+					if(el.life_dmode == 2) setParticleAt(x, y, new Particle(el_map.get(ctype), x, y), true);
+				}
+				if(!validGame(x, y)) setRemove(true);
 				last_update = System.currentTimeMillis();
 			}
 		}
@@ -337,5 +449,13 @@ public class Game extends Thread {
 	
 	static interface ElementMovement {
 		public void move(Particle p);
+	}
+	
+	static interface ParticleInit {
+		public void init(Particle p);
+	}
+	
+	static interface ParticleUpdate {
+		public void update(Particle p);
 	}
 }

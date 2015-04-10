@@ -16,8 +16,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	private static final long serialVersionUID = 1L;
 	
-	static int width = 612;
-	static int height = 384;
+	final static int width = 612;
+	final static int height = 384;
 	
 	static int img_scale = 1;
 	
@@ -46,7 +46,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		Window.window.resize();
 	}
 	
-	public Timer timer = new Timer(1, this);
+	public Timer timer = new Timer(5, this);
 	
 	public Point mouse = new Point(0,0);
 	
@@ -70,8 +70,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	static Graphics2D w2d;
-	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	static Graphics2D b2d = img.createGraphics();
+	static Font typeface = new Font ("Monospaced", Font.PLAIN, 12); 
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -85,55 +86,72 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				draw_cell(Game.cells[w][h]);
 		
 		b2d.setColor(Color.LIGHT_GRAY);
-		int sx = mstart.x * img_scale; int ex = (mstop.x-mstart.x) * img_scale;
-		int sy = mstart.y * img_scale; int ey = (mstop.y-mstart.y) * img_scale;
-		b2d.drawRect(sx, sy, ex, ey);
+		int sx = mstart.x * img_scale; int w = (mstop.x-mstart.x) * img_scale;
+		int sy = mstart.y * img_scale; int h = (mstop.y-mstart.y) * img_scale;
+		b2d.drawRect(sx, sy, w, h);
+		//b2d.drawOval(sx, sy, w, h);
+		b2d.drawLine(mouse.x, 0, mouse.x, 4); b2d.drawLine(mouse.x, getHeight()-4, mouse.x, getHeight());
+		b2d.drawLine(0, mouse.y, 4, mouse.y); b2d.drawLine(getWidth()-4, mouse.y, getWidth(), mouse.y);
+		b2d.drawRect(sx + w/2, sy + h/2, img_scale-1, img_scale-1);
 		b2d.setColor(new Color(244,244,244,32));
-		b2d.fillRect(sx, sy, ex, ey);
+		b2d.fillRect(sx, sy, w, h);
 		
 		w2d.drawImage(img, null, 0, 0);
 		w2d.setColor(Color.WHITE);
 		w2d.setXORMode(Color.BLACK);
+		w2d.setFont(typeface);
 		int line = 1;
-		w2d.drawString("FramesPS: "+dfps.average(), 5, 15*line++);
-		w2d.drawString("UpdatesPS: "+Game.gfps.fps(), 5, 15*line++);
-		w2d.drawString("'0' to '7' Place: "+left.shortName, 5, 15*line++);
-		w2d.drawString("'S'        Size: "+(small ? "Default" : "Large"), 5, 15*line++);
-		w2d.drawString("'Space'    Game: "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
-		w2d.drawString("Parts: "+size, 5, 15*line++);
+		w2d.drawString("FramesPS    "+dfps.fps(), 5, 15*line++);
+		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, 15*line++);
+		w2d.drawString("'0' to '9'  Place: "+left.shortName, 5, 15*line++);
+		w2d.drawString("'S'         Size: "+(small ? "Default" : "Large"), 5, 15*line++);
+		w2d.drawString("'Space'     Game: "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
+		w2d.drawString("'F'         Frame", 5, 15*line++);
+		w2d.drawString("Parts       "+size, 5, 15*line++);
 		
 		Particle p = Game.getParticleAt(mouse.x, mouse.y);
-		w2d.drawString("X: "+mouse.x+" Y:"+mouse.y, 5, getHeight()-30);
-		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.celcius+", Life: "+p.life) : "Empty", 5, getHeight()-15);
+		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
+		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.celcius+", Life: "+p.life) : "Empty", 5, getHeight()-10);
 		dfps.add();
 	}
 	
 	public int size = 0;
 	public void draw_cell(Cell c) {
 		if(c.part!=null) {
-			if(c.part.el.remove)
+			if(c.part.remove()) {
 				c.part = null;
-			else {
+			} else {
 				size++;
-				b2d.setColor(c.part.getColor());
-				b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
+				if(c.part!=null) {
+					b2d.setColor(c.part.getColor());
+					b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
+				}
 			}
 		}
 	}
 	
-	public Element left = Game.dust;
-	public Element right = Game.none;
+	static Element left = Game.dust;
+	static Element right = Game.none;
 	
 	public void place(Element e) {
 		for(int x=mstart.x; x<=mstop.x; x++)
-			for(int y=mstart.y; y<=mstop.y; y++)
-				Game.setParticleAt(x, y, new Particle(e, x, y), e==Game.none);
+			for(int y=mstart.y; y<=mstop.y; y++) {
+				Game.setParticleAt(x, y, new Particle(e, x, y), e==Game.none || (Game.particleAt(x, y) && Game.getParticleAt(x, y).el.conducts && left==Game.sprk));
+			}
+	}
+	
+	public Point screenToMouse(Point p) {
+		return new Point(p.x / img_scale, p.y / img_scale);
+	}
+	
+	public void updateMouse(Point p) {
+		mouse = p;
+		mstart = new Point(mouse.x-draw_size/2,mouse.y-draw_size/2);
+		mstop = new Point(mstart.x+draw_size, mstart.y+draw_size);
 	}
 	
 	public void mouseDragged(MouseEvent e) {
-		mouse = e.getPoint();
-		mstart = new Point(mouse.x-draw_size/2,mouse.y-draw_size/2);
-		mstop = new Point(mstart.x+draw_size, mstart.y+draw_size);
+		updateMouse(screenToMouse(e.getPoint()));
 		if(SwingUtilities.isLeftMouseButton(e))
 			place(left);
 		if(SwingUtilities.isRightMouseButton(e))
@@ -141,9 +159,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		mouse = e.getPoint();
-		mstart = new Point(mouse.x-draw_size/2,mouse.y-draw_size/2);
-		mstop = new Point(mstart.x+draw_size, mstart.y+draw_size);
+		updateMouse(screenToMouse(e.getPoint()));
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -163,6 +179,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			place(left);
 		if(SwingUtilities.isRightMouseButton(e))
 			place(right);
+		if(SwingUtilities.isMiddleMouseButton(e)) {
+			Particle m = Game.getParticleAt(mouse.x, mouse.y);
+			if(m!=null) left = m.el;
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -181,6 +201,19 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		int key = e.getKeyChar();
 		if(key==' ') Game.paused = !Game.paused;
 		if(key=='s') if(small) makeLarge(); else makeSmall();
+		if(key=='f') {
+			Game.paused = true;
+			Game.update();
+		}
+		
+		if(key=='[') {
+			draw_size-=2; updateMouse(mouse);
+			if(draw_size<0) draw_size = 0;
+		}
+		if(key==']') {
+			draw_size+=2; updateMouse(mouse);
+			if(draw_size<0) draw_size = 0;
+		}
 		
 		if(key=='0') left = Game.none;
 		if(key=='1') left = Game.dust;
@@ -188,8 +221,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(key=='3') left = Game.dmnd;
 		if(key=='4') left = Game.metl;
 		if(key=='5') left = Game.gas;
-		if(key=='6') left = Game.warp;
+		if(key=='6') left = Game.sprk;
 		if(key=='7') left = Game.phot;
+		if(key=='8') left = Game.fire;
+		if(key=='9') left = Game.wood;
 	}
 	
 	public int draw_size = 0;
@@ -232,9 +267,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 					
 					total+=fps;
 					avg = total / seconds;
+					if(seconds > 60) resetAverage();
 				}
 				try {
-					Thread.sleep(10);
+					Thread.sleep(25);
 				} catch (InterruptedException e) {}
 			}
 		}

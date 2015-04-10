@@ -17,21 +17,26 @@ public class Window extends JFrame {
 		window.setVisible(true);
 	}
 	
+	public Display game;
+	public SideMenu menu;
 	public Window() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
 		setTitle("Powder Game");
 		setResizable(false);
 		
-		Display game = new Display();
-		game.setSize(Display.width, Display.height);
+		game = new Display();
 		add(game, BorderLayout.CENTER);
+		
+		menu = new SideMenu();
+		menu.setPreferredSize(new Dimension(menu.width, menu.height));
+		add(menu, BorderLayout.EAST);
 		
 		resize();
 	}
 	
 	public void resize() {
-		getContentPane().setPreferredSize(new Dimension(Display.width*Display.img_scale, Display.height*Display.img_scale));
+		getContentPane().setPreferredSize(new Dimension(Display.width*Display.img_scale + menu.width, Display.height*Display.img_scale));
 		pack();
 	}
 }
