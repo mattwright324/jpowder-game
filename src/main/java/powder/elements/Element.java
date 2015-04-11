@@ -48,12 +48,18 @@ public class Element {
             double plottedX = p.x + p.vx;
             double plottedY = p.y + p.vy;
             // Shitty particle detection
-            if (Cells.particleAt((int)plottedX, (int)plottedY)) {
+            // Please improve
+            // Added check for no collision with other radioactive particles
+            Particle collide;
+            if ((collide = Cells.getParticleAt((int)plottedX, (int)plottedY)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vy = -p.vy;
                 p.vx = -p.vx;
-            } else if (Cells.particleAt((int)plottedX, p.y)) {
+            } else if ((collide = Cells.getParticleAt((int)plottedX, p.y)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vx = - p.vx;
-            } else if (Cells.particleAt(p.x, (int)plottedY)) {
+            } else if ((collide = Cells.getParticleAt(p.x, (int)plottedY)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vy = -p.vy;
             }
             p.tryMove((int)plottedX, (int)plottedY);
@@ -218,7 +224,7 @@ public class Element {
         phot.life = 1000;
         phot.life_dmode = 1;
         phot.setParticleBehaviour(phot_behaviour);
-        phot.setMovement(em_phot);
+        phot.setMovement(em_radioactive);
         el_map.put(7, phot);
 
         fire.life = 120;
@@ -275,6 +281,7 @@ public class Element {
 
         radp.weight = 0;
         radp.convMelt = false;
+        radp.life_dmode = 1;
         radp.setMovement(em_radioactive);
         radp.setParticleBehaviour(radioactive_behaviour);
         el_map.put(16, radp);

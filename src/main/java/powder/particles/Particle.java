@@ -127,7 +127,9 @@ public class Particle {
             
             if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {
+                // Delete mode
                 if (el.life_dmode == 1) setRemove(true);
+                // Decay mode
                 if (el.life_dmode == 2) Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
             }
             if (!Cells.validGame(x, y)) setRemove(true);
