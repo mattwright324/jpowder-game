@@ -109,7 +109,6 @@ public class Particle {
             for(int w=-1; w<2; w++)
             	for(int h=-1; h<2; h++)
             		if(Cells.particleAt(x+w, y+h) && !(w==0 && h==0)) {
-            			// Heat transfer? Doesn't work too well at the moment. Temperature view added but not good on fps.
             			Particle p = Cells.getParticleAt(x+w, y+h);
             			double diff = (celcius - p.celcius);
             			double trans = p.el.heatTransfer;

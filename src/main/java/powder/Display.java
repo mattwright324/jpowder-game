@@ -40,6 +40,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for (int w = 0; w < Display.width; w++)
 			for (int h = 0; h < Display.height; h++) 
 				Cells.cells[w][h] = new Cell(w, h);
+		for (int w = 0; w < Display.width/4; w++)
+			for (int h = 0; h < Display.height/4; h++) 
+				Cells.cellsb[w][h] = new BigCell(w, h);
 		game.startUpdateThread();
 		timer.start();
 		dfps.start();
@@ -100,7 +103,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		b2d.drawLine(getWidth() - 4, my, getWidth(), my);
 		b2d.setColor(new Color(244, 244, 244, 32));
 		b2d.fillRect(sx, sy, w, h);
-
+		
 		w2d.drawImage(img, null, 0, 0);
 		w2d.setColor(Color.WHITE);
 		w2d.setXORMode(Color.BLACK);

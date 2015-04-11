@@ -3,15 +3,19 @@ package main.java.powder;
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
-import java.util.ArrayList;
-
 public class Cells {
 	
-	//final static Cell[][] grid = new Cell[Display.width/4][Display.height/4]; // for air/wall grid
+	// TODO Wall & Air Grid
+	
+	final static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
     final static Cell[][] cells = new Cell[Display.width][Display.height];
     
     public static boolean valid(int x, int y) {
         return !(x < 0 || y < 0 || x >= Display.width || y >= Display.height);
+    }
+    
+    public static boolean validGame(int x, int y) {
+        return !(x < 4 || y < 4 || x >= Display.width - 4 || y >= Display.height - 4);
     }
     
     public static Particle getParticleAt(int x, int y) {
@@ -30,19 +34,15 @@ public class Cells {
     	int p = 0;
     	for(int w=0; w<3; w++)
     		for(int h=0; h<3; h++)
-    			if(!(w==0 && h==0))
+    			if(!(w-1==0 && h-1==0))
     				tmp[p++] = getParticleAt(x+(w-1), x+(h-1));
         return tmp;
     }
-
+    
     public static boolean particleAt(int x, int y) {
         return !valid(x, y) || cells[x][y].part != null;
     }
-
-    public static boolean validGame(int x, int y) {
-        return !(x < 4 || y < 4 || x >= Display.width - 4 || y >= Display.height - 4);
-    }
-
+    
     public static void setParticleAt(int x, int y, Particle p, boolean insert) {
         if (!valid(x, y)) return;
         if (!insert && particleAt(x, y)) return;

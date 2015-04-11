@@ -5,7 +5,6 @@ import main.java.powder.particles.Particle;
 import main.java.powder.particles.ParticleBehaviour;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -45,26 +44,27 @@ public class Element {
     };
 
     static IElementMovement em_radioactive = new IElementMovement() {
-        @Override
         public void move(Particle p) {
             double plottedX = p.x + p.vx;
             double plottedY = p.y + p.vy;
             // Shitty particle detection
             // Please improve
             // Added check for no collision with other radioactive particles
-            Particle collide;
-            if ((collide = Cells.getParticleAt((int)plottedX, (int)plottedY)) != null &&
-                    (collide.el != Element.radp || collide.el != Element.phot)) {
+            if(rad_collide(plottedX, plottedY)) {
                 p.vy = -p.vy;
                 p.vx = -p.vx;
-            } else if ((collide = Cells.getParticleAt((int)plottedX, p.y)) != null &&
-                    (collide.el != Element.radp || collide.el != Element.phot)) {
-                p.vx = - p.vx;
-            } else if ((collide = Cells.getParticleAt(p.x, (int)plottedY)) != null &&
-                    (collide.el != Element.radp || collide.el != Element.phot)) {
+            } else if(rad_collide(plottedX, p.y)) {
+                p.vx = -p.vx;
+            } else if(rad_collide(p.x, plottedY)) {
                 p.vy = -p.vy;
             }
             p.tryMove((int)plottedX, (int)plottedY);
+        }
+        
+        public Particle collide;
+        public boolean rad_collide(double x, double y) {
+        	return (collide = Cells.getParticleAt((int)x, (int)y)) != null &&
+        			(collide.el != Element.radp || collide.el != Element.phot);
         }
     };
 
@@ -123,14 +123,11 @@ public class Element {
     };
 
     static ParticleBehaviour plutonium_behaviour = new ParticleBehaviour() {
-        @Override
         public void init(Particle p) {
             p.life = r.nextInt(400) + 100;
         }
-        @Override
-        public void update(Particle p) {
-        }
-        @Override
+        public void update(Particle p) {}
+        
         public void destruct(Particle p) {
             for (int x = p.x - 1; x <= p.x + 1; x++) {
                 for (int y = p.y - 1; x <= p.y + 1; y++) {
@@ -139,7 +136,7 @@ public class Element {
             }
             // Set self to neutron
             Cells.setParticleAt(p.x, p.y, new Particle(Element.radp, p.x, p.y), true);
-            // Instantly update, causing a decay cascade.
+            // Instantly update, causing a decay cascade. This looks cool especially in temp view.
             Element.radp.behaviour.update(Cells.getParticleAt(p.x, p.y));
         }
     };

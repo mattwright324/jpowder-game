@@ -6,6 +6,8 @@ public class Cell {
     public int x, y;
     public Particle part;
     
+    // TODO Stacked Particles ?
+    
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;
