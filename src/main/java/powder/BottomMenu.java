@@ -31,6 +31,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	public Rectangle clear = new Rectangle(5, 5, 40, 40);
 	public Rectangle resize = new Rectangle(5+45, 5, 40, 40);
 	public Rectangle pause = new Rectangle(5+90, 5, 40, 40);
+	public Rectangle view = new Rectangle(5+135, 5, 40, 40);
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g2d = (Graphics2D) g;
@@ -42,17 +43,20 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		g2d.draw(clear);
 		g2d.draw(resize);
 		g2d.draw(pause);
+		g2d.draw(view);
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("NEW", clear.x+5, 30);
 		g2d.drawString("SIZE", resize.x+5, 30);
 		g2d.fillRect(pause.x+12, pause.y+5, 5, pause.height-9);
 		g2d.fillRect(pause.x+22, pause.y+5, 5, pause.height-9);
+		g2d.drawString("VIEW", view.x+5, 30);
 	}
 	
 	public void mouseClicked(MouseEvent e) {
 		if(clear.contains(e.getPoint())) Cells.setAllOfAs(-1, Element.none);
 		if(resize.contains(e.getPoint())) Display.toggle_size();
 		if(pause.contains(e.getPoint())) Display.toggle_pause();
+		if(view.contains(e.getPoint())) if(Display.view == 0) Display.view = 1; else Display.view = 0; 
 	}
 
 	public void mouseEntered(MouseEvent e) {

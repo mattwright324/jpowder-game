@@ -112,8 +112,9 @@ public class Particle {
             			// Heat transfer? Doesn't work too well at the moment. Temperature view added but not good on fps.
             			Particle p = Cells.getParticleAt(x+w, y+h);
             			double diff = (celcius - p.celcius);
-            			p.celcius += (diff * 0.8);
-        				celcius = celcius - (diff * 0.1);
+            			double trans = p.el.heatTransfer;
+            			p.celcius += (diff * trans);
+        				celcius = celcius - (diff * trans);
         				if(celcius < -273.25) celcius = -273.25;
         				if(celcius > 9725.85) celcius = 9725.85;
             		}

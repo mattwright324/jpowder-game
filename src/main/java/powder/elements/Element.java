@@ -206,6 +206,13 @@ public class Element {
         metl.weight = 1000;
         metl.conducts = true;
         metl.convertToAt(lava, 1000);
+        metl.setParticleBehaviour(new ParticleBehaviour() {
+			public void init(Particle p) {}
+			public void update(Particle p) {
+				double c = p.celcius / p.el.convAt;
+				p.setDeco(new Color((int) (255.0 * c) % 255, (int) (255.0 * c) % 255, 224));
+			}
+        });
         el_map.put(6, metl);
         
         phot.celcius = 922;
@@ -288,6 +295,7 @@ public class Element {
     public Element conv;
     public double convAt = 22.0;
     public boolean convMelt = true; // true = <  false = >
+    public double heatTransfer = 0.3;
     
     public void convertToAt(Element e, double temp) {
     	conv = e;
