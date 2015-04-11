@@ -84,6 +84,37 @@ public class Element {
         }
     };
 
+    static ParticleBehaviour phot_behaviour = new ParticleBehaviour() {
+        public void init(Particle p) {
+            while (p.vx == 0 && p.vy == 0) {
+                p.vx = 3 * (r.nextInt(3) - 1);
+                p.vy = 3 * (r.nextInt(3) - 1);
+            }
+        }
+
+        public void update(Particle p) {
+        }
+    };
+
+    static ParticleBehaviour fire_behaviour = new ParticleBehaviour() {
+        public void init(Particle p) {
+            p.life += r.nextInt(50);
+            p.celcius += r.nextInt(20);
+        }
+
+        public void update(Particle p) {
+            // Change to plasma above 1000 Celius
+            if (p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
+            p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
+            for (int w = 0; w < 3; w++)
+                for (int h = 0; h < 3; h++)
+                    if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
+                        Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y + (h - 1), p.y + (h - 1)), true);
+                    }
+            p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+        }
+    };
+
     static ParticleBehaviour radioactive_behaviour = new ParticleBehaviour() {
         @Override
         public void init(Particle p) {
@@ -96,6 +127,45 @@ public class Element {
         @Override
         public void update(Particle p) {
             // TODO: Add particle interaction.
+        }
+    };
+
+    static ParticleBehaviour sprk_behaviour = new ParticleBehaviour() {
+        public void init(Particle p) {
+            // TODO: stuff
+        }
+
+        public void update(Particle p) {
+            if (p.life == 4)
+                for (int w = 0; w < 5; w++)
+                    for (int h = 0; h < 5; h++) {
+                        int x = p.x - (w - 2);
+                        int y = p.y - (h - 2);
+                        if (Cells.valid(x, y)) {
+                            Particle o = Cells.getParticleAt(x, y);
+                            if (o != null) {
+                                Particle s = new Particle(sprk, x, y);
+                                s.ctype = o.el.id;
+                                if (o.el.conducts && o.life == 0) Cells.setParticleAt(x, y, s, true);
+                            }
+                        }
+                    }
+        }
+    };
+
+    static ParticleBehaviour plsm_behaviour = new ParticleBehaviour() {
+        public void init(Particle p) {
+            p.life += r.nextInt(50);
+            p.celcius += r.nextInt(20);
+        }
+
+        public void update(Particle p) {
+            p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
+            for (int w = 0; w < 3; w++)
+                for (int h = 0; h < 3; h++)
+                    if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
+                        Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y+(h-1), p.y+(h- 1)), true);
+                    }
         }
     };
 
@@ -141,17 +211,7 @@ public class Element {
         phot.celcius = 922;
         phot.life = 1000;
         phot.life_dmode = 1;
-        phot.setParticleBehaviour(new ParticleBehaviour() {
-            public void init(Particle p) {
-                while (p.vx == 0 && p.vy == 0) {
-                    p.vx = 3 * (r.nextInt(3) - 1);
-                    p.vy = 3 * (r.nextInt(3) - 1);
-                }
-            }
-
-            public void update(Particle p) {
-            }
-        });
+        phot.setParticleBehaviour(phot_behaviour);
         phot.setMovement(em_phot);
         el_map.put(7, phot);
 
@@ -159,23 +219,7 @@ public class Element {
         fire.life_dmode = 1;
         fire.celcius = 400;
         fire.setMovement(em_gas);
-        fire.setParticleBehaviour(new ParticleBehaviour() {
-            public void init(Particle p) {
-                p.life += r.nextInt(50);
-                p.celcius += r.nextInt(20);
-            }
-
-            public void update(Particle p) {
-                if (p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
-                p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
-                for (int w = 0; w < 3; w++)
-                    for (int h = 0; h < 3; h++)
-                        if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
-                            Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y + (h - 1), p.y + (h - 1)), true);
-                        }
-                p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
-            }
-        });
+        fire.setParticleBehaviour(fire_behaviour);
         el_map.put(8, fire);
 
         wood.flammibility = 0.5;
@@ -184,28 +228,7 @@ public class Element {
 
         sprk.life = 4;
         sprk.life_dmode = 2;
-        sprk.setParticleBehaviour(new ParticleBehaviour() {
-            public void init(Particle p) {
-                // TODO: stuff
-            }
-
-            public void update(Particle p) {
-                if (p.life == 4)
-                    for (int w = 0; w < 5; w++)
-                        for (int h = 0; h < 5; h++) {
-                            int x = p.x - (w - 2);
-                            int y = p.y - (h - 2);
-                            if (Cells.valid(x, y)) {
-                                Particle o = Cells.getParticleAt(x, y);
-                                if (o != null) {
-                                    Particle s = new Particle(sprk, x, y);
-                                    s.ctype = o.el.id;
-                                    if (o.el.conducts && o.life == 0) Cells.setParticleAt(x, y, s, true);
-                                }
-                            }
-                        }
-            }
-        });
+        sprk.setParticleBehaviour(sprk_behaviour);
         el_map.put(10, sprk);
         
         watr.setMovement(em_liquid);
@@ -218,21 +241,7 @@ public class Element {
         plsm.life = 120;
         plsm.life_dmode = 1;
         plsm.sandEffect = true;
-        plsm.setParticleBehaviour(new ParticleBehaviour() {
-            public void init(Particle p) {
-                p.life += r.nextInt(50);
-                p.celcius += r.nextInt(20);
-            }
-
-            public void update(Particle p) {
-                p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
-                for (int w = 0; w < 3; w++)
-                    for (int h = 0; h < 3; h++)
-                        if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
-                            Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y+(h-1), p.y+(h- 1)), true);
-            			}
-            }
-        });
+        plsm.setParticleBehaviour(plsm_behaviour);
         el_map.put(12, plsm);
         
         lava.setMovement(em_liquid);
