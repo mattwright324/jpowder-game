@@ -65,7 +65,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	}
 	
 	public void mousePressed(MouseEvent e) {
-		if(clear.contains(e.getPoint())) Cells.setAllOfAs(-1, Element.none);
+		if(clear.contains(e.getPoint())) {
+			Game.paused = true;
+			Cells.setAllOfAs(-1, Element.none);
+		}
 		if(resize.contains(e.getPoint())) Display.toggle_size();
 		if(pause.contains(e.getPoint())) Display.toggle_pause();
 		if(view.contains(e.getPoint())) if(Display.view == 0) Display.view = 1; else Display.view = 0; 

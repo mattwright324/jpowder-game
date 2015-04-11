@@ -13,7 +13,7 @@ public class Cells {
     public static boolean valid(int x, int y) {
         return !(x < 0 || y < 0 || x >= Display.width || y >= Display.height);
     }
-
+    
     public static Particle getParticleAt(int x, int y) {
         if (!valid(x, y)) return null;
         return cells[x][y].part;
@@ -25,13 +25,13 @@ public class Cells {
      * @param y The y co-ord
      * @return An array of particles, with the top row first, then the second row, then the third row.
      */
-    public static ArrayList<Particle> getSurroundingParticles(int x, int y) {
-        ArrayList<Particle> tmp = new ArrayList<Particle>();
-        for (int xx = x-1; xx <= x+1; x++) {
-            for (int yy = y-1; yy <= y+1; x++) {
-                tmp.add(getParticleAt(xx, yy));
-            }
-        }
+    public static Particle[] getSurroundingParticles(int x, int y) {
+    	Particle[] tmp = new Particle[8];
+    	int p = 0;
+    	for(int w=0; w<3; w++)
+    		for(int h=0; h<3; h++)
+    			if(!(w==0 && h==0))
+    				tmp[p++] = getParticleAt(x+(w-1), x+(h-1));
         return tmp;
     }
 

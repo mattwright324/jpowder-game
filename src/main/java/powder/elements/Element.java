@@ -155,10 +155,8 @@ public class Element {
         }
         @Override
         public void update(Particle p) {
-            ArrayList<Particle> surrounding = Cells.getSurroundingParticles(p.x, p.y);
-            for (Particle part : surrounding) {
+            for (Particle part : Cells.getSurroundingParticles(p.x, p.y)) {
                 if (part == null) continue;
-                // Instantly mutate plutonium
                 if (part.el == Element.plut) {
                     part.life = 1;
                     Cells.setParticleAt(part.x, part.y, part, true);
