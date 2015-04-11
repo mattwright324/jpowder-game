@@ -46,8 +46,8 @@ public class Particle {
         return Math.random() < el.flammibility;
     }
     
-    public boolean melt() {
-    	return el.conv!=null && el.convAt <= celcius;
+    public boolean convert() {
+    	return el.conv!=null && el.convMelt ? el.convAt <= celcius : el.convAt >= celcius;
     }
     
     public boolean warmerThan(Particle p) {
@@ -71,7 +71,7 @@ public class Particle {
     }
     
     public Color getTempColor() {
-    	int c = (int) (1000.0 / celcius % 200) + 55;
+    	int c = (int) (celcius % 200) + 55;
     	return new Color(c, c, c);
     }
     
@@ -118,7 +118,7 @@ public class Particle {
         				if(celcius > 9725.85) celcius = 9725.85;
             		}
             
-            if(melt()) {
+            if(convert()) {
             	Particle melted = new Particle(el.conv, x, y);
             	melted.ctype = el.id;
             	Cells.setParticleAt(x, y, melted, true);

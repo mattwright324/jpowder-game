@@ -39,9 +39,8 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 		g2d = (Graphics2D) g;
 		if(init) init();
 		
-		b2d.setColor(Color.GRAY);
 		b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, width, 0, Color.WHITE));
-		b2d.fillRect(0, 0, width, height);
+		b2d.fillRect(0, 0, width, height*2);
 
 		for (int key : Element.el_map.keySet()) {
 			Element e = Element.el_map.get(key);

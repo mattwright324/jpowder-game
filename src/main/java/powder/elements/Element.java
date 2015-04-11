@@ -12,10 +12,10 @@ import java.util.Random;
 public class Element {
     public final static Map<Integer, Element> el_map = new HashMap<Integer, Element>();
     // Declare elements
-    public static Element none = new Element(0, "NONE", Color.BLACK);
+    public static Element none = new Element(0, "NONE", "Erase",Color.BLACK);
     public static Element dust = new Element(1, "DUST", "Dust", new Color(162, 168, 9));
-    public static Element dmnd = new Element(2, "DMND", "Diamond, indestructable!", new Color(32, 248, 228));
-    public static Element gas = new Element(3, "GAS", "Gas, flammable!",new Color(208, 180, 208));
+    public static Element dmnd = new Element(2, "DMND", "Diamond", new Color(32, 248, 228));
+    public static Element gas = new Element(3, "GAS", "Gas",new Color(208, 180, 208));
     public static Element warp = new Element(4, "WARP", "Warp", new Color(32, 32, 32));
     public static Element salt = new Element(5, "SALT", "Salt", new Color(243, 243, 243));
     public static Element metl = new Element(6, "METL", "Metal", new Color(64, 64, 224));
@@ -27,6 +27,7 @@ public class Element {
     public static Element plsm = new Element(12, "PLSM", "Plasma", new Color(180, 80, 180));
     public static Element lava = new Element(13, "LAVA", "Molten material.", Color.ORANGE);
     public static Element stne = new Element(14, "STNE", "Stone", Color.LIGHT_GRAY);
+    public static Element stm = new Element(15, "STM", "Steam", Color.CYAN.darker());
     
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
@@ -174,6 +175,7 @@ public class Element {
         
         watr.setMovement(em_liquid);
         watr.weight = 50;
+        watr.convertToAt(stm, 101);
         watr.conducts = true;
         el_map.put(11, watr);
         
@@ -209,6 +211,14 @@ public class Element {
         stne.convertToAt(lava, 200);
         stne.setMovement(em_powder);
         el_map.put(14, stne);
+        
+        stm.weight = 5;
+        stm.celcius = 120;
+        stm.sandEffect = true;
+        stm.convertToAt(watr, 100);
+        stm.convMelt = false;
+        stm.setMovement(em_gas);
+        el_map.put(14, stm);
     }
 
     public int id = 0;
@@ -226,6 +236,7 @@ public class Element {
     public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
     public Element conv;
     public double convAt = 22.0;
+    public boolean convMelt = true; // true = <  false = >
     
     public void convertToAt(Element e, double temp) {
     	conv = e;

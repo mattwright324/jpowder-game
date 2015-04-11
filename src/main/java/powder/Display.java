@@ -109,7 +109,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		int line = 1;
 		w2d.drawString("FramesPS    "+dfps.fps(), 5, 15*line++);
 		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, 15*line++);
-		w2d.drawString("Selected    "+left.shortName, 5, 15*line++);
+		w2d.drawString("Selected    "+left.description, 5, 15*line++);
 		w2d.drawString("'S'ize      "+(small ? "Default" : "Large"), 5, 15*line++);
 		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
 		w2d.drawString("'F'         Frame", 5, 15*line++);
