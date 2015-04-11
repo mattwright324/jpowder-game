@@ -39,11 +39,11 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		g2d.setPaint(new GradientPaint(0,0, Color.BLACK, 0, height, Color.WHITE));
 		g2d.fillRect(0, 0, Display.width*2 + SideMenu.width, height);
 		
-		g2d.setColor(Color.GRAY);
-		g2d.draw(clear);
-		g2d.draw(resize);
-		g2d.draw(pause);
-		g2d.draw(view);
+		g2d.setColor(new Color(128,128,128,64));
+		g2d.fill(clear);
+		g2d.fill(resize);
+		g2d.fill(pause);
+		g2d.fill(view);
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("NEW", clear.x+5, 30);
 		g2d.drawString("SIZE", resize.x+5, 30);
@@ -53,10 +53,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	}
 	
 	public void mouseClicked(MouseEvent e) {
-		if(clear.contains(e.getPoint())) Cells.setAllOfAs(-1, Element.none);
-		if(resize.contains(e.getPoint())) Display.toggle_size();
-		if(pause.contains(e.getPoint())) Display.toggle_pause();
-		if(view.contains(e.getPoint())) if(Display.view == 0) Display.view = 1; else Display.view = 0; 
+		
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -68,7 +65,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	}
 	
 	public void mousePressed(MouseEvent e) {
-		
+		if(clear.contains(e.getPoint())) Cells.setAllOfAs(-1, Element.none);
+		if(resize.contains(e.getPoint())) Display.toggle_size();
+		if(pause.contains(e.getPoint())) Display.toggle_pause();
+		if(view.contains(e.getPoint())) if(Display.view == 0) Display.view = 1; else Display.view = 0; 
 	}
 
 	public void mouseReleased(MouseEvent e) {
