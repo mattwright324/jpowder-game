@@ -28,10 +28,19 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		addMouseListener(this);
 	}
 	
-	public Rectangle clear = new Rectangle(5, 5, 40, 40);
-	public Rectangle resize = new Rectangle(5+45, 5, 40, 40);
-	public Rectangle pause = new Rectangle(5+90, 5, 40, 40);
-	public Rectangle view = new Rectangle(5+135, 5, 40, 40);
+	public int b_w = 40;
+	public int b_h = 18;
+	public int b_y = height-b_h-5;
+	public int b_txt_center = b_y+b_h/2+5;
+	
+	public Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
+	public Rectangle resize = new Rectangle(5+45, b_y, b_w, b_h);
+	public Rectangle pause = new Rectangle(5+90, b_y, b_w, b_h);
+	public Rectangle view = new Rectangle(5+135, b_y, b_w, b_h);
+	
+	// Try to display elements in bottom bar and have categories on the right.
+	public Rectangle el_test = new Rectangle(5, 5, b_w, b_h);
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g2d = (Graphics2D) g;
@@ -39,17 +48,18 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		g2d.setPaint(new GradientPaint(0,0, Color.BLACK, 0, height, Color.WHITE));
 		g2d.fillRect(0, 0, Display.width*2 + SideMenu.width, height);
 		
-		g2d.setColor(new Color(128,128,128,64));
+		g2d.setColor(new Color(32,64,128,128));
 		g2d.fill(clear);
 		g2d.fill(resize);
 		g2d.fill(pause);
 		g2d.fill(view);
+		g2d.fill(el_test);
 		g2d.setColor(Color.WHITE);
-		g2d.drawString("NEW", clear.x+5, 30);
-		g2d.drawString("SIZE", resize.x+5, 30);
+		g2d.drawString("NEW", clear.x+5, b_txt_center);
+		g2d.drawString("SIZE", resize.x+5, b_txt_center);
 		g2d.fillRect(pause.x+12, pause.y+5, 5, pause.height-9);
 		g2d.fillRect(pause.x+22, pause.y+5, 5, pause.height-9);
-		g2d.drawString("VIEW", view.x+5, 30);
+		g2d.drawString("VIEW", view.x+5, b_txt_center);
 	}
 	
 	public void mouseClicked(MouseEvent e) {
@@ -71,7 +81,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		}
 		if(resize.contains(e.getPoint())) Display.toggle_size();
 		if(pause.contains(e.getPoint())) Display.toggle_pause();
-		if(view.contains(e.getPoint())) if(Display.view == 0) Display.view = 1; else Display.view = 0; 
+		if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); 
 	}
 
 	public void mouseReleased(MouseEvent e) {

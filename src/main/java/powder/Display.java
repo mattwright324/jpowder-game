@@ -163,8 +163,12 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			}
 		}
 	}
-
-	public Point screenToMouse(Point p) {
+	
+	public Point mouseToCell(Point p) {
+		return new Point(p.x / img_scale, p.y / img_scale);
+	}
+	
+	public Point mouseToBigCell(Point p) {
 		return new Point(p.x / img_scale, p.y / img_scale);
 	}
 
@@ -175,7 +179,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		updateMouse(screenToMouse(e.getPoint()));
+		updateMouse(mouseToCell(e.getPoint()));
 		if(SwingUtilities.isLeftMouseButton(e))
 			place(left);
 		if(SwingUtilities.isRightMouseButton(e))
@@ -183,7 +187,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		updateMouse(screenToMouse(e.getPoint()));
+		updateMouse(mouseToCell(e.getPoint()));
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -243,7 +247,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(key=='2') setView(1); // Temperature Display
 	}
 	
-	public void setView(int i) {
+	static void setView(int i) {
 		if(i==0) {
 			view = 0;
 			viewName = "Default";

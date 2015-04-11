@@ -119,9 +119,10 @@ public class Particle {
             		}
             
             if(convert()) {
-            	Particle melted = new Particle(el.conv, x, y);
-            	melted.ctype = el.id;
-            	Cells.setParticleAt(x, y, melted, true);
+            	Particle conv = new Particle(el.conv, x, y);
+            	conv.ctype = el.id;
+            	conv.celcius = celcius;
+            	Cells.setParticleAt(x, y, conv, true);
             }
             
             if (life > 0 && el.life_decay) life--;
