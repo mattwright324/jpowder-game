@@ -4,6 +4,7 @@ import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -37,7 +38,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public Point mstart = new Point(0, 0), mstop = new Point(0, 0);
 	
 	public Display() {
-		Game.make_cells();
+		for (int w = 0; w < Display.width; w++)
+			for (int h = 0; h < Display.height; h++) 
+				Cells.cells[w][h] = new Cell(w, h);
 		game.startUpdateThread();
 		timer.start();
 		dfps.start();
@@ -49,7 +52,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		addMouseMotionListener(this);
 
 		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "");
 		setCursor(blankCursor);
 	}
 

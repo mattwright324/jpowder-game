@@ -47,7 +47,7 @@ public class Particle {
     }
     
     public boolean melt() {
-    	return el.melt!=null && el.meltAt <= celcius;
+    	return el.conv!=null && el.convAt <= celcius;
     }
     
     public boolean warmerThan(Particle p) {
@@ -119,7 +119,7 @@ public class Particle {
             		}
             
             if(melt()) {
-            	Particle melted = new Particle(el.melt, x, y);
+            	Particle melted = new Particle(el.conv, x, y);
             	melted.ctype = el.id;
             	Cells.setParticleAt(x, y, melted, true);
             }

@@ -3,9 +3,10 @@ package main.java.powder;
 import main.java.powder.particles.Particle;
 
 public class Cells {
-
+	
+	//final static Cell[][] grid = new Cell[Display.width/4][Display.height/4]; // for air/wall grid
     final static Cell[][] cells = new Cell[Display.width][Display.height];
-
+    
     public static boolean valid(int x, int y) {
         return !(x < 0 || y < 0 || x >= Display.width || y >= Display.height);
     }

@@ -5,7 +5,7 @@ import main.java.powder.particles.Particle;
 public class Cell {
     public int x, y;
     public Particle part;
-
+    
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;

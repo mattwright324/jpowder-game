@@ -81,6 +81,7 @@ public class Element {
         gas.weight = 5;
         gas.flammibility = 0.8;
         gas.sandEffect = true;
+        gas.convertToAt(fire, 120);
         gas.setMovement(em_gas);
         el_map.put(3, gas);
 
@@ -93,12 +94,12 @@ public class Element {
         salt.weight = 100;
         salt.sandEffect = true;
         salt.setMovement(em_powder);
-        salt.setMelt(lava, 200);
+        salt.convertToAt(lava, 200);
         el_map.put(5, salt);
 
         metl.weight = 1000;
         metl.conducts = true;
-        metl.setMelt(lava, 1000);
+        metl.convertToAt(lava, 1000);
         el_map.put(6, metl);
         
         phot.celcius = 922;
@@ -205,7 +206,7 @@ public class Element {
         
         stne.weight = 105;
         stne.sandEffect = true;
-        stne.setMelt(lava, 200);
+        stne.convertToAt(lava, 200);
         stne.setMovement(em_powder);
         el_map.put(14, stne);
     }
@@ -223,12 +224,12 @@ public class Element {
     public boolean sandEffect = false;
     public boolean life_decay = true;
     public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
-    public Element melt, cool;
-    public double meltAt = 22.0;
+    public Element conv;
+    public double convAt = 22.0;
     
-    public void setMelt(Element e, double temp) {
-    	melt = e;
-    	meltAt = temp;
+    public void convertToAt(Element e, double temp) {
+    	conv = e;
+    	convAt = temp;
     }
     
     public Color color = new Color(180, 180, 30);

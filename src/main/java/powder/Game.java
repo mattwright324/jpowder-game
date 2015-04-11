@@ -22,15 +22,6 @@ public class Game extends Thread {
 		gfps.add();
 	}
 
-	// Who needs performance?
-	static void make_cells() {
-		for (int w = 0; w < Display.width; w++) {
-			for (int h = 0; h < Display.height; h++) {
-				Cells.cells[w][h] = new Cell(w, h);
-			}
-		}
-	}
-
 	public void startUpdateThread() {
 		start();
 	}
