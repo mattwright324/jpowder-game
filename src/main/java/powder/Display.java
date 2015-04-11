@@ -147,7 +147,16 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void place(Element e) {
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
-				Cells.setParticleAt(x, y, new Particle(e, x, y), e == Element.none);
+				Particle p = Cells.getParticleAt(x, y);
+				if(p==null || e == Element.none)
+					Cells.setParticleAt(x, y, new Particle(e, x, y), e == Element.none);
+				else if(p.el.conducts && e==Element.sprk) {
+					Particle sprk = new Particle(Element.sprk, x, y);
+					sprk.ctype = p.el.id;
+					Cells.setParticleAt(x, y, sprk, true);
+				} else if(p.el == Element.clne) {
+					p.ctype = e.id;
+				}
 			}
 		}
 	}

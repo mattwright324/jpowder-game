@@ -29,6 +29,7 @@ public class Element {
     public static Element stne = new Element(14, "STNE", "Stone", Color.LIGHT_GRAY);
     public static Element stm = new Element(15, "STM", "Steam", Color.CYAN.darker());
     public static Element radp = new Element(16, "RADP", "Radioactive particle", new Color(0, 17, 214));
+    public static Element clne = new Element(17, "CLNE", "Clone", Color.YELLOW);
 
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
@@ -103,8 +104,6 @@ public class Element {
         }
 
         public void update(Particle p) {
-            // Change to plasma above 1000 Celius
-            if (p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
             p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
             for (int w = 0; w < 3; w++)
                 for (int h = 0; h < 3; h++)
@@ -225,6 +224,7 @@ public class Element {
         fire.life = 120;
         fire.life_dmode = 1;
         fire.celcius = 400;
+        fire.convertToAt(plsm, 1001);
         fire.setMovement(em_gas);
         fire.setParticleBehaviour(fire_behaviour);
         el_map.put(8, fire);
@@ -248,6 +248,8 @@ public class Element {
         plsm.life = 120;
         plsm.life_dmode = 1;
         plsm.sandEffect = true;
+        plsm.convertToAt(fire, 1000);
+        plsm.convMelt = false;
         plsm.setParticleBehaviour(plsm_behaviour);
         el_map.put(12, plsm);
         
@@ -276,7 +278,27 @@ public class Element {
         radp.setMovement(em_radioactive);
         radp.setParticleBehaviour(radioactive_behaviour);
         el_map.put(16, radp);
-
+        
+        clne.weight = dmnd.weight;
+        clne.setParticleBehaviour(new ParticleBehaviour() {
+			public void init(Particle p) {
+				// Needs to be set ctype on click
+				p.ctype = dust.id;
+			}
+			public void update(Particle p) {
+				for(int w=-1; w<2; w++)
+					for(int h=-1; h<2; h++)
+						if(!Cells.particleAt(p.x+w, p.y+h)) {
+							int x = p.x+w;
+							int y = p.y+h;
+							Cells.setParticleAt(x, y, new Particle(el_map.get(p.ctype), x, y), false);
+						}
+			}
+        });
+        el_map.put(17, clne);
+        
+        
+        // Running out of space in SideMenu ; going to have to figure out something new
     }
 
     public int id = 0;
