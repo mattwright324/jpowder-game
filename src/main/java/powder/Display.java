@@ -121,6 +121,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		String info = "Empty";
 		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
 			info = p.el.shortName;
+			if(!(p.ctype==0) && Element.el_map.containsKey(p.ctype)) info += "("+Element.el_map.get(p.ctype).shortName+")";
 			info += ", Temp:"+p.temp();
 			info += ", Life:"+p.life;
 		}
@@ -210,8 +211,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
 	public void keyTyped(KeyEvent e) {
 		int key = e.getKeyChar();
-		if(key==' ') Game.paused = !Game.paused;
-		if(key=='s') if(small) makeLarge(); else makeSmall();
+		if(key==' ') toggle_pause();
+		if(key=='s') toggle_size();
 		if(key=='f') {
 			Game.paused = true;
 			Game.update();
@@ -239,6 +240,14 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			view = 1;
 			viewName = "Temperature";
 		}
+	}
+	
+	static void toggle_size() {
+		if(small) makeLarge(); else makeSmall();
+	}
+	
+	static void toggle_pause() {
+		 Game.paused = !Game.paused;
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {
