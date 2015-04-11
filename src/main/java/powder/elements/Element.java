@@ -28,7 +28,8 @@ public class Element {
     public static Element lava = new Element(13, "LAVA", "Molten material.", Color.ORANGE);
     public static Element stne = new Element(14, "STNE", "Stone", Color.LIGHT_GRAY);
     public static Element stm = new Element(15, "STM", "Steam", Color.CYAN.darker());
-    
+    public static Element radp = new Element(16, "RADP", "Radioactive particle", new Color(0, 17, 214));
+
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
             int ny = p.y + (int) p.vy;
@@ -39,6 +40,25 @@ public class Element {
                 p.setRemove(true);
         }
     };
+
+    static IElementMovement em_radioactive = new IElementMovement() {
+        @Override
+        public void move(Particle p) {
+            double plottedX = p.x + p.vx;
+            double plottedY = p.y + p.vy;
+            // Shitty particle detection
+            if (Cells.particleAt((int)plottedX, (int)plottedY)) {
+                p.vy = -p.vy;
+                p.vx = -p.vx;
+            } else if (Cells.particleAt((int)plottedX, p.y)) {
+                p.vx = - p.vx;
+            } else if (Cells.particleAt(p.x, (int)plottedY)) {
+                p.vy = -p.vy;
+            }
+            p.tryMove((int)plottedX, (int)plottedY);
+        }
+    };
+
     private static Random r = new Random();
 
     static IElementMovement em_powder = new IElementMovement() {
@@ -63,7 +83,22 @@ public class Element {
             p.tryMove(nx, ny);
         }
     };
-    
+
+    static ParticleBehaviour radioactive_behaviour = new ParticleBehaviour() {
+        @Override
+        public void init(Particle p) {
+            // Instead of having vx and vy set in move() this ensures the particles are at a constant speed.
+            p.life = r.nextInt(50) + 1;
+            p.celcius = 982;
+            p.vx = r.nextInt(4) + 1;
+            p.vy = r.nextInt(4) + 1;
+        }
+        @Override
+        public void update(Particle p) {
+            // TODO: Add particle interaction.
+        }
+    };
+
     // Element properties - fun!
     static {
         none.remove = true;
@@ -131,14 +166,14 @@ public class Element {
             }
 
             public void update(Particle p) {
-            	if(p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
-            	p.tryMove(p.x, p.y - (r.nextInt(4)-1));
-            	for(int w=0; w<3; w++)
-            		for(int h=0; h<3; h++)
-            			if(Cells.getParticleAt(p.x+(w-1), p.y+(h-1))!=null && Cells.getParticleAt(p.x+(w-1), p.y+(h-1)).burn()) {
-            				Cells.setParticleAt(p.x+(w-1), p.y+(h-1), new Particle(fire, p.y+(h-1), p.y+(h-1)), true);
-            			}
-            	p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+                if (p.celcius > 1000) Cells.setParticleAt(p.x, p.y, new Particle(plsm, p.x, p.y), true);
+                p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
+                for (int w = 0; w < 3; w++)
+                    for (int h = 0; h < 3; h++)
+                        if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
+                            Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y + (h - 1), p.y + (h - 1)), true);
+                        }
+                p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
             }
         });
         el_map.put(8, fire);
@@ -190,11 +225,11 @@ public class Element {
             }
 
             public void update(Particle p) {
-            	p.tryMove(p.x + (r.nextInt(3)-1), p.y - (r.nextInt(4)-1));
-            	for(int w=0; w<3; w++)
-            		for(int h=0; h<3; h++)
-            			if(Cells.getParticleAt(p.x+(w-1), p.y+(h-1))!=null && Cells.getParticleAt(p.x+(w-1), p.y+(h-1)).burn()) {
-            				Cells.setParticleAt(p.x+(w-1), p.y+(h-1), new Particle(fire, p.y+(h-1), p.y+(h-1)), true);
+                p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
+                for (int w = 0; w < 3; w++)
+                    for (int h = 0; h < 3; h++)
+                        if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
+                            Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y+(h-1), p.y+(h- 1)), true);
             			}
             }
         });
@@ -219,6 +254,13 @@ public class Element {
         stm.convMelt = false;
         stm.setMovement(em_gas);
         el_map.put(14, stm);
+
+        radp.weight = 0;
+        radp.convMelt = false;
+        radp.setMovement(em_radioactive);
+        radp.setParticleBehaviour(radioactive_behaviour);
+        el_map.put(15, radp);
+
     }
 
     public int id = 0;
