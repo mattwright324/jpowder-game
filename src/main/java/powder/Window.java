@@ -22,7 +22,7 @@ public class Window extends JFrame {
 	public Window() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
-		setTitle("Powder Game");
+		setTitle("JPowder");
 		setResizable(false);
 		
 		game = new Display();

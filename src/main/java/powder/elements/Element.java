@@ -26,6 +26,7 @@ public class Element {
     public static Element watr = new Element(11, "WATR", "Water", Color.BLUE);
     public static Element plsm = new Element(12, "PLSM", "Plasma", new Color(180, 80, 180));
     public static Element lava = new Element(13, "LAVA", "Molten material.", Color.ORANGE);
+    public static Element stne = new Element(14, "STNE", "Stone", Color.LIGHT_GRAY);
     
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
@@ -92,10 +93,12 @@ public class Element {
         salt.weight = 100;
         salt.sandEffect = true;
         salt.setMovement(em_powder);
+        salt.setMelt(lava, 200);
         el_map.put(5, salt);
 
         metl.weight = 1000;
         metl.conducts = true;
+        metl.setMelt(lava, 1000);
         el_map.put(6, metl);
         
         phot.celcius = 922;
@@ -184,7 +187,7 @@ public class Element {
             }
 
             public void update(Particle p) {
-            	p.tryMove(p.x, p.y - (r.nextInt(4)-1));
+            	p.tryMove(p.x + (r.nextInt(3)-1), p.y - (r.nextInt(4)-1));
             	for(int w=0; w<3; w++)
             		for(int h=0; h<3; h++)
             			if(Cells.getParticleAt(p.x+(w-1), p.y+(h-1))!=null && Cells.getParticleAt(p.x+(w-1), p.y+(h-1)).burn()) {
@@ -199,6 +202,12 @@ public class Element {
         lava.celcius = 1100;
         lava.conducts = true;
         el_map.put(13, lava);
+        
+        stne.weight = 105;
+        stne.sandEffect = true;
+        stne.setMelt(lava, 200);
+        stne.setMovement(em_powder);
+        el_map.put(14, stne);
     }
 
     public int id = 0;
@@ -207,13 +216,21 @@ public class Element {
     public int weight = 10;
 
     public long life = 0;
-    public double celcius = 0.0;
+    public double celcius = 22.0;
     public boolean remove = false;
     public double flammibility = 0;
     public boolean conducts = false;
     public boolean sandEffect = false;
     public boolean life_decay = true;
     public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
+    public Element melt, cool;
+    public double meltAt = 22.0;
+    
+    public void setMelt(Element e, double temp) {
+    	melt = e;
+    	meltAt = temp;
+    }
+    
     public Color color = new Color(180, 180, 30);
     public IElementMovement movement;
     public ParticleBehaviour behaviour;

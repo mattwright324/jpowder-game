@@ -21,13 +21,11 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 	public Graphics2D g2d;
 	public Graphics2D b2d;
 	
-	public Timer timer = new Timer(30, this);
 	public boolean init = true;
 	
 	public SideMenu() {
 		setFocusable(true);
 		addMouseListener(this);
-		timer.start();
 	}
 
 	public void init() {
@@ -42,7 +40,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 		if(init) init();
 		
 		b2d.setColor(Color.GRAY);
-		b2d.setPaint(new GradientPaint(0, 0, Color.WHITE, width, height*2, Color.WHITE.darker()));
+		b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, width, 0, Color.WHITE));
 		b2d.fillRect(0, 0, width, height);
 
 		for (int key : Element.el_map.keySet()) {
@@ -52,7 +50,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 			b2d.fillRect(5, 5+key*20, getWidth()-10, 15);
 			b2d.setColor(Color.WHITE);
 			b2d.setXORMode(Color.BLACK);
-			b2d.drawString(key+" "+e.shortName, 8, 17+key*20);
+			b2d.drawString(e.shortName, 12, 17+key*20);
 		}
 		
 		b2d.setPaintMode();
