@@ -5,6 +5,7 @@ import main.java.powder.particles.Particle;
 import main.java.powder.particles.ParticleBehaviour;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -30,6 +31,7 @@ public class Element {
     public static Element stm = new Element(15, "STM", "Steam", Color.CYAN.darker());
     public static Element radp = new Element(16, "RADP", "Radioactive particle", new Color(0, 17, 214));
     public static Element clne = new Element(17, "CLNE", "Clone", Color.YELLOW);
+    public static Element plut = new Element(18, "PLUT", "Plutonium", new Color(27, 122, 0)); // Totally not ripped off from tpt
 
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
@@ -48,12 +50,18 @@ public class Element {
             double plottedX = p.x + p.vx;
             double plottedY = p.y + p.vy;
             // Shitty particle detection
-            if (Cells.particleAt((int)plottedX, (int)plottedY)) {
+            // Please improve
+            // Added check for no collision with other radioactive particles
+            Particle collide;
+            if ((collide = Cells.getParticleAt((int)plottedX, (int)plottedY)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vy = -p.vy;
                 p.vx = -p.vx;
-            } else if (Cells.particleAt((int)plottedX, p.y)) {
+            } else if ((collide = Cells.getParticleAt((int)plottedX, p.y)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vx = - p.vx;
-            } else if (Cells.particleAt(p.x, (int)plottedY)) {
+            } else if ((collide = Cells.getParticleAt(p.x, (int)plottedY)) != null &&
+                    (collide.el != Element.radp || collide.el != Element.phot)) {
                 p.vy = -p.vy;
             }
             p.tryMove((int)plottedX, (int)plottedY);
@@ -114,6 +122,28 @@ public class Element {
         }
     };
 
+    static ParticleBehaviour plutonium_behaviour = new ParticleBehaviour() {
+        @Override
+        public void init(Particle p) {
+            p.life = r.nextInt(400) + 100;
+        }
+        @Override
+        public void update(Particle p) {
+        }
+        @Override
+        public void destruct(Particle p) {
+            for (int x = p.x - 1; x <= p.x + 1; x++) {
+                for (int y = p.y - 1; x <= p.y + 1; y++) {
+                    if (!Cells.particleAt(x, y)) Cells.setParticleAt(x, y, new Particle(Element.radp, x, y), false);
+                }
+            }
+            // Set self to neutron
+            Cells.setParticleAt(p.x, p.y, new Particle(Element.radp, p.x, p.y), true);
+            // Instantly update, causing a decay cascade.
+            Element.radp.behaviour.update(Cells.getParticleAt(p.x, p.y));
+        }
+    };
+
     static ParticleBehaviour radioactive_behaviour = new ParticleBehaviour() {
         @Override
         public void init(Particle p) {
@@ -125,7 +155,15 @@ public class Element {
         }
         @Override
         public void update(Particle p) {
-            // TODO: Add particle interaction.
+            ArrayList<Particle> surrounding = Cells.getSurroundingParticles(p.x, p.y);
+            for (Particle part : surrounding) {
+                if (part == null) continue;
+                // Instantly mutate plutonium
+                if (part.el == Element.plut) {
+                    part.life = 1;
+                    Cells.setParticleAt(part.x, part.y, part, true);
+                }
+            }
         }
     };
 
@@ -206,11 +244,13 @@ public class Element {
         metl.conducts = true;
         metl.convertToAt(lava, 1000);
         metl.setParticleBehaviour(new ParticleBehaviour() {
-			public void init(Particle p) {}
-			public void update(Particle p) {
-				double c = p.celcius / p.el.convAt;
-				p.setDeco(new Color((int) (255.0 * c) % 255, (int) (255.0 * c) % 255, 224));
-			}
+            public void init(Particle p) {
+            }
+
+            public void update(Particle p) {
+                double c = p.celcius / p.el.convAt;
+                p.setDeco(new Color((int) (255.0 * c) % 255, (int) (255.0 * c) % 255, 224));
+            }
         });
         el_map.put(6, metl);
         
@@ -218,7 +258,7 @@ public class Element {
         phot.life = 1000;
         phot.life_dmode = 1;
         phot.setParticleBehaviour(phot_behaviour);
-        phot.setMovement(em_phot);
+        phot.setMovement(em_radioactive);
         el_map.put(7, phot);
 
         fire.life = 120;
@@ -256,7 +296,7 @@ public class Element {
         lava.setMovement(em_liquid);
         lava.weight = 50;
         lava.celcius = 1100;
-        lava.conducts = true;
+        lava.conducts = false; // Why does it conduct? That's broken as fuck when I tried it.
         el_map.put(13, lava);
         
         stne.weight = 105;
@@ -275,6 +315,7 @@ public class Element {
 
         radp.weight = 0;
         radp.convMelt = false;
+        radp.life_dmode = 1;
         radp.setMovement(em_radioactive);
         radp.setParticleBehaviour(radioactive_behaviour);
         el_map.put(16, radp);
@@ -283,9 +324,10 @@ public class Element {
         clne.setParticleBehaviour(new ParticleBehaviour() {
 			public void init(Particle p) {
 				// Needs to be set ctype on click
-				p.ctype = dust.id;
+				p.ctype = none.id;
 			}
 			public void update(Particle p) {
+                if (p.ctype == 0) return; // Won't create anything when newly placed.
 				for(int w=-1; w<2; w++)
 					for(int h=-1; h<2; h++)
 						if(!Cells.particleAt(p.x+w, p.y+h)) {
@@ -296,7 +338,13 @@ public class Element {
 			}
         });
         el_map.put(17, clne);
-        
+
+        plut.weight = 500;
+        plut.setMovement(em_powder);
+        plut.setParticleBehaviour(plutonium_behaviour);
+        plut.life_dmode = 1;
+        plut.convMelt = false;
+        el_map.put(18, plut);
         
         // Running out of space in SideMenu ; going to have to figure out something new
     }

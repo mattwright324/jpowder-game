@@ -4,7 +4,6 @@ import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -132,6 +131,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void draw_cell(Cell c) {
 		if(c.part!=null) {
 			if(c.part.remove()) {
+				// bad for performance
 				c.part = null; // Why?
 			} else {
 				size++;

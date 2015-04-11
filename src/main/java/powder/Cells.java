@@ -3,6 +3,8 @@ package main.java.powder;
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
+import java.util.ArrayList;
+
 public class Cells {
 	
 	//final static Cell[][] grid = new Cell[Display.width/4][Display.height/4]; // for air/wall grid
@@ -15,6 +17,22 @@ public class Cells {
     public static Particle getParticleAt(int x, int y) {
         if (!valid(x, y)) return null;
         return cells[x][y].part;
+    }
+
+    /**
+     * Gets the particles that surround the particle at co-ordinates x,y.
+     * @param x The x co-ord
+     * @param y The y co-ord
+     * @return An array of particles, with the top row first, then the second row, then the third row.
+     */
+    public static ArrayList<Particle> getSurroundingParticles(int x, int y) {
+        ArrayList<Particle> tmp = new ArrayList<Particle>();
+        for (int xx = x-1; xx <= x+1; x++) {
+            for (int yy = y-1; yy <= y+1; x++) {
+                tmp.add(getParticleAt(xx, yy));
+            }
+        }
+        return tmp;
     }
 
     public static boolean particleAt(int x, int y) {
