@@ -19,6 +19,7 @@ public class Window extends JFrame {
 	
 	public Display game;
 	public SideMenu menu;
+	public BottomMenu menub;
 	public Window() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
@@ -29,14 +30,18 @@ public class Window extends JFrame {
 		add(game, BorderLayout.CENTER);
 		
 		menu = new SideMenu();
-		menu.setPreferredSize(new Dimension(menu.width, menu.height));
+		menu.setPreferredSize(new Dimension(SideMenu.width, SideMenu.height));
 		add(menu, BorderLayout.EAST);
+		
+		menub = new BottomMenu();
+		menub.setPreferredSize(new Dimension(BottomMenu.width, BottomMenu.height));
+		add(menub, BorderLayout.SOUTH);
 		
 		resize();
 	}
 	
 	public void resize() {
-		getContentPane().setPreferredSize(new Dimension(Display.width*Display.img_scale + menu.width, Display.height*Display.img_scale));
+		getContentPane().setPreferredSize(new Dimension(Display.width*Display.img_scale + SideMenu.width, Display.height*Display.img_scale + BottomMenu.height));
 		pack();
 	}
 }

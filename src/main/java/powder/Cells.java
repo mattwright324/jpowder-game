@@ -1,5 +1,6 @@
 package main.java.powder;
 
+import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
 public class Cells {
@@ -33,7 +34,23 @@ public class Cells {
         }
         cells[x][y].part = p;
     }
-
+    
+    /**
+     * Convert all cells of id n to a specific element.
+     * id -1 = All
+     */
+    public static void setAllOfAs(int id, Element e) {
+    	for(int w=0; w<Display.width; w++) {
+    		for(int h=0; h<Display.height; h++) {
+    			if(particleAt(w,h)) {
+    				if(id == -1 || getParticleAt(w, h).el.id == id) {
+    					setParticleAt(w, h, new Particle(e, w, h), true);
+    				}
+    			}
+    		}
+    	}
+    }
+    
     /**
      * Move from (x1, y1) to (x2, y2). Original spot set null.
      */

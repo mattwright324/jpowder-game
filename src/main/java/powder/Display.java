@@ -116,9 +116,15 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		w2d.drawString("Display '1' or '2' "+viewName, 5, 15*line++);
 		w2d.drawString("Parts       " + size, 5, 15 * line++);
 
-		Particle p = Cells.getParticleAt(mouse.x, mouse.y);
 		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
-		w2d.drawString(p!=null ? (p.el.shortName+", Temp:"+p.temp()+", Life: "+p.life) : "Empty", 5, getHeight()-10);
+		Particle p;
+		String info = "Empty";
+		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
+			info = p.el.shortName;
+			info += ", Temp:"+p.temp();
+			info += ", Life:"+p.life;
+		}
+		w2d.drawString(info, 5, getHeight()-10);
 		dfps.add();
 	}
 	

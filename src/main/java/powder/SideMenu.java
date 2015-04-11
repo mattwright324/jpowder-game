@@ -14,8 +14,8 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public int width = 70;
-	public int height = Display.height;
+	static int width = 70;
+	static int height = Display.height;
 	
 	public BufferedImage img;
 	public Graphics2D g2d;
