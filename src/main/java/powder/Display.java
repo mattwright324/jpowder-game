@@ -4,6 +4,7 @@ import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -136,7 +137,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void draw_cell(Cell c) {
 		if(c.part!=null) {
 			if(c.part.remove()) {
-				// bad for performance
+				// bad for performance ; how is it bad? removes a particle 
 				c.part = null; // Why?
 			} else {
 				size++;
@@ -179,6 +180,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseDragged(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
 		updateMouse(mouseToCell(e.getPoint()));
 		if(SwingUtilities.isLeftMouseButton(e))
 			place(left);
@@ -187,6 +189,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseMoved(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
 		updateMouse(mouseToCell(e.getPoint()));
 	}
 

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,12 +43,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	public Rectangle pause = new Rectangle(5+90, b_y, b_w, b_h);
 	public Rectangle view = new Rectangle(5+135, b_y, b_w, b_h);
 	
-	// Try to display elements in bottom bar and have categories on the right.
-	public Rectangle el_test = new Rectangle(5, 5, b_w, b_h);
-	
 	public List<Button> buttons = new ArrayList<Button>();
-	
-	public Point mouse = new Point(0,0);
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -105,11 +99,12 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	}
 	
 	public void makeButtons() {
-		// Could switch this out with element categories in SideMenu; SideMenu.getCategory() where returns Element[]
 		buttons.clear();
 		int i=0;
 		for(Element e : SideMenu.selected) {
-			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*i++)+(getWidth()-mouse.x-(getWidth()/2)), 5, b_w, b_h);
+			int x = Window.mouse.x;
+			if(x > Window.window.getWidth()/2) x = Window.window.getWidth()/2;
+			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*i++)+(getWidth()-x-(getWidth()/2)), 5, b_w, b_h);
 			b.setElement(e);
 			buttons.add(b);
 		}
@@ -146,12 +141,12 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	}
 	
 	public void mouseDragged(MouseEvent e) {
-		mouse = e.getPoint();
+		Window.updateMouseInFrame(e.getPoint(), this);
 		repaint();
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		mouse = e.getPoint();
+		Window.updateMouseInFrame(e.getPoint(), this);
 		repaint();
 	}
 }

@@ -2,9 +2,10 @@ package main.java.powder.particles;
 
 import main.java.powder.Cells;
 import main.java.powder.Game;
+import main.java.powder.Window;
 import main.java.powder.elements.Element;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 
 public class Particle {
@@ -78,10 +79,21 @@ public class Particle {
         return deco != null ? deco : el.getColor();
     }
     
-    public Color getTempColor() {
-    	int c = (int) celcius % 200 + 55;
+    public Color getTempColor() { // Colorized temperature with no affect on performance!
+    	int w = Window.heatColorStrip.getWidth();
+		int x = (int) (w * (celcius + Math.abs(Game.MIN_TEMP)) / (Math.abs(Game.MAX_TEMP)+ Math.abs(Game.MIN_TEMP)));
+		if(w <= x) x = w-1;
+		if(x < 0) x = 0;
+		int color = Window.heatColorStrip.getRGB(x, 0);
+        int  red = (color & 0x00ff0000) >> 16;
+        int  green = (color & 0x0000ff00) >> 8;
+        int  blue = color & 0x000000ff;
+        return new Color(red, green, blue);
+	}
+    
+    public Color getLifeGradient() {
+    	int c = (int) (life % 200 + 55);
     	return new Color(c, c, c);
-    	//return getColorFromDecimal(tempToDecimal(celcius));
     }
     
     public void setDeco(Color c) { // EW
@@ -173,35 +185,4 @@ public class Particle {
     	if(makectype) ctype = id;
     }
     
-    /* Attempt at colorized temperature view but is too slow on fps and doesn't look good.
-    static long tempToDecimal(double t) {
-		return (long) (16777215 * (t/(Math.abs(Game.MAX_TEMP)+Math.abs(Game.MIN_TEMP))));
-	}
-	
-	static Color getColorFromDecimal(long dec) {
-		 int p = 3;
-         int i = 0;
-         int[] pts = new int[4];
-         boolean alpha = dec > power256[3];
-         if(dec>power256[4])
-        	 dec = (long) (dec-power256[4]);
-         while(true) {
-                 if(dec<i*power256[p]) {
-                	 dec = (long) (dec-((i-1)*power256[p]));
-                         pts[3-p]=i-1;
-                         p--;
-                         i=0;
-                 } else i++;
-                 if(p<0) break;
-         }
-         return new Color(pts[3], pts[2], pts[1], alpha ? pts[0] : 255);
-	}
-	
-	public static double[] power256 = {
-		   Math.pow(256,0),
-		   Math.pow(256,1),
-		   Math.pow(256,2),
-		   Math.pow(256,3),
-		   Math.pow(256,4)
-	};*/
 }

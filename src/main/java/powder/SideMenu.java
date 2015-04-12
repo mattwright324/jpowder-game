@@ -3,18 +3,20 @@ package main.java.powder;
 import main.java.powder.elements.Element;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-public class SideMenu extends JPanel implements ActionListener, MouseListener {
+public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
-	static int width = 55;
+	static int width = 60;
 	static int height = Display.height;
 	
 	public BufferedImage img;
@@ -26,6 +28,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 	public SideMenu() {
 		setFocusable(true);
 		addMouseListener(this);
+		addMouseMotionListener(this);
 	}
 
 	public void init() {
@@ -35,15 +38,16 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 	}
 	
 	public int b_h = 40;
-	public int b_w = 45;
+	public int b_w = width-10;
 	public int b_txt = b_h/2;
 	public int b_txtn = b_h/2+15;
 	
-	public Rectangle sl = new Rectangle(5, 5, b_h, b_w);
+	public Rectangle sl = new Rectangle(5, 5, b_w, b_h);
 	public Rectangle ll = new Rectangle(5, 5+(b_h+5)*1, b_w, b_h);
 	public Rectangle gl = new Rectangle(5, 5+(b_h+5)*2, b_w, b_h);
 	public Rectangle pl = new Rectangle(5, 5+(b_h+5)*3, b_w, b_h);
-	public Rectangle tl = new Rectangle(5, 5+(b_h+5)*4, b_w, b_h);
+	public Rectangle ral = new Rectangle(5, 5+(b_h+5)*4, b_w, b_h);
+	public Rectangle tl = new Rectangle(5, 5+(b_h+5)*5, b_w, b_h);
 	
 	static Element[] selected = Element.solids;
 	
@@ -60,23 +64,29 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 		b2d.fill(ll);
 		b2d.fill(gl);
 		b2d.fill(pl);
+		b2d.fill(ral);
 		b2d.fill(tl);
 		
+		int line = 0;
+		
 		b2d.setColor(Color.WHITE);
-		b2d.drawString("Solid", 10, b_txt);
-		b2d.drawString(Element.solids.length+"", 10, b_txtn);
+		b2d.drawString("Solid", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.solids.length+"", 10, b_txtn+(b_h+5)*line++);
 		
-		b2d.drawString("Liquid", 8, b_txt+(b_h+5)*1);
-		b2d.drawString(Element.liquids.length+"", 10, b_txtn+(b_h+5)*1);
+		b2d.drawString("Liquid", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.liquids.length+"", 10, b_txtn+(b_h+5)*line++);
 		
-		b2d.drawString("Gass", 10, b_txt+(b_h+5)*2);
-		b2d.drawString(Element.gasses.length+"", 10, b_txtn+(b_h+5)*2);
+		b2d.drawString("Gass", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.gasses.length+"", 10, b_txtn+(b_h+5)*line++);
 		
-		b2d.drawString("Powder", 8, b_txt+(b_h+5)*3);
-		b2d.drawString(Element.powders.length+"", 10, b_txtn+(b_h+5)*3);
+		b2d.drawString("Powder", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.powders.length+"", 10, b_txtn+(b_h+5)*line++);
 		
-		b2d.drawString("Tools", 10, b_txt+(b_h+5)*4);
-		b2d.drawString(Element.tools.length+"", 10, b_txtn+(b_h+5)*4);
+		b2d.drawString("Radio", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.radioactive.length+"", 10, b_txtn+(b_h+5)*line++);
+		
+		b2d.drawString("Tools", 10, b_txt+(b_h+5)*line);
+		b2d.drawString(Element.tools.length+"", 10, b_txtn+(b_h+5)*line++);
 		/*for (int key : Element.el_map.keySet()) {
 			Element e = Element.el_map.get(key);
 			b2d.setPaintMode();
@@ -115,11 +125,21 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener {
 		if(ll.contains(p)) selected = Element.liquids;
 		if(gl.contains(p)) selected = Element.gasses;
 		if(pl.contains(p)) selected = Element.powders;
+		if(ral.contains(p)) selected = Element.radioactive;
 		if(tl.contains(p)) selected = Element.tools;
+		Window.menub.repaint();
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		
+	}
+
+	public void mouseDragged(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
+	}
+
+	public void mouseMoved(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
 	}
 	
 }
