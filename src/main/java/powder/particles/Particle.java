@@ -54,7 +54,16 @@ public class Particle {
     }
     
     public boolean convert() {
-    	return el.conv!=null && el.convMelt ? el.convAt <= celcius : el.convAt >= celcius;
+    	switch(el.conv_sign) {
+    	case(Element.CS_GTR):
+    		return el.conv_temp < celcius;
+    	case(Element.CS_LSS):
+    		return el.conv_temp > celcius;
+    	case(Element.CS_EQ):
+    		return el.conv_temp == celcius;
+    	}
+    	return false;
+    	//return el.conv!=null && el.convMelt ? el.convAt <= celcius : el.convAt >= celcius;
     }
     
     public boolean warmerThan(Particle p) {
@@ -127,8 +136,10 @@ public class Particle {
             		}
             
             if(convert()) {
-            	if(el.conv!=null) // Convert calling true when shouldn't. Not sure why I have to need this but do.
+            	if(el.conv_method==Element.CM_TYPE)
             		morph(el.conv, MORPH_KEEP_TEMP, true);
+            	if(el.conv_method==Element.CM_CTYPE)
+            		morph(Element.getID(ctype), MORPH_KEEP_TEMP, true);
             }
             
             if (life > 0 && el.life_decay) life--;
@@ -139,7 +150,7 @@ public class Particle {
                     if (el.behaviour != null) el.behaviour.destruct(this);
                 }
                 // Decay mode
-                if (el.life_dmode == 2) morph(Element.el_map.get(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
+                if (el.life_dmode == 2) morph(Element.getID(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
             }
             if (!Cells.validGame(x, y)) setRemove(true);
             last_update = System.currentTimeMillis();

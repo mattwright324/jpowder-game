@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Element {
     public final static Map<Integer, Element> el_map = new HashMap<Integer, Element>();
-    // Declare elements
+    
     public static Element none = new Element(0, "NONE", "Erase",Color.BLACK);
     public static Element dust = new Element(1, "DUST", "Dust", new Color(162, 168, 9));
     public static Element dmnd = new Element(2, "DMND", "Diamond", new Color(32, 248, 228));
@@ -31,7 +31,12 @@ public class Element {
     public static Element radp = new Element(16, "RADP", "Radioactive particle", new Color(0, 17, 214));
     public static Element clne = new Element(17, "CLNE", "Clone", Color.YELLOW);
     public static Element plut = new Element(18, "PLUT", "Plutonium", new Color(27, 122, 0)); // Totally not ripped off from tpt
-
+    
+    public static Element getID(int id) {
+    	if(el_map.containsKey(id)) return el_map.get(id);
+    	return el_map.get(0); // Do a throw exception instead?
+    }
+    
     static IElementMovement em_phot = new IElementMovement() {
         public void move(Particle p) {
             int ny = p.y + (int) p.vy;
@@ -177,7 +182,7 @@ public class Element {
                         }
                     }
             if(p.life==0) {
-            	p.morph(el_map.get(p.ctype), Particle.MORPH_FULL, false);
+            	p.morph(getID(p.ctype), Particle.MORPH_FULL, false);
             	p.life = 4;
             }
         }
@@ -200,7 +205,12 @@ public class Element {
         }
     };
 
-    // Element properties - fun!
+    public static final int CM_TYPE = 0; // Converts by set type.
+    public static final int CM_CTYPE = 1; // Converts by ctype.
+    public static final int CS_LSS = 10; // Converts less than temp.
+    public static final int CS_GTR = 11; // Converts greater than temp.
+    public static final int CS_EQ = 12; // Converts equal to temp.
+    
     static {
         none.remove = true;
         none.weight = -Integer.MAX_VALUE;
@@ -218,7 +228,7 @@ public class Element {
         gas.weight = 5;
         gas.flammibility = 0.8;
         gas.sandEffect = true;
-        gas.convertToAt(fire, 120);
+        gas.setConvert(fire, CS_GTR, 250);
         gas.setMovement(em_gas);
         el_map.put(3, gas);
 
@@ -231,18 +241,18 @@ public class Element {
         salt.weight = 100;
         salt.sandEffect = true;
         salt.setMovement(em_powder);
-        salt.convertToAt(lava, 200);
+        salt.setConvert(lava, CS_GTR, 801);
         el_map.put(5, salt);
 
         metl.weight = 1000;
         metl.conducts = true;
-        metl.convertToAt(lava, 1000);
+        metl.setConvert(lava, CS_GTR, 1100);
         metl.setParticleBehaviour(new ParticleBehaviour() {
             public void init(Particle p) {
             }
 
             public void update(Particle p) {
-                double c = p.celcius / p.el.convAt;
+                double c = p.celcius / p.el.conv_temp;
                 p.setDeco(new Color((int) (255.0 * c) % 255, (int) (255.0 * c) % 255, 224));
             }
         });
@@ -258,14 +268,14 @@ public class Element {
         fire.life = 120;
         fire.life_dmode = 1;
         fire.celcius = 400;
-        fire.convertToAt(plsm, 1001);
+        fire.setConvert(plsm, CS_GTR, 2500);
         fire.setMovement(em_gas);
         fire.setParticleBehaviour(fire_behaviour);
         el_map.put(8, fire);
 
         wood.flammibility = 0.5;
         wood.weight = 500;
-        wood.convertToAt(fire, 1980);
+        wood.setConvert(fire, CS_GTR, 1980);
         el_map.put(9, wood);
 
         sprk.life = 4;
@@ -275,7 +285,7 @@ public class Element {
         
         watr.setMovement(em_liquid);
         watr.weight = 50;
-        watr.convertToAt(stm, 101);
+        watr.setConvert(stm, CS_GTR, 100);
         watr.conducts = true;
         el_map.put(11, watr);
         
@@ -283,8 +293,7 @@ public class Element {
         plsm.life = 120;
         plsm.life_dmode = 1;
         plsm.sandEffect = true;
-        plsm.convertToAt(fire, 1000);
-        plsm.convMelt = false;
+        plsm.setConvert(fire, CS_LSS, fire.conv_temp+1);
         plsm.setParticleBehaviour(plsm_behaviour);
         el_map.put(12, plsm);
         
@@ -295,20 +304,18 @@ public class Element {
         
         stne.weight = 105;
         stne.sandEffect = true;
-        stne.convertToAt(lava, 200);
+        stne.setConvert(lava, CS_GTR, salt.conv_temp);
         stne.setMovement(em_powder);
         el_map.put(14, stne);
         
         stm.weight = 5;
         stm.celcius = 120;
         stm.sandEffect = true;
-        stm.convertToAt(watr, 100);
-        stm.convMelt = false;
+        stm.setConvert(watr, CS_LSS, 100);
         stm.setMovement(em_gas);
         el_map.put(15, stm);
 
         radp.weight = 0;
-        radp.convMelt = false;
         radp.life_dmode = 1;
         radp.setMovement(em_radioactive);
         radp.setParticleBehaviour(radioactive_behaviour);
@@ -327,7 +334,7 @@ public class Element {
 						if(!Cells.particleAt(p.x+w, p.y+h)) {
 							int x = p.x+w;
 							int y = p.y+h;
-							Cells.setParticleAt(x, y, new Particle(el_map.get(p.ctype), x, y), false);
+							Cells.setParticleAt(x, y, new Particle(getID(p.ctype), x, y), false);
 						}
 			}
         });
@@ -337,7 +344,6 @@ public class Element {
         plut.setMovement(em_powder);
         plut.setParticleBehaviour(plutonium_behaviour);
         plut.life_dmode = 1;
-        plut.convMelt = false;
         el_map.put(18, plut);
         
         // Running out of space in SideMenu ; going to have to figure out something new
@@ -358,14 +364,25 @@ public class Element {
     public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
     public double heatTransfer = 0.3;
     
-    // Keep conversion this way?
-    public Element conv;
-    public double convAt = 22.0;
-    public boolean convMelt = true; // true = <  false = >
+    public boolean convert = false;
+    public Element conv = this;
+    public double conv_temp = 22.0;
+    public int conv_method = CM_CTYPE;
+    public int conv_sign = CS_GTR;
     
-    public void convertToAt(Element e, double temp) {
+    public void setConvert(Element e, int sign, double temp) {
+    	convert = true;
     	conv = e;
-    	convAt = temp;
+    	conv_method = CM_TYPE;
+    	conv_sign = sign;
+    	conv_temp = temp;
+    }
+    
+    public void setCtypeConvert(int sign, double temp) {
+    	convert = true;
+    	conv_method = CM_CTYPE;
+    	conv_sign = sign;
+    	conv_temp = temp;
     }
     
     public Color color = new Color(180, 180, 30);
