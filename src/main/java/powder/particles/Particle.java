@@ -1,13 +1,17 @@
 package main.java.powder.particles;
 
 import main.java.powder.Cells;
+import main.java.powder.Game;
 import main.java.powder.elements.Element;
 
 import java.awt.*;
 import java.util.Random;
 
 public class Particle {
-
+	
+	public static final int MORPH_FULL = 0;
+    public static final int MORPH_KEEP_TEMP = 1;
+	
     public Random r = new Random();
     public Element el;
     public int x, y;
@@ -21,7 +25,21 @@ public class Particle {
     public long last_update = System.currentTimeMillis();
 
     public Particle(Element e, int x, int y) {
-        el = e;
+    	init(e, x, y);
+    }
+
+    public Particle(Element e, int x, int y, long life, double celcius) {
+    	init(e, x, y);
+        this.life = life;
+        this.celcius = celcius;
+        setRemove(el.remove);
+        if (el.sandEffect) addSandEffect();
+        if (el.behaviour != null) el.behaviour.init(this);
+    }
+    
+    public void init(Element e, int x, int y) {
+    	deco = null;
+    	el = e;
         this.x = x;
         this.y = y;
         this.life = el.life;
@@ -30,18 +48,7 @@ public class Particle {
         if (el.sandEffect) addSandEffect();
         if (el.behaviour != null) el.behaviour.init(this);
     }
-
-    public Particle(Element e, int x, int y, long life, double celcius) {
-        el = e;
-        this.x = x;
-        this.y = y;
-        this.life = life;
-        this.celcius = celcius;
-        setRemove(el.remove);
-        if (el.sandEffect) addSandEffect();
-        if (el.behaviour != null) el.behaviour.init(this);
-    }
-
+    
     public boolean burn() {
         return Math.random() < el.flammibility;
     }
@@ -71,8 +78,9 @@ public class Particle {
     }
     
     public Color getTempColor() {
-    	int c = (int) (celcius % 200) + 55;
+    	int c = (int) celcius % 200 + 55;
     	return new Color(c, c, c);
+    	//return getColorFromDecimal(tempToDecimal(celcius));
     }
     
     public void setDeco(Color c) { // EW
@@ -114,16 +122,14 @@ public class Particle {
             			double trans = p.el.heatTransfer;
             			p.celcius += (diff * trans);
         				celcius = celcius - (diff * trans);
-        				if(celcius < -273.25) celcius = -273.25;
-        				if(celcius > 9725.85) celcius = 9725.85;
+        				if(celcius < Game.MIN_TEMP) celcius = Game.MIN_TEMP;
+        				if(celcius > Game.MAX_TEMP) celcius = Game.MAX_TEMP;
             		}
             
-            if(convert()) {
-            	Particle conv = new Particle(el.conv, x, y);
-            	conv.ctype = el.id;
-            	conv.celcius = celcius;
-            	Cells.setParticleAt(x, y, conv, true);
-            }
+            //if(convert()) {
+            //	creating null spaces
+            //	morph(el.conv, MORPH_KEEP_TEMP, true);
+            //}
             
             if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {
@@ -133,7 +139,7 @@ public class Particle {
                     if (el.behaviour != null) el.behaviour.destruct(this);
                 }
                 // Decay mode
-                if (el.life_dmode == 2) Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
+                if (el.life_dmode == 2) morph(Element.el_map.get(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
             }
             if (!Cells.validGame(x, y)) setRemove(true);
             last_update = System.currentTimeMillis();
@@ -148,4 +154,51 @@ public class Particle {
             Cells.moveTo(x, y, nx, ny);
         }
     }
+    
+    public void morph(Element e, int type, boolean makectype) {
+    	int id = el.id;
+    	switch(type) {
+    	case(MORPH_FULL):
+    		init(e, x, y); break;
+    	case(MORPH_KEEP_TEMP):
+    		double temp = celcius;
+    		init(e, x, y); 
+    		celcius = temp; break;
+    	default:
+    		init(e, x, y); break;
+    	}
+    	if(makectype) ctype = id;
+    }
+    
+    /* Attempt at colorized temperature view but is too slow on fps and doesn't look good.
+    static long tempToDecimal(double t) {
+		return (long) (16777215 * (t/(Math.abs(Game.MAX_TEMP)+Math.abs(Game.MIN_TEMP))));
+	}
+	
+	static Color getColorFromDecimal(long dec) {
+		 int p = 3;
+         int i = 0;
+         int[] pts = new int[4];
+         boolean alpha = dec > power256[3];
+         if(dec>power256[4])
+        	 dec = (long) (dec-power256[4]);
+         while(true) {
+                 if(dec<i*power256[p]) {
+                	 dec = (long) (dec-((i-1)*power256[p]));
+                         pts[3-p]=i-1;
+                         p--;
+                         i=0;
+                 } else i++;
+                 if(p<0) break;
+         }
+         return new Color(pts[3], pts[2], pts[1], alpha ? pts[0] : 255);
+	}
+	
+	public static double[] power256 = {
+		   Math.pow(256,0),
+		   Math.pow(256,1),
+		   Math.pow(256,2),
+		   Math.pow(256,3),
+		   Math.pow(256,4)
+	};*/
 }

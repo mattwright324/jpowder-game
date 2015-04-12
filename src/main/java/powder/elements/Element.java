@@ -114,10 +114,13 @@ public class Element {
         public void update(Particle p) {
             p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
             for (int w = 0; w < 3; w++)
-                for (int h = 0; h < 3; h++)
-                    if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
-                        Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y + (h - 1), p.y + (h - 1)), true);
+                for (int h = 0; h < 3; h++) {
+                	Particle o;
+                	if((o = Cells.getParticleAt(p.x +w-1, p.y+h-1)) != null && o.burn()) {
+                        o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
                     }
+                }
+                    
             p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
         }
     };
@@ -135,14 +138,13 @@ public class Element {
                 }
             }
             // Set self to neutron
-            Cells.setParticleAt(p.x, p.y, new Particle(Element.radp, p.x, p.y), true);
+            p.morph(radp, Particle.MORPH_KEEP_TEMP, true);
             // Instantly update, causing a decay cascade. This looks cool especially in temp view.
-            Element.radp.behaviour.update(Cells.getParticleAt(p.x, p.y));
+            // Element.radp.behaviour.update(Cells.getParticleAt(p.x, p.y));
         }
     };
 
     static ParticleBehaviour radioactive_behaviour = new ParticleBehaviour() {
-        @Override
         public void init(Particle p) {
             // Instead of having vx and vy set in move() this ensures the particles are at a constant speed.
             p.life = r.nextInt(50) + 1;
@@ -150,13 +152,11 @@ public class Element {
             p.vx = r.nextInt(4) + 1;
             p.vy = r.nextInt(4) + 1;
         }
-        @Override
+        
         public void update(Particle p) {
             for (Particle part : Cells.getSurroundingParticles(p.x, p.y)) {
-                if (part == null) continue;
-                if (part.el == Element.plut) {
+                if(part!=null && part.el == Element.plut) {
                     part.life = 1;
-                    Cells.setParticleAt(part.x, part.y, part, true);
                 }
             }
         }
@@ -164,24 +164,22 @@ public class Element {
 
     static ParticleBehaviour sprk_behaviour = new ParticleBehaviour() {
         public void init(Particle p) {
-            // TODO: stuff
         }
-
         public void update(Particle p) {
             if (p.life == 4)
                 for (int w = 0; w < 5; w++)
                     for (int h = 0; h < 5; h++) {
                         int x = p.x - (w - 2);
                         int y = p.y - (h - 2);
-                        if (Cells.valid(x, y)) {
-                            Particle o = Cells.getParticleAt(x, y);
-                            if (o != null) {
-                                Particle s = new Particle(sprk, x, y);
-                                s.ctype = o.el.id;
-                                if (o.el.conducts && o.life == 0) Cells.setParticleAt(x, y, s, true);
-                            }
+                        Particle o;
+                        if (Cells.valid(x, y) && (o=Cells.getParticleAt(x, y))!=null) {
+                        	if (o.el.conducts && o.life == 0) o.morph(sprk, Particle.MORPH_FULL, true);
                         }
                     }
+            if(p.life==0) {
+            	p.morph(el_map.get(p.ctype), Particle.MORPH_FULL, false);
+            	p.life = 4;
+            }
         }
     };
 
@@ -194,10 +192,11 @@ public class Element {
         public void update(Particle p) {
             p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
             for (int w = 0; w < 3; w++)
-                for (int h = 0; h < 3; h++)
-                    if (Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)) != null && Cells.getParticleAt(p.x + (w - 1), p.y + (h - 1)).burn()) {
-                        Cells.setParticleAt(p.x + (w - 1), p.y + (h - 1), new Particle(fire, p.y+(h-1), p.y+(h- 1)), true);
-                    }
+                for (int h = 0; h < 3; h++) {
+                	Particle o;
+                	if((o = Cells.getParticleAt(p.x+(w-1), p.y+(h-1)))!=null && o.burn())
+                		o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
+                }
         }
     };
 
@@ -269,7 +268,7 @@ public class Element {
         el_map.put(9, wood);
 
         sprk.life = 4;
-        sprk.life_dmode = 2;
+        sprk.weight = metl.weight;
         sprk.setParticleBehaviour(sprk_behaviour);
         el_map.put(10, sprk);
         
@@ -291,7 +290,6 @@ public class Element {
         lava.setMovement(em_liquid);
         lava.weight = 50;
         lava.celcius = 1100;
-        lava.conducts = false; // Why does it conduct? That's broken as fuck when I tried it.
         el_map.put(13, lava);
         
         stne.weight = 105;
@@ -357,10 +355,12 @@ public class Element {
     public boolean sandEffect = false;
     public boolean life_decay = true;
     public int life_dmode = 0; // 0 = Nothing, 1 = Remove, 2 = Change to Ctype
+    public double heatTransfer = 0.3;
+    
+    // Keep conversion this way?
     public Element conv;
     public double convAt = 22.0;
     public boolean convMelt = true; // true = <  false = >
-    public double heatTransfer = 0.3;
     
     public void convertToAt(Element e, double temp) {
     	conv = e;

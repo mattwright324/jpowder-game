@@ -20,7 +20,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	static boolean small = true;
 	static Graphics2D w2d;
-	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 	static Graphics2D b2d = img.createGraphics();
 	static Font typeface = new Font("Monospaced", Font.PLAIN, 12);
 	static Element left = Element.dust; // Hacky as fuck.
@@ -53,7 +53,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		addMouseWheelListener(this);
 		addMouseMotionListener(this);
 
-		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_4BYTE_ABGR);
 		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "");
 		setCursor(blankCursor);
 	}
@@ -122,10 +122,12 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		Particle p;
 		String info = "Empty";
 		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
-			info = p.el.shortName;
-			if(!(p.ctype==0) && Element.el_map.containsKey(p.ctype)) info += "("+Element.el_map.get(p.ctype).shortName+")";
-			info += ", Temp:"+p.temp();
-			info += ", Life:"+p.life;
+			if(p.el!=null) {
+				info = p.el.shortName;
+				if(!(p.ctype==0) && Element.el_map.containsKey(p.ctype)) info += "("+Element.el_map.get(p.ctype).shortName+")";
+				info += ", Temp:"+p.temp();
+				info += ", Life:"+p.life;
+			} else p.setRemove(true);
 		}
 		w2d.drawString(info, 5, getHeight()-10);
 		dfps.add();
@@ -154,9 +156,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				if(p==null || e == Element.none)
 					Cells.setParticleAt(x, y, new Particle(e, x, y), e == Element.none);
 				else if(p.el.conducts && e==Element.sprk) {
-					Particle sprk = new Particle(Element.sprk, x, y);
-					sprk.ctype = p.el.id;
-					Cells.setParticleAt(x, y, sprk, true);
+					p.morph(Element.sprk, Particle.MORPH_KEEP_TEMP, true);
 				} else if(p.el == Element.clne) {
 					p.ctype = e.id;
 				}

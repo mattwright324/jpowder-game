@@ -8,7 +8,10 @@ public class Game extends Thread {
 	static boolean paused = false;
 	static Display.FPS gfps = new Display.FPS();
 	static Random r = new Random();
-
+	
+	public static final double MIN_TEMP = -273.15;
+	public static final double MAX_TEMP = 9725.85;
+	
 	static void update() {
 		for (int w = 0; w < Display.width; w++) {
 			for (int h = 0; h < Display.height; h++) {
