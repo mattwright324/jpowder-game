@@ -2,7 +2,6 @@ package main.java.powder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class Window extends JFrame {
 	
 	public static void main(String[] args) {
 		try {
-			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/java/powder/img/colorstrip.png"));
+			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("powder/colorstrip.png"));
 		} catch (IOException e) {}
     }
 	

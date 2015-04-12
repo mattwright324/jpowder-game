@@ -2,9 +2,13 @@ apply plugin: 'java'
 apply plugin: 'application'
 sourceCompatibility = 1.5
 version = '0.0.1'
-
+mainClassName = "main.java.powder.Window"
 repositories {
     mavenCentral()
 }
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+}
 
-mainClassName = "powder.Main"
