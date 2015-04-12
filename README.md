@@ -1,7 +1,7 @@
 # jpowder-game
 A java cellular automata based on The Powder Toy.
 
-Thread located at http://powdertoy.co.uk/Discussions/Thread/View.html?Thread=19989&PageNum=0
+Thread located at [powdertoy.co.uk](http://powdertoy.co.uk/Discussions/Thread/View.html?Thread=19989&PageNum=0)
 
 TODO:
 * Walls and Pressure
