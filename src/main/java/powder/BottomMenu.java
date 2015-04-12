@@ -9,12 +9,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import main.java.powder.elements.Element;
 
-public class BottomMenu extends JPanel implements ActionListener, MouseListener {
+public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -26,6 +30,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	public BottomMenu() {
 		setFocusable(true);
 		addMouseListener(this);
+		addMouseMotionListener(this);
 	}
 	
 	public int b_w = 40;
@@ -38,8 +43,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 	public Rectangle pause = new Rectangle(5+90, b_y, b_w, b_h);
 	public Rectangle view = new Rectangle(5+135, b_y, b_w, b_h);
 	
-	// Try to display elements in bottom bar and have categories on the right.
-	public Rectangle el_test = new Rectangle(5, 5, b_w, b_h);
+	public List<Button> buttons = new ArrayList<Button>();
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -53,7 +57,8 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		g2d.fill(resize);
 		g2d.fill(pause);
 		g2d.fill(view);
-		g2d.fill(el_test);
+		makeButtons();
+		draw_buttons();
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("NEW", clear.x+5, b_txt_center);
 		g2d.drawString("SIZE", resize.x+5, b_txt_center);
@@ -79,11 +84,43 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 			Game.paused = true;
 			Cells.setAllOfAs(-1, Element.none);
 		}
-		if(resize.contains(e.getPoint())) Display.toggle_size();
-		if(pause.contains(e.getPoint())) Display.toggle_pause();
-		if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); 
+		else if(resize.contains(e.getPoint())) Display.toggle_size();
+		else if(pause.contains(e.getPoint())) Display.toggle_pause();
+		else if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); {
+			for(Button b : buttons) {
+				if(b.contains(e.getPoint())) {
+					if(SwingUtilities.isLeftMouseButton(e))
+						Display.left = b.el;
+					if(SwingUtilities.isRightMouseButton(e))
+						Display.right = b.el;
+				}
+			}
+		}
 	}
-
+	
+	public void makeButtons() {
+		buttons.clear();
+		int i=0;
+		for(Element e : SideMenu.selected) {
+			int x = Window.mouse.x;
+			if(x > Window.window.getWidth()/2) x = Window.window.getWidth()/2;
+			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*i++)+(getWidth()-x-(getWidth()/2)), 5, b_w, b_h);
+			b.setElement(e);
+			buttons.add(b);
+		}
+	}
+	
+	public void draw_buttons() {
+		for(Button b : buttons) {
+			Color c = b.el.getColor();
+			g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
+			g2d.setPaintMode();
+			g2d.fill(b);
+			g2d.setColor(Color.WHITE);
+			g2d.drawString(b.el.shortName, b.x+2, b.y+b_h/2+5);
+		}
+	}
+	
 	public void mouseReleased(MouseEvent e) {
 		
 	}
@@ -92,4 +129,24 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener 
 		repaint();
 	}
 	
+	public class Button extends Rectangle {
+		private static final long serialVersionUID = 1L;
+		public Button(int x, int y, int w, int h) {
+			super(x, y, w, h);
+		}
+		public void setElement(Element e) {
+			el = e;
+		}
+		public Element el;
+	}
+	
+	public void mouseDragged(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
+		repaint();
+	}
+
+	public void mouseMoved(MouseEvent e) {
+		Window.updateMouseInFrame(e.getPoint(), this);
+		repaint();
+	}
 }

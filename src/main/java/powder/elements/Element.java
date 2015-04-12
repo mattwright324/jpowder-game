@@ -18,19 +18,27 @@ public class Element {
     public static Element gas = new Element(3, "GAS", "Gas",new Color(208, 180, 208));
     public static Element warp = new Element(4, "WARP", "Warp", new Color(32, 32, 32));
     public static Element salt = new Element(5, "SALT", "Salt", new Color(243, 243, 243));
-    public static Element metl = new Element(6, "METL", "Metal", new Color(64, 64, 224));
+    public static Element metl = new Element(6, "METL", "Metal", new Color(112, 122, 255));
     public static Element phot = new Element(7, "PHOT", "Light", Color.WHITE);
     public static Element fire = new Element(8, "FIRE", "Fire", Color.RED);
     public static Element wood = new Element(9, "WOOD", "Wood", Color.ORANGE.darker());
     public static Element sprk = new Element(10, "SPRK", "Spark", Color.YELLOW);
     public static Element watr = new Element(11, "WATR", "Water", Color.BLUE);
-    public static Element plsm = new Element(12, "PLSM", "Plasma", new Color(180, 80, 180));
+    public static Element plsm = new Element(12, "PLSM", "Plasma", new Color(217, 151, 219));
     public static Element lava = new Element(13, "LAVA", "Molten material.", Color.ORANGE);
     public static Element stne = new Element(14, "STNE", "Stone", Color.LIGHT_GRAY);
-    public static Element stm = new Element(15, "STM", "Steam", Color.CYAN.darker());
+    public static Element stm = new Element(15, "STM", "Steam", new Color(172, 177, 242));
     public static Element radp = new Element(16, "RADP", "Radioactive particle", new Color(0, 17, 214));
     public static Element clne = new Element(17, "CLNE", "Clone", Color.YELLOW);
-    public static Element plut = new Element(18, "PLUT", "Plutonium", new Color(27, 122, 0)); // Totally not ripped off from tpt
+    public static Element plut = new Element(18, "PLUT", "Plutonium", new Color(0, 179, 21)); // Totally not ripped off from tpt
+    public static Element lin = new Element(18, "LN2", "Liquid Nitrogen", new Color(190, 226, 237));
+    
+    public static Element[] solids = new Element[]{dmnd, metl, wood, clne};
+    public static Element[] liquids = new Element[]{watr, lava, lin};
+    public static Element[] gasses = new Element[]{gas, warp, fire, plsm};
+    public static Element[] powders = new Element[]{dust, salt, stne};
+    public static Element[] radioactive = new Element[]{phot, radp, plut};
+    public static Element[] tools = new Element[]{none, sprk};
     
     public static Element getID(int id) {
     	if(el_map.containsKey(id)) return el_map.get(id);
@@ -137,15 +145,13 @@ public class Element {
         public void update(Particle p) {}
         
         public void destruct(Particle p) {
-            for (int x = p.x - 1; x <= p.x + 1; x++) {
+            /*for (int x = p.x - 1; x <= p.x + 1; x++) {
                 for (int y = p.y - 1; x <= p.y + 1; y++) {
                     if (!Cells.particleAt(x, y)) Cells.setParticleAt(x, y, new Particle(Element.radp, x, y), false);
                 }
-            }
-            // Set self to neutron
+            }*/
             p.morph(radp, Particle.MORPH_KEEP_TEMP, true);
-            // Instantly update, causing a decay cascade. This looks cool especially in temp view.
-            // Element.radp.behaviour.update(Cells.getParticleAt(p.x, p.y));
+            p.celcius += 4500; // Decay should result in a lot of heat + pressure (when added)
         }
     };
 
@@ -183,7 +189,11 @@ public class Element {
                     }
             if(p.life==0) {
             	p.morph(getID(p.ctype), Particle.MORPH_FULL, false);
-            	p.life = 4;
+            	if(p.celcius < 300)
+            		p.celcius += 50;
+            	else
+            		p.celcius -= 50;
+            	p.life = 6;
             }
         }
     };
@@ -237,7 +247,7 @@ public class Element {
         warp.life_dmode = 1;
         warp.setMovement(em_gas);
         el_map.put(4, warp);
-
+        
         salt.weight = 100;
         salt.sandEffect = true;
         salt.setMovement(em_powder);
@@ -248,12 +258,13 @@ public class Element {
         metl.conducts = true;
         metl.setConvert(lava, CS_GTR, 1100);
         metl.setParticleBehaviour(new ParticleBehaviour() {
-            public void init(Particle p) {
-            }
-
+            public void init(Particle p) {}
             public void update(Particle p) {
-                double c = p.celcius / p.el.conv_temp;
-                p.setDeco(new Color((int) (255.0 * c) % 255, (int) (255.0 * c) % 255, 224));
+            	Color c = p.getColor();
+            	int red = (int) (112 + (255-112) * (p.celcius + -274) / (p.el.conv_temp + -274));
+            	red = red % 255;
+                //double c = p.celcius / p.el.conv_temp;
+                p.setDeco(new Color(red, c.getGreen(), c.getBlue()));
             }
         });
         el_map.put(6, metl);
@@ -299,7 +310,14 @@ public class Element {
         
         lava.setMovement(em_liquid);
         lava.weight = 50;
-        lava.celcius = 1100;
+        lava.celcius = 1522;
+        lava.setCtypeConvert(CS_LSS, 700);
+        lava.setParticleBehaviour(new ParticleBehaviour(){
+			public void init(Particle p) {
+				p.ctype = stne.id;
+			}
+			public void update(Particle p) {}
+        });
         el_map.put(13, lava);
         
         stne.weight = 105;
@@ -346,7 +364,17 @@ public class Element {
         plut.life_dmode = 1;
         el_map.put(18, plut);
         
-        // Running out of space in SideMenu ; going to have to figure out something new
+        lin.weight = 15;
+        lin.setMovement(em_liquid);
+        lin.celcius = -273;
+        lin.life_dmode = 1;
+        lin.setParticleBehaviour(new ParticleBehaviour() {
+			public void init(Particle p) {}
+			public void update(Particle p) {
+				if(p.celcius > -100 && p.life==0) p.life = 5+r.nextInt(20);
+			}
+        });
+        el_map.put(19, lin);
     }
 
     public int id = 0;
@@ -369,21 +397,6 @@ public class Element {
     public double conv_temp = 22.0;
     public int conv_method = CM_CTYPE;
     public int conv_sign = CS_GTR;
-    
-    public void setConvert(Element e, int sign, double temp) {
-    	convert = true;
-    	conv = e;
-    	conv_method = CM_TYPE;
-    	conv_sign = sign;
-    	conv_temp = temp;
-    }
-    
-    public void setCtypeConvert(int sign, double temp) {
-    	convert = true;
-    	conv_method = CM_CTYPE;
-    	conv_sign = sign;
-    	conv_temp = temp;
-    }
     
     public Color color = new Color(180, 180, 30);
     public IElementMovement movement;
@@ -408,7 +421,26 @@ public class Element {
         description = desc;
         setColor(c);
     }
-
+    
+    public String toString() {
+    	return shortName;
+    }
+    
+    public void setConvert(Element e, int sign, double temp) {
+    	convert = true;
+    	conv = e;
+    	conv_method = CM_TYPE;
+    	conv_sign = sign;
+    	conv_temp = temp;
+    }
+    
+    public void setCtypeConvert(int sign, double temp) {
+    	convert = true;
+    	conv_method = CM_CTYPE;
+    	conv_sign = sign;
+    	conv_temp = temp;
+    }
+    
     public boolean heavierThan(Element e) {
         return e.weight > weight;
     }

@@ -4,6 +4,8 @@ import main.java.powder.particles.Particle;
 
 import java.util.Random;
 
+import main.java.powder.particles.Particle;
+
 
 public class Game extends Thread {
 	
