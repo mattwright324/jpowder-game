@@ -127,6 +127,7 @@ public class Particle {
             	for(int h=-1; h<2; h++)
             		if(Cells.particleAt(x+w, y+h) && !(w==0 && h==0)) {
             			Particle p = Cells.getParticleAt(x+w, y+h);
+                        if (p == null) continue; // What? Why the hell is this NullPointering?!?!
             			double diff = (celcius - p.celcius);
             			double trans = p.el.heatTransfer;
             			p.celcius += (diff * trans);

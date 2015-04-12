@@ -136,6 +136,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void draw_cell(Cell c) {
 		if (c.part == null) return;
 		for (int pnum = 0; pnum < 9; pnum++) {
+			if (c.part == null) continue; // Required for plutonium, because it does something special.
+			// For some reason there's a race condition in here.
 			if (c.part[pnum] != null) {
 				if (c.part[pnum].remove()) {
 					// bad for performance
