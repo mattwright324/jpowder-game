@@ -265,6 +265,7 @@ public class Element {
 
         wood.flammibility = 0.5;
         wood.weight = 500;
+        wood.convertToAt(fire, 1980);
         el_map.put(9, wood);
 
         sprk.life = 4;

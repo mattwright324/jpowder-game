@@ -126,10 +126,10 @@ public class Particle {
         				if(celcius > Game.MAX_TEMP) celcius = Game.MAX_TEMP;
             		}
             
-            //if(convert()) {
-            //	creating null spaces
-            //	morph(el.conv, MORPH_KEEP_TEMP, true);
-            //}
+            if(convert()) {
+            	if(el.conv!=null) // Convert calling true when shouldn't. Not sure why I have to need this but do.
+            		morph(el.conv, MORPH_KEEP_TEMP, true);
+            }
             
             if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {
