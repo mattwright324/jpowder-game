@@ -28,23 +28,14 @@ public class Particle {
     	init(e, x, y);
     }
 
-    public Particle(Element e, int x, int y, long life, double celcius) {
-    	init(e, x, y);
-        this.life = life;
-        this.celcius = celcius;
-        setRemove(el.remove);
-        if (el.sandEffect) addSandEffect();
-        if (el.behaviour != null) el.behaviour.init(this);
-    }
-    
     public void init(Element e, int x, int y) {
-    	deco = null;
     	el = e;
         this.x = x;
         this.y = y;
         this.life = el.life;
         this.celcius = el.celcius;
         setRemove(el.remove);
+        deco = null;
         if (el.sandEffect) addSandEffect();
         if (el.behaviour != null) el.behaviour.init(this);
     }
@@ -54,16 +45,17 @@ public class Particle {
     }
     
     public boolean convert() {
+    	if(!el.convert) return false;
     	switch(el.conv_sign) {
     	case(Element.CS_GTR):
     		return el.conv_temp < celcius;
     	case(Element.CS_LSS):
     		return el.conv_temp > celcius;
     	case(Element.CS_EQ):
-    		return el.conv_temp == celcius;
+    		return (int) el.conv_temp == (int) celcius;
+    	default:
+    		return el.conv_temp < celcius;
     	}
-    	return false;
-    	//return el.conv!=null && el.convMelt ? el.convAt <= celcius : el.convAt >= celcius;
     }
     
     public boolean warmerThan(Particle p) {
@@ -138,7 +130,7 @@ public class Particle {
             if(convert()) {
             	if(el.conv_method==Element.CM_TYPE)
             		morph(el.conv, MORPH_KEEP_TEMP, true);
-            	if(el.conv_method==Element.CM_CTYPE)
+            	else if(el.conv_method==Element.CM_CTYPE)
             		morph(Element.getID(ctype), MORPH_KEEP_TEMP, true);
             }
             
