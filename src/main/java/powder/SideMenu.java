@@ -87,20 +87,11 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 		
 		b2d.drawString("Tools", 10, b_txt+(b_h+5)*line);
 		b2d.drawString(Element.tools.length+"", 10, b_txtn+(b_h+5)*line++);
-		/*for (int key : Element.el_map.keySet()) {
-			Element e = Element.el_map.get(key);
-			b2d.setPaintMode();
-			b2d.setColor(e.getColor());
-			b2d.fillRect(5, 5+key*20, getWidth()-10, 15);
-			b2d.setColor(Color.WHITE);
-			b2d.setXORMode(Color.BLACK);
-			b2d.drawString(e.shortName, 12, 17+key*20);
-		}*/
 		
 		b2d.setPaintMode();
 		g2d.drawImage(img, null, 0, 0);
 	}
-
+	
 	public void actionPerformed(ActionEvent e) {
 		repaint();
 	}
@@ -119,8 +110,6 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
 	public void mousePressed(MouseEvent e) {
 		Point p = e.getPoint();
-		//int id = (e.getPoint().y-5)/20;
-		//if (Element.el_map.containsKey(id)) Display.left = Element.el_map.get(id);
 		if(sl.contains(p)) selected = Element.solids;
 		if(ll.contains(p)) selected = Element.liquids;
 		if(gl.contains(p)) selected = Element.gasses;

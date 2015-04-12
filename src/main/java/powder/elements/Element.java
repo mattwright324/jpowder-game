@@ -311,7 +311,7 @@ public class Element {
         lava.setMovement(em_liquid);
         lava.weight = 50;
         lava.celcius = 1522;
-        //lava.setCtypeConvert(CS_LSS, 700);
+        lava.setCtypeConvert(CS_LSS, 700);
         lava.setParticleBehaviour(new ParticleBehaviour(){
 			public void init(Particle p) {
 				p.ctype = stne.id;
@@ -371,7 +371,7 @@ public class Element {
         lin.setParticleBehaviour(new ParticleBehaviour() {
 			public void init(Particle p) {}
 			public void update(Particle p) {
-				if(p.celcius > -100) p.life = 5+r.nextInt(20);
+				if(p.celcius > -100 && p.life==0) p.life = 5+r.nextInt(20);
 			}
         });
         el_map.put(19, lin);
