@@ -20,9 +20,18 @@ public class Cells {
     
     public static Particle getParticleAt(int x, int y) {
         if (!valid(x, y)) return null;
+        if (cells[x][y].part == null) return null;
+        return cells[x][y].part[0];
+    }
+    public static Particle getParticleAt(int x, int y, int stackIndex) {
+        if (!valid(x, y)) return null;
+        if (cells[x][y].part == null) return null;
+        return cells[x][y].part[stackIndex];
+    }
+    public static Particle[] getAllParticlesAt(int x, int y) {
+        if (!valid(x, y)) return null;
         return cells[x][y].part;
     }
-
     /**
      * Gets the particles that surround the particle at co-ordinates x,y.
      * @param x The x co-ord
@@ -38,21 +47,44 @@ public class Cells {
     				tmp[p++] = getParticleAt(x+(w-1), x+(h-1));
         return tmp;
     }
-    
+
+    public static boolean deleteParticle(int x, int y) {
+        if (!valid(x, y)) return false;
+        if (!particleAt(x, y)) return false;
+        cells[x][y].part = null; // java.lang.NullPointerException
+        return true;
+    }
+
     public static boolean particleAt(int x, int y) {
         return !valid(x, y) || cells[x][y].part != null;
     }
+    // I'm not taking responsibility if you forget to sanitise stackpos and end up passing it 12.
+    public static boolean particleInStackPos(int x, int y, int stackpos) {
+        return !valid(x, y) && (cells[x][y].part != null || cells[x][y].part[stackpos] != null);
+    }
     
-    public static void setParticleAt(int x, int y, Particle p, boolean insert) {
-        if (!valid(x, y)) return;
-        if (!insert && particleAt(x, y)) return;
+    public static boolean setParticleAt(int x, int y, Particle p, boolean insert) {
+        if (!valid(x, y)) return false;
+        if (!insert && particleAt(x, y)) return false;
         if (p != null) {
             p.x = x;
             p.y = y;
         }
-        cells[x][y].part = p;
+        if (cells[x][y].part == null) cells[x][y].part = new Particle[9];
+        cells[x][y].part[0] = p;
+        return true;
     }
-    
+
+    public static boolean setParticleAtWithStack(int x, int y, Particle p, int stackpos) {
+        if (!valid(x, y)) return false;
+        if (!particleAt(x, y) && stackpos != 0) return false;
+        if (p != null) {
+            p.x = x;
+            p.y = y;
+        }
+        cells[x][y].part[stackpos] = p;
+        return true;
+    }
     /**
      * Convert all cells of id n to a specific element.
      * id -1 = All
@@ -75,18 +107,35 @@ public class Cells {
     public static void moveTo(int x1, int y1, int x2, int y2) {
         if (!Cells.valid(x2, y2)) return;
         Particle a = getParticleAt(x1, y1);
-        setParticleAt(x1, y1, null, true);
+        deleteParticle(x1, y1);
         setParticleAt(x2, y2, a, true);
     }
 
     /**
      * Swap two particles coordinates.
      */
-    public static void swap(int x1, int y1, int x2, int y2) {
+    /*public static void swap(int x1, int y1, int x2, int y2) {
         if (!valid(x2, y2)) return;
         Particle a = getParticleAt(x1, y1);
         Particle b = getParticleAt(x2, y2);
         setParticleAt(x1, y1, b, true);
         setParticleAt(x2, y2, a, true);
+    }*/
+
+    /**
+     * Swap two cells rather than the particles.
+     */
+    public static void swap(int x1, int y1, int x2, int y2) {
+        if (!valid(x2, y2)) return;
+        Cell a = cells[x1][y1];
+        Cell b = cells[x2][y2];
+        a.x = x2;
+        a.y = y2;
+        b.x = x1;
+        b.y = y1;
+        a.cascadeUpdateParticlePositions();
+        cells[x1][y1] = b;
+        b.cascadeUpdateParticlePositions();
+        cells[x2][y2] = a;
     }
 }

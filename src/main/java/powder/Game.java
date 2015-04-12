@@ -1,5 +1,7 @@
 package main.java.powder;
 
+import main.java.powder.particles.Particle;
+
 import java.util.Random;
 
 
@@ -16,9 +18,9 @@ public class Game extends Thread {
 		for (int w = 0; w < Display.width; w++) {
 			for (int h = 0; h < Display.height; h++) {
 				if (Cells.particleAt(w, h)) {
-					try {
-						Cells.cells[w][h].part.update();
-					} catch (NullPointerException e) {}
+					for (Particle part : Cells.getAllParticlesAt(w, h)) {
+						if (!(part == null)) part.update();
+					}
 				}
 			}
 		}
