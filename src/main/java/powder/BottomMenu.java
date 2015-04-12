@@ -107,9 +107,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	public void makeButtons() {
 		// Could switch this out with element categories in SideMenu; SideMenu.getCategory() where returns Element[]
 		buttons.clear();
-		for(int id : Element.el_map.keySet()) {
-			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*id)+(getWidth()-mouse.x-(getWidth()/2)), 5, b_w, b_h);
-			b.setElement(Element.getID(id));
+		int i=0;
+		for(Element e : SideMenu.selected) {
+			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*i++)+(getWidth()-mouse.x-(getWidth()/2)), 5, b_w, b_h);
+			b.setElement(e);
 			buttons.add(b);
 		}
 	}

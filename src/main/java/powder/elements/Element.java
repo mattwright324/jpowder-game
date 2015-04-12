@@ -32,6 +32,12 @@ public class Element {
     public static Element clne = new Element(17, "CLNE", "Clone", Color.YELLOW);
     public static Element plut = new Element(18, "PLUT", "Plutonium", new Color(27, 122, 0)); // Totally not ripped off from tpt
     
+    public static Element[] solids = new Element[]{dmnd, metl, wood, clne};
+    public static Element[] liquids = new Element[]{watr, lava};
+    public static Element[] gasses = new Element[]{gas, warp, fire, plsm};
+    public static Element[] powders = new Element[]{dust, salt, stne, plut};
+    public static Element[] tools = new Element[]{none, sprk};
+    
     public static Element getID(int id) {
     	if(el_map.containsKey(id)) return el_map.get(id);
     	return el_map.get(0); // Do a throw exception instead?
