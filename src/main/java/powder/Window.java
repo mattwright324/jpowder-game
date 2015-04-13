@@ -2,7 +2,6 @@ package main.java.powder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class Window extends JFrame {
 	
 	public static void main(String[] args) {
 		try {
-			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/java/powder/img/colorstrip.png"));
+			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/colorstrip.png"));
 		} catch (IOException e) {}
     }
 	
@@ -35,7 +34,9 @@ public class Window extends JFrame {
 		setTitle("JPowder");
 		setResizable(false);
 		setVisible(true);
-		
+		try {
+			setIconImage(ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/jpowder1.png")));
+		} catch (IOException e) {}
 		game = new Display();
 		add(game, BorderLayout.CENTER);
 		
