@@ -35,7 +35,9 @@ public class Window extends JFrame {
 		setTitle("JPowder");
 		setResizable(false);
 		setVisible(true);
-		
+		try {
+			setIconImage(ImageIO.read(ClassLoader.getSystemResourceAsStream("main/java/powder/img/jpowder1.png")));
+		} catch (IOException e) {}
 		game = new Display();
 		add(game, BorderLayout.CENTER);
 		
