@@ -23,7 +23,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	static Graphics2D w2d;
 	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 	static Graphics2D b2d = img.createGraphics();
-	static Font typeface = new Font("Monospaced", Font.PLAIN, 12);
+	static Font typeface = new Font("Monospaced", Font.PLAIN, 11);
 	static Element left = Element.dust; // Hacky as fuck.
 	static Element right = Element.none;
 	static FPS dfps = new FPS();
@@ -57,6 +57,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_4BYTE_ABGR);
 		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "");
 		setCursor(blankCursor);
+		
+		setKeyBindings();
 	}
 
 	static void makeSmall() {
@@ -105,19 +107,20 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		b2d.setColor(new Color(244, 244, 244, 32));
 		b2d.fillRect(sx, sy, w, h);
 		
+		
 		w2d.drawImage(img, null, 0, 0);
 		w2d.setColor(Color.WHITE);
 		w2d.setXORMode(Color.BLACK);
 		w2d.setFont(typeface);
 		int line = 1;
-		w2d.drawString("FramesPS    "+dfps.fps(), 5, 15*line++);
-		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, 15*line++);
-		w2d.drawString("Selected    "+left.description, 5, 15*line++);
-		w2d.drawString("'Size      "+(small ? "Default" : "Large"), 5, 15*line++);
-		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
-		w2d.drawString("'F'         Frame", 5, 15*line++);
-		w2d.drawString("Display '1' or '2' "+viewName, 5, 15*line++);
-		w2d.drawString("Parts       " + size, 5, 15 * line++);
+		int spacing = w2d.getFontMetrics().getHeight();
+		w2d.drawString("FramesPS    "+dfps.fps(), 5, spacing*line++);
+		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, spacing*line++);
+		w2d.drawString("Selected    "+left.description, 5, spacing*line++);
+		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, spacing*line++);
+		w2d.drawString("'F'         Frame", 5, spacing*line++);
+		w2d.drawString("Display     "+viewName, 5, spacing*line++);
+		w2d.drawString("Parts       "+size, 5, spacing*line++);
 
 		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
 		Particle p;
@@ -131,6 +134,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			} else p.setRemove(true);
 		}
 		w2d.drawString(info, 5, getHeight()-10);
+		
 		dfps.add();
 	}
 	
@@ -235,25 +239,57 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void keyTyped(KeyEvent e) {
-		int key = e.getKeyChar();
-		if(key==' ') toggle_pause();
-		if(key=='s') toggle_size();
-		if(key=='f') {
-			Game.paused = true;
-			Game.update();
-		}
-
-		if(key=='[') {
-			draw_size-=2; updateMouse(mouse);
-			if(draw_size<0) draw_size = 0;
-		}
-		if(key==']') {
-			draw_size+=2; updateMouse(mouse);
-			if(draw_size<0) draw_size = 0;
-		}
-		
-		if(key=='1') setView(0); // Default
-		if(key=='2') setView(1); // Temperature Display
+		// Broken with focus issues.
+	}
+	
+	public InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	public ActionMap am = getActionMap();
+	
+	@SuppressWarnings("serial")
+	public void setKeyBindings() {
+		addKeyBinding(' ', "pause", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				Display.toggle_pause();
+			}
+		});
+		addKeyBinding('s', "resize", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				Display.toggle_size();
+			}
+		});
+		addKeyBinding('f', "frame", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				Game.paused = true;
+				Game.update();
+			}
+		});
+		addKeyBinding('[', "mouse_small", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				draw_size-=2; updateMouse(mouse);
+				if(draw_size<0) draw_size = 0;
+			}
+		});
+		addKeyBinding(']', "mouse_big", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				draw_size+=2; updateMouse(mouse);
+				if(draw_size<0) draw_size = 0;
+			}
+		});
+		addKeyBinding('1', "view1", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				setView(0);
+			}
+		});
+		addKeyBinding('2', "view2", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				setView(1);
+			}
+		});
+	}
+	
+	public void addKeyBinding(char c, String name, Action action) {
+		im.put(KeyStroke.getKeyStroke(c), name);
+		am.put(name, action);
 	}
 	
 	static void setView(int i) {
