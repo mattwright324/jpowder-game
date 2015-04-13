@@ -113,7 +113,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		w2d.drawString("FramesPS    "+dfps.fps(), 5, 15*line++);
 		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, 15*line++);
 		w2d.drawString("Selected    "+left.description, 5, 15*line++);
-		w2d.drawString("'S'ize      "+(small ? "Default" : "Large"), 5, 15*line++);
+		w2d.drawString("'Size      "+(small ? "Default" : "Large"), 5, 15*line++);
 		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, 15*line++);
 		w2d.drawString("'F'         Frame", 5, 15*line++);
 		w2d.drawString("Display '1' or '2' "+viewName, 5, 15*line++);
@@ -135,17 +135,23 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void draw_cell(Cell c) {
-		if(c.part!=null) {
-			if(c.part.remove()) {
-				// bad for performance ; how is it bad? removes a particle 
-				c.part = null; // Why?
-			} else {
-				size++;
-				try {
-					b2d.setColor(c.part.getColor());
-					if(view==1) b2d.setColor(c.part.getTempColor());
-					b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
-				} catch (NullPointerException e) {}
+		if (c.part == null) return;
+		for (int pnum = 0; pnum < 9; pnum++) {
+			if (c.part == null) continue; // Required for plutonium, because it does something special.
+			// For some reason there's a race condition in here.
+			if (c.part[pnum] != null) {
+				if (c.part[pnum].remove()) {
+					// bad for performance
+					c.part = null; // Why?
+				} else {
+					size++;
+					try {
+						b2d.setColor(c.part[pnum].getColor());
+						if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
+						b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
+					} catch (NullPointerException e) {
+					}
+				}
 			}
 		}
 	}
