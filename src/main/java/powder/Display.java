@@ -164,13 +164,15 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
 				Particle p = Cells.getParticleAt(x, y);
-				if(p==null || e == Elements.none)
+				if(e == Elements.none)
 					// Delete the particle. Not set it to none. None is still a particle.
 					Cells.deleteParticle(x, y);
-				else if(p.el.conducts && e==Elements.sprk) {
+				else if(p != null && p.el.conducts && e==Elements.sprk) {
 					p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
-				} else if(p.el == Elements.clne) {
+				} else if(p != null && p.el == Elements.clne) {
 					p.ctype = e.id;
+				} else {
+					Cells.setParticleAt(x, y, new Particle(e, x, y), false);
 				}
 			}
 		}
