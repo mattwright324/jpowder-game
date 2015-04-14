@@ -5,7 +5,6 @@ import main.java.powder.elements.Elements;
 import main.java.powder.particles.Particle;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -164,10 +163,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
 				Particle p = Cells.getParticleAt(x, y);
-				if(e == Elements.none)
+				if(e == Elements.none) {
 					// Delete the particle. Not set it to none. None is still a particle.
 					Cells.deleteParticle(x, y);
-				else if(p != null && p.el.conducts && e==Elements.sprk) {
+				} else if(p != null && p.el.conducts && e==Elements.sprk) {
 					p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
 				} else if(p != null && p.el == Elements.clne) {
 					p.ctype = e.id;
