@@ -2,7 +2,6 @@ package main.java.powder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -36,10 +35,17 @@ public class Window extends JFrame {
 		setTitle("JPowder");
 		setResizable(false);
 		setVisible(true);
+		BufferedImage iconImg = null;
+		boolean success = true;
 		try {
-			// Gradle knows best
-			setIconImage(ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/jpowder1.png")));
-		} catch (IOException e) {}
+			iconImg = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("img/powder/jpowder1.png"));
+		} catch (IOException e) {
+			System.out.println(e.getLocalizedMessage());
+			success = false;
+		}
+		if (success) {
+			setIconImage(iconImg);
+		}
 		game = new Display();
 		add(game, BorderLayout.CENTER);
 		
