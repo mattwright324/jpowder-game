@@ -60,6 +60,7 @@ public class Elements {
 	public static Element create(int id, String name, String desc, Color c, int weight) {
 		Element e = new Element(id, name, desc, c);
 		e.weight = weight;
+		add(id, e);
 		return e;
 	}
 	
@@ -248,7 +249,7 @@ public class Elements {
 	public static final Element metl, qrtz, dmnd, coal, insl, clne;
 	public static final Element watr, lava, ln2, oil;
 	public static final Element phot, radp;
-	public static final Element gas, warp, fire, plsm;
+	public static final Element gas, warp, fire, plsm, stm;
 	static { // 
 		none = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
 		none.remove = true;
@@ -334,6 +335,9 @@ public class Elements {
 		
 		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_GAS);
 		clne.setParticleBehaviour(clne_behaviour);
+		
+		stm = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
+		stm.setMovement(em_gas);
 	}
 	
 	static { // Conversions
@@ -343,12 +347,18 @@ public class Elements {
 		stne.setConvert(lava, CS_GTR, 850);
 		metl.setConvert(lava, CS_GTR, 1000);
 		qrtz.setConvert(lava, CS_GTR, 3000);
+		
+		watr.setConvert(stm, CS_GTR, 100);
+		stm.setConvert(watr, CS_LSS, 100);
+		
+		fire.setConvert(plsm, CS_GTR, 1000);
+		plsm.setConvert(fire, CS_LSS, 1000);
 	}
 	
 	public static final Element[] powder = {dust, stne, salt, bcol, plut};
 	public static final Element[] liquid = {watr, lava, ln2, oil};
 	public static final Element[] solid = {metl, qrtz, dmnd, coal, insl};
-	public static final Element[] gasses = {gas, warp, fire, plsm};
+	public static final Element[] gasses = {gas, warp, fire, plsm, stm};
 	public static final Element[] radio = {phot, radp};
 	public static final Element[] tools = {none, sprk};
 }
