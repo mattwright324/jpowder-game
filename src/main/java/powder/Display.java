@@ -1,6 +1,7 @@
 package main.java.powder;
 
 import main.java.powder.elements.Element;
+import main.java.powder.elements.Elements;
 import main.java.powder.particles.Particle;
 
 import javax.swing.*;
@@ -24,8 +25,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 	static Graphics2D b2d = img.createGraphics();
 	static Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-	static Element left = Element.dust; // Hacky as fuck.
-	static Element right = Element.none;
+	static Element left = Elements.dust; // Hacky as fuck.
+	static Element right = Elements.none;
 	static FPS dfps = new FPS();
 	static int view = 0;
 	static String viewName = "Default";
@@ -128,7 +129,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
 			if(p.el!=null) {
 				info = p.el.shortName;
-				if(!(p.ctype==0) && Element.el_map.containsKey(p.ctype)) info += "("+Element.el_map.get(p.ctype).shortName+")";
+				if(!(p.ctype==0) && Elements.exists(p.ctype)) info += "("+Elements.get(p.ctype)+")";
 				info += ", Temp:"+p.temp();
 				info += ", Life:"+p.life;
 			} else p.setRemove(true);
@@ -143,19 +144,18 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for (int pnum = 0; pnum < 9; pnum++) {
 			if (c.part == null) continue; // Required for plutonium, because it does something special.
 			// For some reason there's a race condition in here.
-			if (c.part[pnum] != null) {
-				if (c.part[pnum].remove()) {
+			if (c.part[pnum] != null && c.part[pnum].display()) {
+				/*if (c.part[pnum].remove()) {
 					// bad for performance
 					c.part = null; // Why?
-				} else {
-					size++;
-					try {
-						b2d.setColor(c.part[pnum].getColor());
-						if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
-						b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
-					} catch (NullPointerException e) {
-					}
-				}
+				} else {*/
+				size++;
+				try {
+					b2d.setColor(c.part[pnum].getColor());
+					if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
+					b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
+				} catch (NullPointerException e) {}
+				//}
 			}
 		}
 	}
@@ -164,11 +164,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
 				Particle p = Cells.getParticleAt(x, y);
-				if(p==null || e == Element.none)
-					Cells.setParticleAt(x, y, new Particle(e, x, y), e == Element.none);
-				else if(p.el.conducts && e==Element.sprk) {
-					p.morph(Element.sprk, Particle.MORPH_KEEP_TEMP, true);
-				} else if(p.el == Element.clne) {
+				if(p==null || e == Elements.none)
+					Cells.setParticleAt(x, y, new Particle(e, x, y), e == Elements.none);
+				else if(p.el.conducts && e==Elements.sprk) {
+					p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
+				} else if(p.el == Elements.clne) {
 					p.ctype = e.id;
 				}
 			}
@@ -309,6 +309,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	static void toggle_pause() {
 		 Game.paused = !Game.paused;
+		 Window.window.menub.repaint();
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {

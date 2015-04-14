@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import main.java.powder.elements.Element;
+import main.java.powder.elements.Elements;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	
@@ -55,8 +56,9 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 		g2d.setColor(new Color(32,64,128,128));
 		g2d.fill(clear);
 		g2d.fill(resize);
-		g2d.fill(pause);
 		g2d.fill(view);
+		if(Game.paused) g2d.setColor(new Color(255,64,128,128));
+		g2d.fill(pause);
 		makeButtons();
 		draw_buttons();
 		g2d.setColor(Color.WHITE);
@@ -82,7 +84,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	public void mousePressed(MouseEvent e) {
 		if(clear.contains(e.getPoint())) {
 			Game.paused = true;
-			Cells.setAllOfAs(-1, Element.none);
+			Cells.setAllOfAs(-1, Elements.none);
 		}
 		else if(resize.contains(e.getPoint())) Display.toggle_size();
 		else if(pause.contains(e.getPoint())) Display.toggle_pause();

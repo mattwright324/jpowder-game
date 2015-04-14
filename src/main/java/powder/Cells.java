@@ -8,6 +8,7 @@ public class Cells {
 	// TODO Wall & Air Grid
 	
 	final static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
+	
     final static Cell[][] cells = new Cell[Display.width][Display.height];
     
     public static boolean valid(int x, int y) {
@@ -85,6 +86,7 @@ public class Cells {
         cells[x][y].part[stackpos] = p;
         return true;
     }
+    
     /**
      * Convert all cells of id n to a specific element.
      * id -1 = All

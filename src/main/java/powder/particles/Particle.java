@@ -4,26 +4,31 @@ import main.java.powder.Cells;
 import main.java.powder.Game;
 import main.java.powder.Window;
 import main.java.powder.elements.Element;
+import main.java.powder.elements.Elements;
 
 import java.awt.Color;
 import java.util.Random;
 
 public class Particle {
 	
+	public static final Random r = new Random();
+	
 	public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
 	
-    public Random r = new Random();
-    public Element el;
     public int x, y;
+    public Element el;
+    public long update = 50;
+    public long last_update = System.currentTimeMillis();
+    public long time = 0;
+    
     public int ctype = 0;
+    public int tmp = 0;
     public Color deco;
     public double vx = 0, vy = 0;
     public long life = 0;
     public double celcius = 0.0;
     public boolean remove = false;
-    public long update = 50;
-    public long last_update = System.currentTimeMillis();
 
     public Particle(Element e, int x, int y) {
     	init(e, x, y);
@@ -41,6 +46,10 @@ public class Particle {
         if (el.behaviour != null) el.behaviour.init(this);
     }
     
+    public boolean display() {
+    	return !remove() || el.display;
+    }
+    
     public boolean burn() {
         return Math.random() < el.flammibility;
     }
@@ -48,11 +57,11 @@ public class Particle {
     public boolean convert() {
     	if(!el.convert) return false;
     	switch(el.conv_sign) {
-    	case(Element.CS_GTR):
+    	case(Elements.CS_GTR):
     		return el.conv_temp < celcius;
-    	case(Element.CS_LSS):
+    	case(Elements.CS_LSS):
     		return el.conv_temp > celcius;
-    	case(Element.CS_EQ):
+    	case(Elements.CS_EQ):
     		return (int) el.conv_temp == (int) celcius;
     	default:
     		return el.conv_temp < celcius;
@@ -81,7 +90,7 @@ public class Particle {
     
     public Color getTempColor() { // Colorized temperature with no affect on performance!
     	int w = Window.heatColorStrip.getWidth();
-		int x = (int) (w * (celcius + Math.abs(Game.MIN_TEMP)) / (Math.abs(Game.MAX_TEMP)+ Math.abs(Game.MIN_TEMP)));
+		int x = (int) (w * (celcius + Math.abs(Elements.MIN_TEMP)) / (Math.abs(Elements.MAX_TEMP)+ Math.abs(Elements.MIN_TEMP)));
 		if(w <= x) x = w-1;
 		if(x < 0) x = 0;
 		int color = Window.heatColorStrip.getRGB(x, 0);
@@ -121,7 +130,7 @@ public class Particle {
     }
 
     public void update() {
-        if (ready()) {
+        if(ready()) {
             if (el.behaviour != null)
                 el.behaviour.update(this);
             if (el.movement != null)
@@ -136,18 +145,40 @@ public class Particle {
             			double trans = p.el.heatTransfer;
             			p.celcius += (diff * trans);
         				celcius = celcius - (diff * trans);
-        				if(celcius < Game.MIN_TEMP) celcius = Game.MIN_TEMP;
-        				if(celcius > Game.MAX_TEMP) celcius = Game.MAX_TEMP;
+        				if(celcius < Elements.MIN_TEMP) celcius = Elements.MIN_TEMP;
+        				if(celcius > Elements.MAX_TEMP) celcius = Elements.MAX_TEMP;
             		}
             
             if(convert()) {
             	if(el.conv_method==Element.CM_TYPE)
             		morph(el.conv, MORPH_KEEP_TEMP, true);
             	else if(el.conv_method==Element.CM_CTYPE)
-            		morph(Element.getID(ctype), MORPH_KEEP_TEMP, true);
+            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
             }
             
-            if (life > 0 && el.life_decay) life--;
+            if(el.life_decay) {
+            	if(life>0) life--;
+            	if(life-1==0)
+            	switch(el.life_decay_mode) {
+            	case(Elements.DECAY_DIE):
+            		break;
+            	case(Elements.DECAY_CTYPE):
+            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+            		break;
+            	}
+            }
+            if(el.tmp_decay) {
+            	if(tmp>0) tmp--;
+            	if(tmp-1==0)
+            	switch(el.tmp_decay_mode) {
+            	case(Elements.DECAY_DIE):
+            		break;
+            	case(Elements.DECAY_CTYPE):
+            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+            		break;
+            	}
+            }
+            /*if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {
                 // Delete mode
                 if (el.life_dmode == 1){
@@ -156,8 +187,9 @@ public class Particle {
                 }
                 // Decay mode
                 if (el.life_dmode == 2) morph(Element.getID(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
-            }
+            }*/
             if (!Cells.validGame(x, y)) setRemove(true);
+            time++;
             last_update = System.currentTimeMillis();
         }
     }
