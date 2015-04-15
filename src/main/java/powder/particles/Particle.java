@@ -39,7 +39,7 @@ public class Particle {
         this.y = y;
         this.life = el.life;
         this.celcius = el.celcius;
-        setRemove(el.remove);
+        //setRemove(el.remove);
         deco = null;
         if (el.sandEffect) addSandEffect();
         if (el.behaviour != null) el.behaviour.init(this);
@@ -53,7 +53,7 @@ public class Particle {
         return Math.random() < el.flammibility;
     }
     
-    public boolean convert() {
+    public boolean shouldConvert() {
     	if(!el.convert) return false;
     	switch(el.conv_sign) {
     	case(Elements.CS_GTR):
@@ -148,7 +148,7 @@ public class Particle {
         				if(celcius > Elements.MAX_TEMP) celcius = Elements.MAX_TEMP;
             		}
             
-            if(convert()) {
+            if(shouldConvert()) {
             	if(el.conv_method==Element.CM_TYPE)
             		morph(el.conv, MORPH_KEEP_TEMP, true);
             	else if(el.conv_method==Element.CM_CTYPE)
@@ -183,16 +183,6 @@ public class Particle {
                     }
                 }
             }
-            /*if (life > 0 && el.life_decay) life--;
-            if (life - 1 == 0) {
-                // Delete mode
-                if (el.life_dmode == 1){
-                    setRemove(true);
-                    if (el.behaviour != null) el.behaviour.destruct(this);
-                }
-                // Decay mode
-                if (el.life_dmode == 2) morph(Element.getID(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
-            }*/
             if (!Cells.validGame(x, y)) setRemove(true);
             time++;
             last_update = System.currentTimeMillis();
