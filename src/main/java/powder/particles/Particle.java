@@ -1,12 +1,11 @@
 package main.java.powder.particles;
 
 import main.java.powder.Cells;
-import main.java.powder.Game;
 import main.java.powder.Window;
 import main.java.powder.elements.Element;
 import main.java.powder.elements.Elements;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Random;
 
 public class Particle {
@@ -158,25 +157,31 @@ public class Particle {
             
             if(el.life_decay) {
             	if(life>0) life--;
-            	if(life-1==0)
-            	switch(el.life_decay_mode) {
-            	case(Elements.DECAY_DIE):
-            		break;
-            	case(Elements.DECAY_CTYPE):
-            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
-            		break;
-            	}
+            	if(life-1==0) {
+                    switch(el.life_decay_mode) {
+                        case (Elements.DECAY_DIE):
+                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            setRemove(true);
+                            break;
+                        case (Elements.DECAY_CTYPE):
+                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                            break;
+                    }
+                }
             }
             if(el.tmp_decay) {
             	if(tmp>0) tmp--;
-            	if(tmp-1==0)
-            	switch(el.tmp_decay_mode) {
-            	case(Elements.DECAY_DIE):
-            		break;
-            	case(Elements.DECAY_CTYPE):
-            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
-            		break;
-            	}
+            	if(tmp-1==0) {
+                    switch (el.tmp_decay_mode) {
+                        case (Elements.DECAY_DIE):
+                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            setRemove(true);
+                            break;
+                        case (Elements.DECAY_CTYPE):
+                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                            break;
+                    }
+                }
             }
             /*if (life > 0 && el.life_decay) life--;
             if (life - 1 == 0) {

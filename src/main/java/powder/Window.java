@@ -36,7 +36,7 @@ public class Window extends JFrame {
 		setResizable(false);
 		setVisible(true);
 		BufferedImage iconImg = null;
-		boolean success = true;
+		/*boolean success = true;
 		try {
 			iconImg = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("img/powder/jpowder1.png"));
 		} catch (IOException e) {
@@ -45,7 +45,7 @@ public class Window extends JFrame {
 		}
 		if (success) {
 			setIconImage(iconImg);
-		}
+		}*/
 		game = new Display();
 		add(game, BorderLayout.CENTER);
 		
