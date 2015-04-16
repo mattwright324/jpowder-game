@@ -68,10 +68,11 @@ public class Elements {
         public void move(Particle p) {
             int ny = p.y + (int) p.vy;
             int nx = p.x + (int) p.vx;
-            if (!Cells.particleAt(nx, ny))
+            p.tryMove(nx, ny);
+            /*if (!Cells.particleAt(nx, ny))
                 Cells.moveTo(p.x, p.y, nx, ny);
             else
-                p.setRemove(true);
+                p.setRemove(true);*/
         }
     };
 
@@ -125,7 +126,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour phot_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_phot = new ParticleBehaviour() {
         public void init(Particle p) {
             while (p.vx == 0 && p.vy == 0) {
                 p.vx = 3 * (r.nextInt(3) - 1);
@@ -137,7 +138,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour fire_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_fire = new ParticleBehaviour() {
         public void init(Particle p) {
             p.life += r.nextInt(50);
             p.celcius += r.nextInt(20);
@@ -157,7 +158,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour plutonium_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_plut = new ParticleBehaviour() {
         public void init(Particle p) {
             p.life = r.nextInt(400) + 100;
         }
@@ -168,7 +169,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour radioactive_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_radio = new ParticleBehaviour() {
         public void init(Particle p) {
             p.life = r.nextInt(50) + 1;
             p.celcius = 982;
@@ -185,7 +186,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour sprk_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_sprk = new ParticleBehaviour() {
         public void init(Particle p) {
         }
         public void update(Particle p) {
@@ -210,7 +211,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour plsm_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_plsm = new ParticleBehaviour() {
         public void init(Particle p) {
             p.life += r.nextInt(50);
             p.celcius += r.nextInt(20);
@@ -227,7 +228,7 @@ public class Elements {
         }
     };
 
-    static ParticleBehaviour clne_behaviour = new ParticleBehaviour() {
+    static ParticleBehaviour pb_clne = new ParticleBehaviour() {
 		public void init(Particle p) {
 			// Needs to be set ctype on click
 			p.ctype = none.id;
@@ -244,16 +245,43 @@ public class Elements {
 		}
     };
 
-	static ParticleBehaviour lav_behaviour =  new ParticleBehaviour(){
+	static ParticleBehaviour pb_lava =  new ParticleBehaviour(){
 		public void init(Particle p) {
 			p.ctype = stne.id;
 		}
-	public void update(Particle p) {}
+		public void update(Particle p) {}
+	};
+	
+	static ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
+		public void init(Particle p) {
+			p.tmp = r.nextInt(10);
+			p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.tmp / 10.0))));
+		}
+		public void update(Particle p) {
+			if(p.celcius > 1670 && Math.random() < 0.05)
+				p.morph(lava, Particle.MORPH_KEEP_TEMP, true);
+		}
+	};
+	
+	static ParticleBehaviour pb_fill = new ParticleBehaviour() {
+		public void init(Particle p) {}
+		public void update(Particle p) {
+			if(p.tmp==0) {
+				p.tmp = 1;
+				if(!Cells.particleAt(p.x+1, p.y)) set(p.x+1, p.y);
+				if(!Cells.particleAt(p.x-1, p.y)) set(p.x-1, p.y);
+				if(!Cells.particleAt(p.x, p.y+1)) set(p.x, p.y+1);
+				if(!Cells.particleAt(p.x, p.y-1)) set(p.x, p.y-1);
+			}
+		}
+		public void set(int x, int y) {
+			Cells.setParticleAt(x, y, new Particle(fill, x, y), false);
+		}
 	};
 
-	public static final Element none, sprk;
+	public static final Element none, sprk, fill;
 	public static final Element dust, stne, salt, bcol, plut;
-	public static final Element metl, qrtz, dmnd, coal, insl, clne;
+	public static final Element metl, qrtz, dmnd, coal, insl, clne, ice;
 	public static final Element watr, lava, ln2, oil;
 	public static final Element phot, radp;
 	public static final Element gas, warp, fire, plsm, stm;
@@ -278,7 +306,8 @@ public class Elements {
 		metl.conducts = true;
 		
 		qrtz = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
-		
+		qrtz.tmp_decay = false;
+		qrtz.setParticleBehaviour(pb_qrtz);
 		dmnd = create(7, "DMND", "Diamond", new Color(32, 248, 228), WEIGHT_DMND);
 		
 		coal = create(8, "COAL", "Coal", Color.GRAY, WEIGHT_SOLID);
@@ -289,11 +318,11 @@ public class Elements {
 		insl.flammibility = 0.1;
 		
 		plut = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
-		plut.setParticleBehaviour(plutonium_behaviour);
+		plut.setParticleBehaviour(pb_plut);
 		plut.setMovement(em_powder);
 		
 		sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
-		sprk.setParticleBehaviour(sprk_behaviour);
+		sprk.setParticleBehaviour(pb_sprk);
 		
 		watr = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
 		watr.setMovement(em_liquid);
@@ -301,7 +330,7 @@ public class Elements {
 		
 		lava = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
 		lava.setMovement(em_liquid);
-		lava.setParticleBehaviour(lav_behaviour);
+		lava.setParticleBehaviour(pb_lava);
 		lava.celcius = 1522;
 		
 		ln2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
@@ -314,11 +343,11 @@ public class Elements {
 		
 		phot = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
 		phot.setMovement(em_phot);
-		phot.setParticleBehaviour(phot_behaviour);
+		phot.setParticleBehaviour(pb_phot);
 		
 		radp = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
 		radp.setMovement(em_radioactive);
-		radp.setParticleBehaviour(radioactive_behaviour);
+		radp.setParticleBehaviour(pb_radio);
 		radp.celcius = 982;
 		
 		gas = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
@@ -329,43 +358,54 @@ public class Elements {
 		warp.setMovement(em_gas);
 		
 		fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
-		fire.setParticleBehaviour(fire_behaviour);
+		fire.setParticleBehaviour(pb_fire);
 		fire.celcius = 450;
 		
 		plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
-		plsm.setParticleBehaviour(plsm_behaviour);
+		plsm.setParticleBehaviour(pb_plsm);
 		plsm.celcius = MAX_TEMP;
 		
-		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_GAS);
-		clne.setParticleBehaviour(clne_behaviour);
+		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
+		clne.setParticleBehaviour(pb_clne);
 		
 		stm = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
 		stm.setMovement(em_gas);
+		
+		ice = create(24, "ICE", "Ice", new Color(200, 200, 255), WEIGHT_SOLID);
+		ice.celcius = -25;
+		
+		fill = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
+		fill.tmp_decay = false;
+		fill.heatTransfer = 0.5;
+		fill.setParticleBehaviour(pb_fill);
 	}
 	
 	static { // Conversions
-		lava.setCtypeConvert(CS_LSS, 700);
+		lava.addCtypeConvert(CS_LSS, 700);
 		
-		salt.setConvert(lava, CS_GTR, 750);
-		stne.setConvert(lava, CS_GTR, 850);
-		metl.setConvert(lava, CS_GTR, 1000);
-		qrtz.setConvert(lava, CS_GTR, 3000);
+		salt.addConvert(lava, CS_GTR, 750);
+		stne.addConvert(lava, CS_GTR, 850);
+		metl.addConvert(lava, CS_GTR, 1000);
+		//qrtz.addConvert(lava, CS_GTR, 1670); 
 
-		gas.setConvert(fire, CS_GTR, 300);
-
-		oil.setConvert(gas, CS_GTR, 150);
-
-		watr.setConvert(stm, CS_GTR, 100);
-		stm.setConvert(watr, CS_LSS, 100);
+		gas.addConvert(fire, CS_GTR, 300);
 		
-		fire.setConvert(plsm, CS_GTR, 1000);
-		plsm.setConvert(fire, CS_LSS, 1000);
+		oil.addConvert(gas, CS_GTR, 150);
+		
+		ice.addConvert(watr, CS_GTR, 0);
+		watr.addConvert(ice, CS_LSS, 0);
+		
+		watr.addConvert(stm, CS_GTR, 100);
+		stm.addConvert(watr, CS_LSS, 100);
+		
+		fire.addConvert(plsm, CS_GTR, 1000);
+		plsm.addConvert(fire, CS_LSS, 1000);
 	}
 	
-	public static final Element[] powder = {dust, stne, salt, bcol, plut};
+	public static final Element[] powder = {dust, stne, salt, bcol};
 	public static final Element[] liquid = {watr, lava, ln2, oil};
-	public static final Element[] solid = {metl, qrtz, dmnd, coal, insl};
-	public static final Element[] gasses = {gas, warp, fire, plsm, stm};
-	public static final Element[] radio = {phot, radp};
-	public static final Element[] tools = {none, sprk};
+	public static final Element[] solid = {metl, qrtz, dmnd, coal, insl, ice};
+	public static final Element[] gasses = {gas, fire, plsm, stm};
+	public static final Element[] radio = {phot, radp, plut, warp};
+	public static final Element[] tools = {none, sprk, fill};
 }

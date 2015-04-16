@@ -2,6 +2,7 @@ package main.java.powder.particles;
 
 import main.java.powder.Cells;
 import main.java.powder.Window;
+import main.java.powder.elements.Conversion;
 import main.java.powder.elements.Element;
 import main.java.powder.elements.Elements;
 
@@ -51,20 +52,6 @@ public class Particle {
     
     public boolean burn() {
         return Math.random() < el.flammibility;
-    }
-    
-    public boolean shouldConvert() {
-    	if(!el.convert) return false;
-    	switch(el.conv_sign) {
-    	case(Elements.CS_GTR):
-    		return el.conv_temp < celcius;
-    	case(Elements.CS_LSS):
-    		return el.conv_temp > celcius;
-    	case(Elements.CS_EQ):
-    		return (int) el.conv_temp == (int) celcius;
-    	default:
-    		return el.conv_temp < celcius;
-    	}
     }
     
     public boolean warmerThan(Particle p) {
@@ -148,12 +135,9 @@ public class Particle {
         				if(celcius > Elements.MAX_TEMP) celcius = Elements.MAX_TEMP;
             		}
             
-            if(shouldConvert()) {
-            	if(el.conv_method==Element.CM_TYPE)
-            		morph(el.conv, MORPH_KEEP_TEMP, true);
-            	else if(el.conv_method==Element.CM_CTYPE)
-            		morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
-            }
+            for(Conversion c : el.convs) {
+        		if(c!=null && c.shouldConvert(this)) c.doConversion(this);
+        	}
             
             if(el.life_decay) {
             	if(life>0) life--;

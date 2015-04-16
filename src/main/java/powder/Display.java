@@ -142,19 +142,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if (c.part == null) return;
 		for (int pnum = 0; pnum < 9; pnum++) {
 			if (c.part == null) continue; // Required for plutonium, because it does something special.
-			// For some reason there's a race condition in here.
 			if (c.part[pnum] != null && c.part[pnum].display()) {
-				/*if (c.part[pnum].remove()) {
-					// bad for performance
-					c.part = null; // Why?
-				} else {*/
 				size++;
-				try {
-					b2d.setColor(c.part[pnum].getColor());
-					if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
-					b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
-				} catch (NullPointerException e) {}
-				//}
+				b2d.setColor(c.part[pnum].getColor());
+				if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
+				b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
 			}
 		}
 	}
@@ -311,7 +303,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	static void toggle_pause() {
 		 Game.paused = !Game.paused;
-		 Window.window.menub.repaint();
+		 Window.menub.repaint();
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {

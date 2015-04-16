@@ -33,13 +33,13 @@ public class Cells {
         if (!valid(x, y)) return null;
         return cells[x][y].part;
     }
+    
     /**
      * Gets the particles that surround the particle at co-ordinates x,y.
      * @param x The x co-ord
      * @param y The y co-ord
      * @return An array of particles, with the top row first, then the second row, then the third row.
      */
-
     public static Particle[] getSurroundingParticles(int x, int y) {
     	Particle[] tmp = new Particle[8];
     	int p = 0;
@@ -51,7 +51,11 @@ public class Cells {
     }
 
     public static void clearScreen() {
-        cells = new Cell[Display.width][Display.height];
+        for(int w = 0; w<Display.width; w++) {
+        	 for(int h = 0; h<Display.height; h++) {
+             	cells[w][h].reset();
+             }
+        }
     }
 
     public static boolean deleteParticle(int x, int y) {
