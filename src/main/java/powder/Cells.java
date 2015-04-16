@@ -7,9 +7,9 @@ public class Cells {
 	
 	// TODO Wall & Air Grid
 	
-	final static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
-	
-    final static Cell[][] cells = new Cell[Display.width][Display.height];
+	static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
+	// Final bad
+    static Cell[][] cells = new Cell[Display.width][Display.height];
     
     public static boolean valid(int x, int y) {
         return !(x < 0 || y < 0 || x >= Display.width || y >= Display.height);
@@ -39,6 +39,7 @@ public class Cells {
      * @param y The y co-ord
      * @return An array of particles, with the top row first, then the second row, then the third row.
      */
+
     public static Particle[] getSurroundingParticles(int x, int y) {
     	Particle[] tmp = new Particle[8];
     	int p = 0;
@@ -47,6 +48,10 @@ public class Cells {
     			if(!(w-1==0 && h-1==0))
     				tmp[p++] = getParticleAt(x+(w-1), x+(h-1));
         return tmp;
+    }
+
+    public static void clearScreen() {
+        cells = new Cell[Display.width][Display.height];
     }
 
     public static boolean deleteParticle(int x, int y) {

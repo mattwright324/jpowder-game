@@ -24,7 +24,8 @@ public class Game extends Thread {
 					for(int s=0; s<9; s++) {
 						if((p = Cells.getParticleAt(w, h, s))!=null) {
 							if(p.remove()) {
-								p = null;
+								//p = null;
+								Cells.deleteParticle(w, h);
 							} else {
 								p.update();
 							}

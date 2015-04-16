@@ -1,13 +1,13 @@
 package main.java.powder.elements;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import main.java.powder.Cells;
 import main.java.powder.particles.Particle;
 import main.java.powder.particles.ParticleBehaviour;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Elements {
 	
@@ -226,7 +226,7 @@ public class Elements {
                 }
         }
     };
-    
+
     static ParticleBehaviour clne_behaviour = new ParticleBehaviour() {
 		public void init(Particle p) {
 			// Needs to be set ctype on click
@@ -243,7 +243,14 @@ public class Elements {
 					}
 		}
     };
-	
+
+	static ParticleBehaviour lav_behaviour =  new ParticleBehaviour(){
+		public void init(Particle p) {
+			p.ctype = stne.id;
+		}
+	public void update(Particle p) {}
+	};
+
 	public static final Element none, sprk;
 	public static final Element dust, stne, salt, bcol, plut;
 	public static final Element metl, qrtz, dmnd, coal, insl, clne;
@@ -283,6 +290,7 @@ public class Elements {
 		
 		plut = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
 		plut.setParticleBehaviour(plutonium_behaviour);
+		plut.setMovement(em_powder);
 		
 		sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
 		sprk.setParticleBehaviour(sprk_behaviour);
@@ -293,12 +301,7 @@ public class Elements {
 		
 		lava = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
 		lava.setMovement(em_liquid);
-		lava.setParticleBehaviour(new ParticleBehaviour(){
-			public void init(Particle p) {
-				p.ctype = stne.id;
-			}
-			public void update(Particle p) {}
-        });
+		lava.setParticleBehaviour(lav_behaviour);
 		lava.celcius = 1522;
 		
 		ln2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
@@ -347,7 +350,11 @@ public class Elements {
 		stne.setConvert(lava, CS_GTR, 850);
 		metl.setConvert(lava, CS_GTR, 1000);
 		qrtz.setConvert(lava, CS_GTR, 3000);
-		
+
+		gas.setConvert(fire, CS_GTR, 300);
+
+		oil.setConvert(gas, CS_GTR, 150);
+
 		watr.setConvert(stm, CS_GTR, 100);
 		stm.setConvert(watr, CS_LSS, 100);
 		

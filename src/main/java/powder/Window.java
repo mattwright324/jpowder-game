@@ -2,7 +2,6 @@ package main.java.powder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -20,8 +19,8 @@ public class Window extends JFrame {
 	
 	public static void main(String[] args) {
 		try {
-			// Eclipse will give me errors if the actual path isn't filled out. Does it work for you to keep it like this?
-			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/colorstrip.png"));
+			// Gradle knows best
+			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/colorstrip.png"));
 		} catch (IOException e) {}
     }
 	
@@ -36,9 +35,17 @@ public class Window extends JFrame {
 		setTitle("JPowder");
 		setResizable(false);
 		setVisible(true);
+		BufferedImage iconImg = null;
+		/*boolean success = true;
 		try {
-			setIconImage(ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/jpowder1.png")));
-		} catch (IOException e) {}
+			iconImg = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("img/powder/jpowder1.png"));
+		} catch (IOException e) {
+			System.out.println(e.getLocalizedMessage());
+			success = false;
+		}
+		if (success) {
+			setIconImage(iconImg);
+		}*/
 		game = new Display();
 		add(game, BorderLayout.CENTER);
 		
