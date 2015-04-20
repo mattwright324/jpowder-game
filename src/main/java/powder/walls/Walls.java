@@ -3,10 +3,16 @@ package main.java.powder.walls;
 import java.awt.Color;
 
 public class Walls {
-	static Wall wall = new Wall("Wall", Color.GRAY);
-	static Wall air = new Wall("Air-Only", new Color(128,128,128, 64));
-	
+	public static final Wall none, wall, air, wvoid;
 	static {
+		none = new Wall("WNone", Color.BLACK);
+		none.remove = true;
+		
+		wall = new Wall("Wall", Color.LIGHT_GRAY);
+		
+		air = new Wall("WAir", new Color(128,128,255, 64));
 		air.air = true;
+		
+		wvoid = new Wall("WVoid", new Color(255,128,128, 64));
 	}
 }

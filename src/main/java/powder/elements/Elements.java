@@ -1,8 +1,10 @@
 package main.java.powder.elements;
 
 import main.java.powder.Cells;
+import main.java.powder.Item;
 import main.java.powder.particles.Particle;
 import main.java.powder.particles.ParticleBehaviour;
+import main.java.powder.walls.Walls;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -53,7 +55,7 @@ public class Elements {
 	}
 	
 	public static void add(int id, Element e) {
-		id_name.put(id, e.shortName);
+		id_name.put(id, e.name);
 		el_map.put(id, e);
 	}
 	
@@ -196,7 +198,7 @@ public class Elements {
                         int x = p.x - (w - 2);
                         int y = p.y - (h - 2);
                         Particle o;
-                        if (Cells.valid(x, y) && (o=Cells.getParticleAt(x, y))!=null) {
+                        if (Cells.valid(x, y, 0) && (o=Cells.getParticleAt(x, y))!=null) {
                         	if (o.el.conducts && o.life == 0) o.morph(sprk, Particle.MORPH_FULL, true);
                         }
                     }
@@ -279,7 +281,7 @@ public class Elements {
 		}
 	};
 
-	public static final Element none, sprk, fill;
+	public static final Element none, sprk, fill, ant;
 	public static final Element dust, stne, salt, bcol, plut;
 	public static final Element metl, qrtz, dmnd, coal, insl, clne, ice;
 	public static final Element watr, lava, ln2, oil;
@@ -378,6 +380,48 @@ public class Elements {
 		fill.tmp_decay = false;
 		fill.heatTransfer = 0.5;
 		fill.setParticleBehaviour(pb_fill);
+		
+		ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
+		ant.tmp_decay = false;
+		ant.life_decay = false;
+		ant.setParticleBehaviour(new ParticleBehaviour(){
+			public void init(Particle p) {
+				p.life = 180;
+				p.tmp = 1; // tmp 0 = dead, 1 = right, 2 = left
+			}
+			public void update(Particle p) { // TODO
+				if(p.tmp==0) p.setDeco(Color.GRAY);
+				if(p.tmp==1 || p.tmp==2) {
+					int angle = 0;
+					if(p.tmp==1) angle = (int) (p.life -= 90);
+					if(p.tmp==2) angle = (int) (p.life += 90);
+					if(angle < 0) angle = 360 + angle;
+					if(angle > 270) angle = angle - 270 ;
+					p.life = angle; 
+					int x = p.x;
+					int y = p.y;
+					int nx = p.x;
+					int ny = p.y;
+					if(angle==0) nx += 1;
+					if(angle==180) nx -= 1;
+					if(angle==90) ny -= 1;
+					if(angle==270) ny += 1;
+					System.out.println(p.life+", "+angle+" , "+ x+"."+y+" , "+nx+"."+ny);
+					Particle o = Cells.getParticleAt(nx, ny);
+					if(o==null) {
+						p.tmp = 1;
+						Particle dead = new Particle(Elements.coal, x, y);
+						dead.tmp = 0;
+						Cells.setParticleAt(nx, ny, p, true);
+						Cells.setParticleAt(x, y, dead, true);
+					} else {
+						p.tmp = 2;
+						Cells.setParticleAt(nx, ny, p, true);
+						Cells.deleteParticle(x, y);
+					}
+				}
+			}
+		});
 	}
 	
 	static { // Conversions
@@ -387,14 +431,12 @@ public class Elements {
 		stne.addConvert(lava, CS_GTR, 850);
 		metl.addConvert(lava, CS_GTR, 1000);
 		//qrtz.addConvert(lava, CS_GTR, 1670); 
-
-		gas.addConvert(fire, CS_GTR, 300);
 		
 		oil.addConvert(gas, CS_GTR, 150);
+		gas.addConvert(fire, CS_GTR, 300);
 		
 		ice.addConvert(watr, CS_GTR, 0);
 		watr.addConvert(ice, CS_LSS, 0);
-		
 		watr.addConvert(stm, CS_GTR, 100);
 		stm.addConvert(watr, CS_LSS, 100);
 		
@@ -402,10 +444,10 @@ public class Elements {
 		plsm.addConvert(fire, CS_LSS, 1000);
 	}
 	
-	public static final Element[] powder = {dust, stne, salt, bcol};
-	public static final Element[] liquid = {watr, lava, ln2, oil};
-	public static final Element[] solid = {metl, qrtz, dmnd, coal, insl, ice};
-	public static final Element[] gasses = {gas, fire, plsm, stm};
-	public static final Element[] radio = {phot, radp, plut, warp};
-	public static final Element[] tools = {none, sprk, fill};
+	public static final Item[] powder = {dust, stne, salt, bcol};
+	public static final Item[] liquid = {watr, lava, ln2, oil};
+	public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice};
+	public static final Item[] gasses = {gas, fire, plsm, stm};
+	public static final Item[] radio = {phot, radp, plut, warp};
+	public static final Item[] tools = {none, sprk, fill, ant, Walls.wall, Walls.air, Walls.wvoid};
 }

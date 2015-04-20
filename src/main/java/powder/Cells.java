@@ -1,5 +1,7 @@
 package main.java.powder;
 
+import java.awt.Point;
+
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
@@ -7,30 +9,28 @@ public class Cells {
 	
 	// TODO Wall & Air Grid
 	
-	static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
+	public static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
 	// Final bad
-    static Cell[][] cells = new Cell[Display.width][Display.height];
+    public static Cell[][] cells = new Cell[Display.width][Display.height];
     
-    public static boolean valid(int x, int y) {
-        return !(x < 0 || y < 0 || x >= Display.width || y >= Display.height);
-    }
-    
-    public static boolean validGame(int x, int y) {
-        return !(x < 4 || y < 4 || x >= Display.width - 4 || y >= Display.height - 4);
+    public static boolean valid(int x, int y, int offset) {
+        return !(x < offset || y < offset || x >= Display.width-offset || y >= Display.height-offset);
     }
     
     public static Particle getParticleAt(int x, int y) {
-        if (!valid(x, y)) return null;
+        if (!valid(x, y, 0)) return null;
         if (cells[x][y].part == null) return null;
         return cells[x][y].part[0];
     }
+    
     public static Particle getParticleAt(int x, int y, int stackIndex) {
-        if (!valid(x, y)) return null;
+        if (!valid(x, y, 0)) return null;
         if (cells[x][y].part == null) return null;
         return cells[x][y].part[stackIndex];
     }
+    
     public static Particle[] getAllParticlesAt(int x, int y) {
-        if (!valid(x, y)) return null;
+        if (!valid(x, y, 0)) return null;
         return cells[x][y].part;
     }
     
@@ -59,22 +59,23 @@ public class Cells {
     }
 
     public static boolean deleteParticle(int x, int y) {
-        if (!valid(x, y)) return false;
+        if (!valid(x, y, 0)) return false;
         if (!particleAt(x, y)) return false;
+        //System.out.println("Deleted "+x+"."+y);
         cells[x][y].part = null; // java.lang.NullPointerException
         return true;
     }
 
     public static boolean particleAt(int x, int y) {
-        return !valid(x, y) || cells[x][y].part != null;
+        return !valid(x, y, 0) || cells[x][y].part != null;
     }
     // I'm not taking responsibility if you forget to sanitise stackpos and end up passing it 12.
     public static boolean particleInStackPos(int x, int y, int stackpos) {
-        return !valid(x, y) && (cells[x][y].part != null || cells[x][y].part[stackpos] != null);
+        return !valid(x, y, 0) && (cells[x][y].part != null || cells[x][y].part[stackpos] != null);
     }
     
     public static boolean setParticleAt(int x, int y, Particle p, boolean insert) {
-        if (!valid(x, y)) return false;
+        if (!valid(x, y, 0)) return false;
         if (!insert && particleAt(x, y)) return false;
         if (p != null) {
             p.x = x;
@@ -86,7 +87,7 @@ public class Cells {
     }
 
     public static boolean setParticleAtWithStack(int x, int y, Particle p, int stackpos) {
-        if (!valid(x, y)) return false;
+        if (!valid(x, y, 0)) return false;
         if (!particleAt(x, y) && stackpos != 0) return false;
         if (p != null) {
             p.x = x;
@@ -116,7 +117,7 @@ public class Cells {
      * Move from (x1, y1) to (x2, y2). Original spot set null.
      */
     public static void moveTo(int x1, int y1, int x2, int y2) {
-        if (!Cells.valid(x2, y2)) return;
+        if (!Cells.valid(x2, y2, 0)) return;
         Particle a = getParticleAt(x1, y1);
         deleteParticle(x1, y1);
         setParticleAt(x2, y2, a, true);
@@ -137,7 +138,7 @@ public class Cells {
      * Swap two cells rather than the particles.
      */
     public static void swap(int x1, int y1, int x2, int y2) {
-        if (!valid(x2, y2)) return;
+        if (!valid(x2, y2, 0)) return;
         Cell a = cells[x1][y1];
         Cell b = cells[x2][y2];
         a.x = x2;
@@ -148,5 +149,26 @@ public class Cells {
         cells[x1][y1] = b;
         b.cascadeUpdateParticlePositions();
         cells[x2][y2] = a;
+    }
+    
+    
+    public Point[] cellsOnLine(Point a, Point b) {
+    	int dx = b.x - a.x;
+    	int dy = b.y - a.y;
+    	double d = 2*dy - dx;
+    	Point[] pts = new Point[dx];
+    	pts[0] = a;
+    	int y = a.y;
+    	for(int x=1; x<dx; x++) {
+    		if(d > 0) {
+    			y++;
+    			pts[x] = new Point(x, y);
+    			d = d + (2*dy-2*dx);
+    		} else {
+    			pts[x] = new Point(x, y);
+    			d = 2*dy;
+    		}
+    	}
+    	return pts;
     }
 }

@@ -1,6 +1,5 @@
 package main.java.powder;
 
-import main.java.powder.elements.Element;
 import main.java.powder.elements.Elements;
 
 import javax.swing.*;
@@ -50,7 +49,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 	public Rectangle ral = new Rectangle(5, 5+(b_h+5)*4, b_w, b_h);
 	public Rectangle tl = new Rectangle(5, 5+(b_h+5)*5, b_w, b_h);
 	
-	static Element[] selected = Elements.solid;
+	static Item[] selected = Elements.solid;
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

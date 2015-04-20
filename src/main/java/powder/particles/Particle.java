@@ -1,10 +1,12 @@
 package main.java.powder.particles;
 
 import main.java.powder.Cells;
+import main.java.powder.Display;
 import main.java.powder.Window;
 import main.java.powder.elements.Conversion;
 import main.java.powder.elements.Element;
 import main.java.powder.elements.Elements;
+import main.java.powder.walls.Wall;
 
 import java.awt.*;
 import java.util.Random;
@@ -46,6 +48,10 @@ public class Particle {
         if (el.behaviour != null) el.behaviour.init(this);
     }
     
+    public Wall toWall() {
+    	return Cells.cellsb[x/4][y/4].wall;
+    }
+    
     public boolean display() {
     	return !remove() || el.display;
     }
@@ -71,7 +77,14 @@ public class Particle {
     }
     
     public Color getColor() { // EW
-        return deco != null ? deco : el.getColor();
+    	switch(Display.view) {
+    	case(1):
+    		return getTempColor();
+    	case(2):
+    		return getLifeGradient();
+    	default:
+    		return deco != null ? deco : el.getColor();
+    	}
     }
     
     public Color getTempColor() { // Colorized temperature with no affect on performance!
@@ -108,7 +121,7 @@ public class Particle {
     }
 
     public boolean remove() {
-        return remove;
+        return remove || (toWall() != null && toWall().parts);
     }
 
     public boolean ready() {
@@ -167,7 +180,7 @@ public class Particle {
                     }
                 }
             }
-            if (!Cells.validGame(x, y)) setRemove(true);
+            if (!Cells.valid(x, y, 4)) setRemove(true);
             time++;
             last_update = System.currentTimeMillis();
         }

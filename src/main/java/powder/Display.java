@@ -3,39 +3,49 @@ package main.java.powder;
 import main.java.powder.elements.Element;
 import main.java.powder.elements.Elements;
 import main.java.powder.particles.Particle;
+import main.java.powder.walls.Wall;
+import main.java.powder.walls.Walls;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 public class Display extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
-
-	final static int width = 612;
-	final static int height = 384;
 	private static final long serialVersionUID = 1L;
-	static int img_scale = 1;
 	
-	static int cell_w = 0;
-	static int cell_h = 0;
+	final static int width = 612; // 612
+	final static int height = 384; // 384
+	
+	//static int img_scale = 1;
+	//static int cell_w = 0;
+	//static int cell_h = 0;
+	static int scale = 1; // fillRect vs drawRect
 	
 	static boolean small = true;
 	static Graphics2D w2d;
 	static BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 	static Graphics2D b2d = img.createGraphics();
 	static Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-	static Element left = Elements.dust; // Hacky as fuck.
-	static Element right = Elements.none;
-	static FPS dfps = new FPS();
-	static int view = 0;
+	static Item left = Elements.dust; // Hacky as fuck.
+	static Item right = Elements.none;
+	static Counter dfps = new Counter();
+	public static int view = 0;
 	static String viewName = "Default";
 	
 	public Timer timer = new Timer(5, this);
 	public Point mouse = new Point(0,0);
+	public Point mouse_drag = new Point(0,0);
 	public Game game = new Game();
 	public int size = 0;
 	public int draw_size = 0;
 	public Point mstart = new Point(0, 0), mstop = new Point(0, 0);
+	
+	static boolean hud = true;
+	static boolean help = false;
+	
+	static int fps_cap = 60;
 	
 	public Display() {
 		for (int w = 0; w < Display.width; w++)
@@ -59,23 +69,30 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		setCursor(blankCursor);
 		
 		setKeyBindings();
+		
+		Cells.cellsb[25][25].wall = Walls.wall;
+		Cells.cellsb[26][25].wall = Walls.wall;
+		Cells.cellsb[27][25].wall = Walls.air;
+		Cells.cellsb[28][25].wall = Walls.air;
+		Cells.cellsb[29][25].wall = Walls.wvoid;
+		Cells.cellsb[30][25].wall = Walls.wvoid;
 	}
 
 	static void makeSmall() {
-		cell_w = 0;
-		cell_h = 0;
-		img_scale = 1;
-		img = new BufferedImage(width * img_scale, height * img_scale, BufferedImage.TYPE_4BYTE_ABGR);
+		//img_scale = 1;
+		//cell_w = cell_h = 0;
+		scale = 1;
+		img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_4BYTE_ABGR);
 		b2d = img.createGraphics();
 		small = true;
 		Window.window.resize();
 	}
 
 	static void makeLarge() {
-		cell_w = 1;
-		cell_h = 1;
-		img_scale = 2;
-		img = new BufferedImage(width * img_scale, height * img_scale, BufferedImage.TYPE_4BYTE_ABGR);
+		//img_scale = 2;
+		//cell_w = cell_h = 1;
+		scale = 2;
+		img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_4BYTE_ABGR);
 		b2d = img.createGraphics();
 		small = false;
 		Window.window.resize();
@@ -84,29 +101,29 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		w2d = (Graphics2D) g;
-
 		b2d.setColor(Color.BLACK);
 		b2d.fillRect(0, 0, getWidth(), getHeight());
+		
+		for(int w=0; w<Cells.cellsb.length; w++)
+			for(int h=0; h<Cells.cellsb[0].length; h++)
+				draw_bigcell(Cells.cellsb[w][h]);
 		size = 0;
 		for(int w=0; w<width; w++)
 			for(int h=0; h<height; h++)
 				draw_cell(Cells.cells[w][h]);
-
 		b2d.setColor(Color.LIGHT_GRAY);
-		int sx = mstart.x * img_scale; int w = (mstop.x-mstart.x) * img_scale;
-		int sy = mstart.y * img_scale; int h = (mstop.y-mstart.y) * img_scale;
+		int sx = mstart.x * scale; int w = (mstop.x-mstart.x) * scale;
+		int sy = mstart.y * scale; int h = (mstop.y-mstart.y) * scale;
 		b2d.drawRect(sx, sy, w, h);
-		//b2d.drawOval(sx, sy, w, h);
 		int mx = sx + w / 2;
 		int my = sy + h / 2;
-		b2d.drawRect(mx, my, img_scale - 1, img_scale - 1);
+		b2d.drawRect(mx, my, scale - 1, scale - 1);
 		b2d.drawLine(mx, 0, mx, 4); 
-		b2d.drawLine(mx, getHeight()-4,mx, getHeight());
+		b2d.drawLine(mx, getHeight()-4, mx, getHeight());
 		b2d.drawLine(0, my, 4, my);
 		b2d.drawLine(getWidth() - 4, my, getWidth(), my);
 		b2d.setColor(new Color(244, 244, 244, 32));
 		b2d.fillRect(sx, sy, w, h);
-		
 		
 		w2d.drawImage(img, null, 0, 0);
 		w2d.setColor(Color.WHITE);
@@ -114,23 +131,30 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		w2d.setFont(typeface);
 		int line = 1;
 		int spacing = w2d.getFontMetrics().getHeight();
-		w2d.drawString("FramesPS    "+dfps.fps(), 5, spacing*line++);
-		w2d.drawString("UpdatesPS   "+Game.gfps.fps(), 5, spacing*line++);
-		w2d.drawString("Selected    "+left.description, 5, spacing*line++);
-		w2d.drawString("'Space'     "+(Game.paused ? "Paused" : "Playing"), 5, spacing*line++);
-		w2d.drawString("'F'         Frame", 5, spacing*line++);
-		w2d.drawString("Display     "+viewName, 5, spacing*line++);
+		w2d.drawString("FPS    "+dfps.fps()+", UPS    "+Game.gfps.fps(), 5, spacing*line++);
 		w2d.drawString("Parts       "+size, 5, spacing*line++);
-
+		w2d.drawString(left.name+" || "+right.name, 5, spacing*line++);
+		if(help) {
+			w2d.drawString("", 5, spacing*line++);
+			w2d.drawString("KEY      ACTION         STATE", 5, spacing*line++);
+			w2d.drawString("F        single frame   ", 5, spacing*line++);
+			w2d.drawString("[ ]      mouse size     "+draw_size, 5, spacing*line++);
+			w2d.drawString("SPACE    toggle pause   "+(Game.paused ? "Paused" : "Playing"), 5, spacing*line++);
+			w2d.drawString("S        window size    "+(small ? "Default" : "Large"), 5, spacing*line++);
+			w2d.drawString("1-3      display type   "+viewName, 5, spacing*line++);
+		}
+		
+		
 		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
 		Particle p;
 		String info = "Empty";
 		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
 			if(p.el!=null) {
-				info = p.el.shortName;
+				info = p.el.name;
 				if(!(p.ctype==0) && Elements.exists(p.ctype)) info += "("+Elements.get(p.ctype)+")";
 				info += ", Temp:"+p.temp();
 				info += ", Life:"+p.life;
+				info += ", TMP:"+p.tmp;
 			} else p.setRemove(true);
 		}
 		w2d.drawString(info, 5, getHeight()-10);
@@ -145,13 +169,20 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			if (c.part[pnum] != null && c.part[pnum].display()) {
 				size++;
 				b2d.setColor(c.part[pnum].getColor());
-				if (view == 1) b2d.setColor(c.part[pnum].getTempColor());
-				b2d.drawRect(c.screen_x(), c.screen_y(), cell_w, cell_h);
+				b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
 			}
 		}
 	}
 	
-	public void place(Element e) {
+	public void draw_bigcell(BigCell c) {
+		if (c.wall == null) return;
+		b2d.setColor(c.wall.color);
+		b2d.fillRect(c.screen_x(), c.screen_y(), (scale)*4, (scale)*4);
+	}
+	
+	public void place(Item e) {
+		w2d.setColor(Color.WHITE);
+		w2d.drawLine(mouse_drag.x, mouse_drag.y, mouse.x, mouse.y);
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
 				Particle p = Cells.getParticleAt(x, y);
@@ -163,18 +194,21 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				} else if(p != null && p.el == Elements.clne) {
 					p.ctype = e.id;
 				} else {
-					Cells.setParticleAt(x, y, new Particle(e, x, y), false);
+					if(e instanceof Element)
+						Cells.setParticleAt(x, y, new Particle((Element) e, x, y), false);
+					if(e instanceof Wall)
+						;//
 				}
 			}
 		}
 	}
 	
 	public Point mouseToCell(Point p) {
-		return new Point(p.x / img_scale, p.y / img_scale);
+		return new Point(p.x / scale, p.y / scale);
 	}
 	
 	public Point mouseToBigCell(Point p) {
-		return new Point(p.x / img_scale, p.y / img_scale);
+		return new Point(p.x / scale / 4, p.y / scale / 4);
 	}
 
 	public void updateMouse(Point p) {
@@ -195,6 +229,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void mouseMoved(MouseEvent e) {
 		Window.updateMouseInFrame(e.getPoint(), this);
 		updateMouse(mouseToCell(e.getPoint()));
+		mouse_drag = mouse;
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -216,7 +251,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			place(right);
 		if(SwingUtilities.isMiddleMouseButton(e)) {
 			Particle m = Cells.getParticleAt(mouse.x, mouse.y);
+			Wall w = Cells.cellsb[mouse.x/4][mouse.y/4].wall;
 			if(m!=null) left = m.el;
+			if(w!=null) left = w;
 		}
 	}
 
@@ -279,6 +316,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				setView(1);
 			}
 		});
+		addKeyBinding('3', "view3", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				setView(2);
+			}
+		});
 	}
 	
 	public void addKeyBinding(char c, String name, Action action) {
@@ -294,6 +336,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(i==1) {
 			view = 1;
 			viewName = "Temperature";
+		}
+		if(i==2) {
+			view = 2;
+			viewName = "Life Gradient";
 		}
 	}
 	
@@ -315,53 +361,5 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void actionPerformed(ActionEvent e) {
 		repaint();
-	}
-
-	static class FPS extends Thread {
-		public double seconds = 0;
-		public long total = 0;
-		public double avg = 0;
-		
-		public long count = 0;
-		public long fps = 0;
-		public long last_fps = System.currentTimeMillis();
-		
-		public void add() {
-			count++;
-		}
-		
-		public void run() {
-			while(isAlive()) {
-				if(System.currentTimeMillis()-last_fps > 1000) {
-					seconds+=(System.currentTimeMillis()-last_fps) / 1000.0;
-					
-					fps = count;
-					count = 0;
-					last_fps = System.currentTimeMillis();
-					
-					total+=fps;
-					avg = total / seconds;
-					if(seconds > 60) resetAverage();
-				}
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException ignored) {
-				}
-			}
-		}
-		
-		public long fps() {
-			return fps;
-		}
-		
-		public void resetAverage() {
-			seconds = 0;
-			total = 0;
-			avg = 0;
-		}
-		
-		public double average() {
-			return Math.round(avg * 100.0) / 100.0;
-		}
 	}
 }

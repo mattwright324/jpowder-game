@@ -13,11 +13,12 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import main.java.powder.elements.Element;
-import main.java.powder.elements.Elements;
+import main.java.powder.walls.Wall;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	
@@ -40,9 +41,12 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	public int b_txt_center = b_y+b_h/2+5;
 	
 	public Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
-	public Rectangle resize = new Rectangle(5+45, b_y, b_w, b_h);
-	public Rectangle pause = new Rectangle(5+90, b_y, b_w, b_h);
-	public Rectangle view = new Rectangle(5+135, b_y, b_w, b_h);
+	public Rectangle resize = new Rectangle(5+(b_w+5)*1, b_y, b_w, b_h);
+	public Rectangle pause = new Rectangle(5+(b_w+5)*2, b_y, b_w, b_h);
+	public Rectangle view = new Rectangle(5+(b_w+5)*3, b_y, b_w, b_h);
+	public Rectangle help = new Rectangle(5+(b_w+5)*4, b_y, b_w, b_h);
+	
+	public JFrame helpWindow = new JFrame();
 	
 	public List<Button> buttons = new ArrayList<Button>();
 	
@@ -57,6 +61,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 		g2d.fill(clear);
 		g2d.fill(resize);
 		g2d.fill(view);
+		g2d.fill(help);
 		if(Game.paused) g2d.setColor(new Color(255,64,128,128));
 		g2d.fill(pause);
 		makeButtons();
@@ -67,6 +72,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 		g2d.fillRect(pause.x+12, pause.y+5, 5, pause.height-9);
 		g2d.fillRect(pause.x+22, pause.y+5, 5, pause.height-9);
 		g2d.drawString("VIEW", view.x+5, b_txt_center);
+		g2d.drawString("KEYS", help.x+5, b_txt_center);
 	}
 	
 	public void mouseClicked(MouseEvent e) {
@@ -86,40 +92,45 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 			Game.paused = true;
 			Cells.clearScreen();
 		}
-		else if(resize.contains(e.getPoint())) Display.toggle_size();
-		else if(pause.contains(e.getPoint())) Display.toggle_pause();
-		else if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); {
+		if(resize.contains(e.getPoint())) Display.toggle_size();
+		if(pause.contains(e.getPoint())) Display.toggle_pause();
+		if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); {
 			for(Button b : buttons) {
 				if(b.contains(e.getPoint())) {
 					if(SwingUtilities.isLeftMouseButton(e))
-						Display.left = b.el;
+						Display.left = b.item;
 					if(SwingUtilities.isRightMouseButton(e))
-						Display.right = b.el;
+						Display.right = b.item;
 				}
 			}
+		}
+		if(help.contains(e.getPoint())) {
+			Display.help = !Display.help;
 		}
 	}
 	
 	public void makeButtons() {
 		buttons.clear();
 		int i=0;
-		for(Element e : SideMenu.selected) {
+		for(Item e : SideMenu.selected) {
 			int x = Window.mouse.x;
 			if(x > Window.window.getWidth()/2) x = Window.window.getWidth()/2;
 			Button b = new Button(getWidth()-b_w-(5+(b_w+5)*i++)+(getWidth()-x-(getWidth()/2)), 5, b_w, b_h);
-			b.setElement(e);
+			b.setItem(e);
 			buttons.add(b);
 		}
 	}
 	
 	public void draw_buttons() {
 		for(Button b : buttons) {
-			Color c = b.el.getColor();
+			Color c = Color.GRAY;
+			if(b.item instanceof Element) c = ((Element) b.item).getColor();
+			if(b.item instanceof Wall) c = ((Wall) b.item).color;
 			g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
 			g2d.setPaintMode();
 			g2d.fill(b);
 			g2d.setColor(Color.WHITE);
-			g2d.drawString(b.el.shortName, b.x+2, b.y+b_h/2+5);
+			g2d.drawString(b.item.name, b.x+2, b.y+b_h/2+5);
 		}
 	}
 	
@@ -133,13 +144,15 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	
 	public class Button extends Rectangle {
 		private static final long serialVersionUID = 1L;
+		public Item item;
+		
 		public Button(int x, int y, int w, int h) {
 			super(x, y, w, h);
 		}
-		public void setElement(Element e) {
-			el = e;
+		
+		public void setItem(Item i) {
+			item = i;
 		}
-		public Element el;
 	}
 	
 	public void mouseDragged(MouseEvent e) {

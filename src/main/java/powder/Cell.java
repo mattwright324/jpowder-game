@@ -26,10 +26,10 @@ public class Cell {
     }
 
     public int screen_x() {
-        return x * Display.img_scale;
+        return x * Display.scale;
     }
 
     public int screen_y() {
-        return y * Display.img_scale;
+        return y * Display.scale;
     }
 }

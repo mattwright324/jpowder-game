@@ -18,12 +18,13 @@ public class Window extends JFrame {
 	static BottomMenu menub;
 	
 	public static void main(String[] args) {
+		window.setVisible(true);
 		try {
 			// Gradle knows best
-			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/colorstrip.png"));
+			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/colorstrip.png"));
 		} catch (IOException e) {}
 		try {
-			iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/jpowder.png"));
+			iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/jpowder.png"));
 			window.setIconImage(iconImg);
 		} catch(IOException e) {}
     }
@@ -38,7 +39,6 @@ public class Window extends JFrame {
 		setLayout(new BorderLayout());
 		setTitle("JPowder");
 		setResizable(false);
-		setVisible(true);
 		
 		game = new Display();
 		add(game, BorderLayout.CENTER);
@@ -55,7 +55,7 @@ public class Window extends JFrame {
 	}
 	
 	public void resize() {
-		getContentPane().setPreferredSize(new Dimension(Display.width*Display.img_scale + SideMenu.width, Display.height*Display.img_scale + BottomMenu.height));
+		getContentPane().setPreferredSize(new Dimension(Display.width*Display.scale + SideMenu.width, Display.height*Display.scale + BottomMenu.height));
 		pack();
 	}
 	

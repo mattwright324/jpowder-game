@@ -1,15 +1,12 @@
 package main.java.powder.elements;
 
+import main.java.powder.Item;
 import main.java.powder.particles.ParticleBehaviour;
 
 import java.awt.*;
 import java.util.Arrays;
 
-public class Element {
-	
-    public int id = 0;
-    public String shortName = "ELEM";
-    public String description = "Element description.";
+public class Element extends Item {
     
     public int weight = Elements.WEIGHT_POWDER;
     public double celcius = Elements.DEFAULT_TEMP;
@@ -19,6 +16,7 @@ public class Element {
     public boolean sandEffect = false;
     public double heatTransfer = 0.3;
     public boolean display = true;
+    public double air_movement = 0;
     
     public long life = 0;
     public boolean life_decay = true;
@@ -35,27 +33,27 @@ public class Element {
     public ParticleBehaviour behaviour;
     public Element(int eid, String name) {
         id = eid;
-        shortName = name;
+        this.name = name;
     }
     public Element(int eid, String name, Color c) {
         id = eid;
-        shortName = name;
+        this.name = name;
         setColor(c);
     }
     public Element(int eid, String name, String desc) {
         id = eid;
-        shortName = name;
+        this.name = name;
         description = desc;
     }
     public Element(int eid, String name, String desc, Color c) {
         id = eid;
-        shortName = name;
+        this.name = name;
         description = desc;
         setColor(c);
     }
     
     public String toString() {
-    	return shortName;
+    	return name;
     }
     
     public void addConvert(Element e, int sign, double temp) {
