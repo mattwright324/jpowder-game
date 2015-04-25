@@ -1,5 +1,8 @@
 package main.java.powder;
 
+import java.awt.Point;
+import java.util.Arrays;
+
 import main.java.powder.elements.Elements;
 import main.java.powder.particles.Particle;
 
@@ -68,6 +71,11 @@ public class Grid {
     	cell(x, y).reset();
     }
     
+    public static void setStack(int x, int y, Particle p) {
+    	remStack(x, y);
+    	cell(x, y).add(p);
+    }
+    
     public static boolean empty(int x, int y) {
     	return cell(x, y).empty();
     }
@@ -129,5 +137,36 @@ public class Grid {
     
     public static String set(int m, String name, String val) { // set(TYPE, "watr", "none")
     	return set(m, Elements.getID(name), Elements.getID(val));
+    }
+    
+    /**
+     * Bresenham's Line Algorithm
+     * Used to fill spacing between mouse drags.
+     */
+    public static Point[] line(Point a, Point b) {
+    	Point[] pts = new Point[0];
+    	int dx = Math.abs(b.x - a.x);
+    	int dy = Math.abs(b.y - a.y);
+
+    	int sx = (a.x < b.x) ? 1 : -1;
+    	int sy = (a.y < b.y) ? 1 : -1;
+    	
+    	int err = dx - dy;
+
+    	while(true) {
+    	    if(a.x == b.x && a.y == b.y) break;
+    	    int e2 = 2 * err;
+    	    if(e2 > -dy) {
+    	        err = err - dy;
+    	        a.x = a.x + sx;
+    	    }
+    	    if(e2 < dx) {
+    	        err = err + dx;
+    	        a.y = a.y + sy;
+    	    }
+    	    pts = Arrays.copyOf(pts, pts.length+1);
+    	    pts[pts.length-1] = new Point(a.x, a.y);
+    	}
+    	return pts;
     }
 }

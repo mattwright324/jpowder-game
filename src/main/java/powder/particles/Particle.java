@@ -14,7 +14,6 @@ import java.util.Random;
 public class Particle {
 	
 	public static final Random r = new Random();
-	final long cid = r.nextLong();
 	
 	public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
@@ -32,10 +31,11 @@ public class Particle {
     public double celcius = 0.0;
     public boolean remove = false;
     
+    /*final long cid = r.nextLong();
     public boolean same(Particle p) {
     	//System.out.println(x+"."+y+","+cid+" =? "+p.x+"."+p.y+","+p.cid);
     	return cid==p.cid;
-    }
+    }*/
     
     public Particle(Element e, int x, int y) {
     	init(e, x, y);
@@ -126,7 +126,7 @@ public class Particle {
     }
     
     public boolean remove() {
-        return remove || (toWall() != null && toWall().parts);
+        return remove || (toWall() != null && !toWall().parts);
     }
 
     public boolean ready() {
@@ -192,19 +192,11 @@ public class Particle {
     }
     
     public void tryMove(int nx, int ny) {
-    	//int pos = Grid.cell(x, y).findPos(this);
-    	if(Grid.cell(nx, ny).addable(this)) { // TODO On move returning -1, need to work on a new particle position system.
-    		//System.out.println("Move?");
+    	if(Grid.valid(nx, ny, 0) && Grid.cell(nx, ny).addable(this)) {
     		//System.out.println(pos+" >> "+x+"."+y+" -> "+nx+"."+ny);
     		Grid.cell(x, y).rem(pos);
     		Grid.cell(nx, ny).add(this);
     	}
-        /*Particle o = Cells.getParticleAt(nx, ny);
-        if (o != null) {
-            if (heavierThan(o)) Cells.swap(x, y, nx, ny);
-        } else {
-            Cells.moveTo(x, y, nx, ny);
-        }*/
     }
     
     public void morph(Element e, int type, boolean makectype) {

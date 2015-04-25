@@ -31,18 +31,6 @@ public class Game extends Thread {
 		for(int w = 0; w < Display.width; w++) {
 			for(int h = 0; h < Display.height; h++) {
 				Grid.cell(w, h).update();
-				/*Cell cell = Grid.cell(w, h);
-				if(!cell.empty()) {
-					for(int pos=0; pos<cell.count(); pos++) {
-						Particle p = cell.part(pos);
-						if(p!=null) {
-							if(p.remove())
-								cell.rem(pos);
-							else
-								p.update();
-						}
-					}
-				}*/
 			}
 		}
 		gfps.add();

@@ -275,7 +275,7 @@ public class Elements {
 			p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.tmp / 10.0))));
 		}
 		public void update(Particle p) {
-			if(p.celcius > 1670 && Math.random() < 0.05)
+			if(p.celcius > 1670 && Math.random() < 0.01)
 				p.morph(lava, Particle.MORPH_KEEP_TEMP, true);
 		}
 	};
@@ -285,24 +285,64 @@ public class Elements {
 		public void update(Particle p) {
 			if(p.tmp==0) {
 				p.tmp = 1;
-				if(Grid.empty(p.x+1, p.y)) set(p.x+1, p.y);
-				if(Grid.empty(p.x-1, p.y)) set(p.x-1, p.y);
-				if(Grid.empty(p.x, p.y+1)) set(p.x, p.y+1);
-				if(Grid.empty(p.x, p.y-1)) set(p.x, p.y-1);
+				set(p.x+1, p.y);
+				set(p.x-1, p.y);
+				set(p.x, p.y+1);
+				set(p.x, p.y-1);
 			}
 		}
 		public void set(int x, int y) {
-			Grid.cell(x, y).add(fill);
+			if(Grid.valid(x, y, 0) && Grid.cell(x, y).addable(fill))
+				Grid.cell(x, y).add(fill);
 		}
 	};
-
+	
+	static ParticleBehaviour pb_ant = new ParticleBehaviour() {
+		public void init(Particle p) {
+			p.life = 180;
+			p.tmp = 1; // tmp 0 = dead, 1 = right, 2 = left
+		}
+		public void update(Particle p) { // TODO Works ok but doesn't act as Langton's Ant should.
+			if(p.tmp==0) p.setDeco(Color.GRAY);
+			if(p.tmp==1 || p.tmp==2) {
+				int angle = 0;
+				if(p.tmp==1) angle = (int) (p.life -= 90);
+				if(p.tmp==2) angle = (int) (p.life += 90);
+				if(angle < 0) angle = 360 + angle;
+				if(angle > 270) angle = angle - 270 ;
+				p.life = angle; 
+				int x = p.x;
+				int y = p.y;
+				int nx = p.x;
+				int ny = p.y;
+				if(angle==0) nx += 1;
+				if(angle==180) nx -= 1;
+				if(angle==90) ny -= 1;
+				if(angle==270) ny += 1;
+				System.out.println(p.life+", "+angle+" , "+ x+"."+y+" , "+nx+"."+ny);
+				Particle o = Grid.getStackTop(nx, ny);
+				if(o==null) {
+					p.tmp = 1;
+					Particle dead = new Particle(Elements.coal, x, y);
+					dead.tmp = 0;
+					Grid.setStack(nx, ny, p);
+					Grid.setStack(x, y, dead);
+				} else {
+					p.tmp = 2;
+					Grid.setStack(nx, ny, p);
+					Grid.remStack(x, y);
+				}
+			}
+		}
+	};
+	
 	public static final Element none, sprk, fill, ant;
 	public static final Element dust, stne, salt, bcol, plut;
 	public static final Element metl, qrtz, dmnd, coal, insl, clne, ice;
 	public static final Element watr, lava, ln2, oil;
 	public static final Element phot, radp;
 	public static final Element gas, warp, fire, plsm, stm;
-	static { // 
+	static {
 		none = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
 		none.remove = true;
 		
@@ -379,10 +419,14 @@ public class Elements {
 		fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
 		fire.setParticleBehaviour(pb_fire);
 		fire.celcius = 450;
+		fire.life_decay_mode = DECAY_DIE;
+		fire.life = 120;
 		
 		plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
 		plsm.setParticleBehaviour(pb_plsm);
 		plsm.celcius = MAX_TEMP;
+		plsm.life_decay_mode = DECAY_DIE;
+		plsm.life = 120;
 		
 		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
 		clne.setParticleBehaviour(pb_clne);
@@ -401,44 +445,7 @@ public class Elements {
 		ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
 		ant.tmp_decay = false;
 		ant.life_decay = false;
-		ant.setParticleBehaviour(new ParticleBehaviour(){
-			public void init(Particle p) {
-				p.life = 180;
-				p.tmp = 1; // tmp 0 = dead, 1 = right, 2 = left
-			}
-			public void update(Particle p) { // TODO
-				if(p.tmp==0) p.setDeco(Color.GRAY);
-				if(p.tmp==1 || p.tmp==2) {
-					int angle = 0;
-					if(p.tmp==1) angle = (int) (p.life -= 90);
-					if(p.tmp==2) angle = (int) (p.life += 90);
-					if(angle < 0) angle = 360 + angle;
-					if(angle > 270) angle = angle - 270 ;
-					p.life = angle; 
-					int x = p.x;
-					int y = p.y;
-					int nx = p.x;
-					int ny = p.y;
-					if(angle==0) nx += 1;
-					if(angle==180) nx -= 1;
-					if(angle==90) ny -= 1;
-					if(angle==270) ny += 1;
-					System.out.println(p.life+", "+angle+" , "+ x+"."+y+" , "+nx+"."+ny);
-					/*Particle o = Cells.getParticleAt(nx, ny);
-					if(o==null) {
-						p.tmp = 1;
-						Particle dead = new Particle(Elements.coal, x, y);
-						dead.tmp = 0;
-						Cells.setParticleAt(nx, ny, p, true);
-						Cells.setParticleAt(x, y, dead, true);
-					} else {
-						p.tmp = 2;
-						Cells.setParticleAt(nx, ny, p, true);
-						Cells.deleteParticle(x, y);
-					}*/
-				}
-			}
-		});
+		ant.setParticleBehaviour(pb_ant);
 	}
 	
 	static { // Conversions

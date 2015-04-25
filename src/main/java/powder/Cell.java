@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
+import main.java.powder.walls.Wall;
 
 public class Cell {
 	
@@ -39,7 +40,11 @@ public class Cell {
     
     // Stacked Particles
     
-    public Particle[] stack = new Particle[1];
+    public Particle[] stack = new Particle[0];
+    
+    public Wall toWall() {
+    	return Grid.bigcell(x/4, y/4).wall;
+    }
     
     public int count() {
     	int s = 0;
@@ -48,10 +53,14 @@ public class Cell {
     	return s;
     }
     
+    public int null_count() {
+    	return stack.length - count();
+    }
+    
     public boolean empty() {
     	for(int i=0; i<stack.length; i++)
     		if(stack[i]!=null) return false;
-    	return stack.length == 0;
+    	return true;
     }
     
     public boolean addable(Particle p) {
@@ -69,30 +78,41 @@ public class Cell {
     	return stack[pos];
     }
     
-    public void rem(int pos) {
+    public void rem(int pos) { // Remove
     	if(stack.length<=pos) return;
     	stack[pos] = null;
     }
     
-    public int findPos(Particle p) {
-    	for(int i=0; i<count(); i++)
+    /*public int findPos(Particle p) {
+    	for(int i=0; i<stack.length; i++)
     		if(stack[i]!=null && stack[i].same(p)) return i;
     	return -1;
-    }
+    }*/
     
     public void add(Particle p) {
-    	if(empty() && stack.length>1) cleanStack();
-    	p.x = x;
-    	p.y = y;
+    	for(int i=0; i<stack.length; i++)
+    		if(stack[i]==null) {
+    			p.x = x;
+    	    	p.y = y;
+    	    	p.pos = i;
+    	    	stack[i] = p;
+    	    	return;
+    		}
+    	
     	stack = Arrays.copyOf(stack, stack.length+1);
     	stack[stack.length-1] = p;
     	p.pos = stack.length-1;
+    	p.x = x;
+    	p.y = y;
     }
     
     public void add(Element e) {
     	add(new Particle(e, x, y));
     }
     
+    /**
+     * Update the entire stack.
+     */
     public void update() {
     	Particle p;
     	for(int i=0; i<stack.length; i++) {
@@ -111,21 +131,24 @@ public class Cell {
      * Should not be used often, preferred on pause.
      */
     public void cleanStack() {
-    	int nulls = 0;
-    	for(int i=0; i<stack.length; i++) {
-			if(stack[i]==null) {
-				for(int n=i; n<stack.length; n++) {
-					if(stack[n]!=null) {
-						stack[i] = stack[n];
-						stack[n] = null;
-						nulls++;
-						break;
-					}
-				}
-			}
-		}
-    	if(nulls>0)
-    		Arrays.copyOf(stack, stack.length-nulls);
-    	if(stack.length==0 || stack.length==1 && stack[0]==null) stack = new Particle[1];
+    	if(stack.length>0 && empty()) {
+    		stack = new Particle[0];
+    	} else {
+    		int nulls = 0;
+        	for(int i=0; i<stack.length; i++) {
+    			if(stack[i]==null) {
+    				for(int n=i; n<stack.length; n++) {
+    					if(stack[n]!=null) {
+    						stack[i] = stack[n];
+    						stack[n] = null;
+    						nulls++;
+    						break;
+    					}
+    				}
+    			}
+    		}
+        	if(nulls>0)
+        		Arrays.copyOf(stack, stack.length-nulls);
+    	}
     }
 }

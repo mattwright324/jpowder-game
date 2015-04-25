@@ -38,14 +38,12 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public Point mouse = new Point(0,0);
 	public Point mouse_drag = new Point(0,0);
 	public Game game = new Game();
-	public int size = 0;
+	public int size = 0, nsize = 0;
 	public int draw_size = 0;
 	public Point mstart = new Point(0, 0), mstop = new Point(0, 0);
 	
 	static boolean hud = true;
 	static boolean help = false;
-	
-	static int fps_cap = 60;
 	
 	public Display() {
 		for (int w = 0; w < Display.width; w++)
@@ -108,6 +106,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			for(int h=0; h<Grid.agrid[0].length; h++)
 				draw_bigcell(Grid.bigcell(w, h));
 		size = 0;
+		nsize = 0;
 		for(int w=0; w<width; w++)
 			for(int h=0; h<height; h++)
 				draw_cell(Grid.cell(w, h));
@@ -126,39 +125,42 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		b2d.fillRect(sx, sy, w, h);
 		
 		w2d.drawImage(img, null, 0, 0);
-		w2d.setColor(Color.WHITE);
-		w2d.setXORMode(Color.BLACK);
-		w2d.setFont(typeface);
-		int line = 1;
-		int spacing = w2d.getFontMetrics().getHeight();
-		w2d.drawString("FPS    "+dfps.fps()+", UPS    "+Game.gfps.fps(), 5, spacing*line++);
-		w2d.drawString("Parts       "+size, 5, spacing*line++);
-		w2d.drawString(left.name+" || "+right.name, 5, spacing*line++);
-		if(help) {
-			w2d.drawString("", 5, spacing*line++);
-			w2d.drawString("KEY      ACTION         STATE", 5, spacing*line++);
-			w2d.drawString("F        single frame   ", 5, spacing*line++);
-			w2d.drawString("[ ]      mouse size     "+draw_size, 5, spacing*line++);
-			w2d.drawString("SPACE    toggle pause   "+(Game.paused ? "Paused" : "Playing"), 5, spacing*line++);
-			w2d.drawString("S        window size    "+(small ? "Default" : "Large"), 5, spacing*line++);
-			w2d.drawString("1-3      display type   "+viewName, 5, spacing*line++);
+		if(hud) {
+			w2d.setColor(Color.WHITE);
+			w2d.setXORMode(Color.BLACK);
+			w2d.setFont(typeface);
+			int line = 1;
+			int spacing = w2d.getFontMetrics().getHeight();
+			w2d.drawString("FPS    "+dfps.fps()+", UPS    "+Game.gfps.fps(), 5, spacing*line++);
+			w2d.drawString("Parts       "+size, 5, spacing*line++);
+			w2d.drawString("Null Cells  "+nsize, 5, spacing*line++);
+			w2d.drawString(left.name+" || "+right.name, 5, spacing*line++);
+			if(help) {
+				w2d.drawString("", 5, spacing*line++);
+				w2d.drawString("KEY      ACTION         STATE", 5, spacing*line++);
+				w2d.drawString("F        single frame   ", 5, spacing*line++);
+				w2d.drawString("H        toggle hud     ", 5, spacing*line++);
+				w2d.drawString("[ ]      mouse size     "+draw_size, 5, spacing*line++);
+				w2d.drawString("SPACE    toggle pause   "+(Game.paused ? "Paused" : "Playing"), 5, spacing*line++);
+				w2d.drawString("S        window size    "+(small ? "Default" : "Large"), 5, spacing*line++);
+				w2d.drawString("1-3      display type   "+viewName, 5, spacing*line++);
+			}
+			
+			
+			w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
+			Particle p;
+			String info = "Empty";
+			if((p = Grid.getStackTop(mouse.x, mouse.y))!=null) {
+				if(p.el!=null) {
+					info = p.el.name;
+					if(!(p.ctype==0) && Elements.exists(p.ctype)) info += "("+Elements.get(p.ctype)+")";
+					info += ", Temp:"+p.temp();
+					info += ", Life:"+p.life;
+					info += ", TMP:"+p.tmp;
+				} else p.setRemove(true);
+			}
+			w2d.drawString(info, 5, getHeight()-10);
 		}
-		
-		
-		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
-		Particle p;
-		String info = "Empty";
-		if((p = Grid.getStackTop(mouse.x, mouse.y))!=null) {
-			if(p.el!=null) {
-				info = p.el.name;
-				if(!(p.ctype==0) && Elements.exists(p.ctype)) info += "("+Elements.get(p.ctype)+")";
-				info += ", Temp:"+p.temp();
-				info += ", Life:"+p.life;
-				info += ", TMP:"+p.tmp;
-			} else p.setRemove(true);
-		}
-		w2d.drawString(info, 5, getHeight()-10);
-		
 		dfps.add();
 	}
 	
@@ -167,10 +169,16 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(!c.empty() && (p = Grid.getStackTop(c.x, c.y))!=null && p.display()) {
 			if(p!=null) {
 				size+=c.count();
-				b2d.setColor(p.getColor());
+				Color col = p.getColor();
+				b2d.setColor(col);
 				b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
+				if(view==3) { // "Fancy" Display; not great on fps
+					b2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
+					b2d.fillRect(c.screen_x()-1, c.screen_y()-1, scale+2, scale+2);
+				}
 			}
 		}
+		nsize+=c.null_count();
 	}
 	
 	public void draw_bigcell(BigCell c) {
@@ -179,11 +187,12 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		b2d.fillRect(c.screen_x(), c.screen_y(), (scale)*4, (scale)*4);
 	}
 	
-	public void place(Item e) {
-		w2d.setColor(Color.WHITE);
-		w2d.drawLine(mouse_drag.x, mouse_drag.y, mouse.x, mouse.y);
-		for (int x = mstart.x; x <= mstop.x; x++) {
-			for (int y = mstart.y; y <= mstop.y; y++) {
+	public void place(Item e, Point pt, int size) {
+		if(pt==null) return;
+		Point start = new Point(pt.x-size, pt.y-size);
+		Point end = new Point(pt.x+size/2, pt.y+size/2);
+		for (int x = start.x; x <= end.x; x++) {
+			for (int y = start.y; y <= end.y; y++) {
 				if(e instanceof Element && Grid.valid(x, y, 0)) {
 					Element el = (Element) e;
 					Cell c = Grid.cell(x, y);
@@ -200,22 +209,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 					}
 				}
 				if(e instanceof Wall) {
+					Wall wl = (Wall) e;
+					BigCell bc = Grid.bigcell(x/4, y/4);
 					
+					bc.wall = wl;
 				}
-				/*Particle p = Cells.getParticleAt(x, y);
-				if(e == Elements.none) {
-					// Delete the particle. Not set it to none. None is still a particle.
-					Cells.deleteParticle(x, y);
-				} else if(p != null && p.el.conducts && e==Elements.sprk) {
-					p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
-				} else if(p != null && p.el == Elements.clne) {
-					p.ctype = e.id;
-				} else {
-					if(e instanceof Element)
-						Cells.setParticleAt(x, y, new Particle((Element) e, x, y), false);
-					if(e instanceof Wall)
-						;//
-				}*/
 			}
 		}
 	}
@@ -235,20 +233,33 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseDragged(MouseEvent e) {
+		mouse_drag = mouse;
 		Window.updateMouseInFrame(e.getPoint(), this);
 		updateMouse(mouseToCell(e.getPoint()));
 		if(SwingUtilities.isLeftMouseButton(e))
-			place(left);
+			for(Point p : Grid.line(mouse_drag, mouse))
+				place(left, p, draw_size);
 		if(SwingUtilities.isRightMouseButton(e))
-			place(right);
+			for(Point p : Grid.line(mouse_drag, mouse))
+				place(right, p, draw_size);
 	}
 
 	public void mouseMoved(MouseEvent e) {
 		Window.updateMouseInFrame(e.getPoint(), this);
 		updateMouse(mouseToCell(e.getPoint()));
-		mouse_drag = mouse;
 	}
-
+	
+	public void mousePressed(MouseEvent e) {
+		if(SwingUtilities.isLeftMouseButton(e))
+			place(left, mouse, draw_size);
+		if(SwingUtilities.isRightMouseButton(e))
+			place(right, mouse, draw_size);
+		if(SwingUtilities.isMiddleMouseButton(e)) {
+			Particle m = Grid.getStackTop(mouse.x, mouse.y);
+			if(m!=null) left = m.el;
+		}
+	}
+	
 	public void mouseClicked(MouseEvent e) {
 
 	}
@@ -259,19 +270,6 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
 	public void mouseExited(MouseEvent e) {
 
-	}
-
-	public void mousePressed(MouseEvent e) {
-		if(SwingUtilities.isLeftMouseButton(e))
-			place(left);
-		if(SwingUtilities.isRightMouseButton(e))
-			place(right);
-		if(SwingUtilities.isMiddleMouseButton(e)) {
-			Particle m = Grid.getStackTop(mouse.x, mouse.y);
-			//Wall w = Cells.cellsb[mouse.x/4][mouse.y/4].wall;
-			if(m!=null) left = m.el;
-			//if(w!=null) left = w;
-		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -328,6 +326,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				if(draw_size<0) draw_size = 0;
 			}
 		});
+		addKeyBinding('h', "hud", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				hud = !hud;
+			}
+		});
 		addKeyBinding('1', "view1", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(0);
@@ -341,6 +344,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		addKeyBinding('3', "view3", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(2);
+			}
+		});
+		addKeyBinding('4', "view4", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				setView(3);
 			}
 		});
 	}
@@ -362,6 +370,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(i==2) {
 			view = 2;
 			viewName = "Life Gradient";
+		}
+		if(i==3) {
+			view = 3;
+			viewName = "Fancy";
 		}
 	}
 	
