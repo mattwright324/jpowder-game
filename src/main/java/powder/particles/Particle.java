@@ -1,7 +1,7 @@
 package main.java.powder.particles;
 
-import main.java.powder.Cells;
 import main.java.powder.Display;
+import main.java.powder.Grid;
 import main.java.powder.Window;
 import main.java.powder.elements.Conversion;
 import main.java.powder.elements.Element;
@@ -14,15 +14,15 @@ import java.util.Random;
 public class Particle {
 	
 	public static final Random r = new Random();
+	final long cid = r.nextLong();
 	
 	public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
 	
-    public int x, y;
+    public int x, y, pos=0;
     public Element el;
     public long update = 50;
     public long last_update = System.currentTimeMillis();
-    public long time = 0;
     
     public int ctype = 0;
     public int tmp = 0;
@@ -31,7 +31,12 @@ public class Particle {
     public long life = 0;
     public double celcius = 0.0;
     public boolean remove = false;
-
+    
+    public boolean same(Particle p) {
+    	//System.out.println(x+"."+y+","+cid+" =? "+p.x+"."+p.y+","+p.cid);
+    	return cid==p.cid;
+    }
+    
     public Particle(Element e, int x, int y) {
     	init(e, x, y);
     }
@@ -49,7 +54,7 @@ public class Particle {
     }
     
     public Wall toWall() {
-    	return Cells.cellsb[x/4][y/4].wall;
+    	return Grid.bigcell(x/4, y/4).wall;
     }
     
     public boolean display() {
@@ -119,7 +124,7 @@ public class Particle {
     public void setRemove(boolean b) {
         remove = b;
     }
-
+    
     public boolean remove() {
         return remove || (toWall() != null && toWall().parts);
     }
@@ -135,10 +140,11 @@ public class Particle {
             if (el.movement != null)
                 el.movement.move(this);
             
+            
             for(int w=-1; w<2; w++)
             	for(int h=-1; h<2; h++)
-            		if(Cells.particleAt(x+w, y+h) && !(w==0 && h==0)) {
-            			Particle p = Cells.getParticleAt(x+w, y+h);
+            		if(Grid.valid(x+w, y+h, 0) && !Grid.cell(x+w, y+h).empty() && !(w==0 && h==0)) {
+            			Particle p = Grid.getStackTop(x+w, y+h);
                         if (p == null) continue; // What? Why the hell is this NullPointering?!?!
             			double diff = (celcius - p.celcius);
             			double trans = p.el.heatTransfer;
@@ -180,19 +186,25 @@ public class Particle {
                     }
                 }
             }
-            if (!Cells.valid(x, y, 4)) setRemove(true);
-            time++;
+            if (!Grid.valid(x, y, 4)) setRemove(true);
             last_update = System.currentTimeMillis();
         }
     }
-
+    
     public void tryMove(int nx, int ny) {
-        Particle o = Cells.getParticleAt(nx, ny);
+    	//int pos = Grid.cell(x, y).findPos(this);
+    	if(Grid.cell(nx, ny).addable(this)) { // TODO On move returning -1, need to work on a new particle position system.
+    		//System.out.println("Move?");
+    		//System.out.println(pos+" >> "+x+"."+y+" -> "+nx+"."+ny);
+    		Grid.cell(x, y).rem(pos);
+    		Grid.cell(nx, ny).add(this);
+    	}
+        /*Particle o = Cells.getParticleAt(nx, ny);
         if (o != null) {
             if (heavierThan(o)) Cells.swap(x, y, nx, ny);
         } else {
             Cells.moveTo(x, y, nx, ny);
-        }
+        }*/
     }
     
     public void morph(Element e, int type, boolean makectype) {

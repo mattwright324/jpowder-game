@@ -1,6 +1,6 @@
 package main.java.powder.elements;
 
-import main.java.powder.Cells;
+import main.java.powder.Grid;
 import main.java.powder.Item;
 import main.java.powder.particles.Particle;
 import main.java.powder.particles.ParticleBehaviour;
@@ -47,6 +47,7 @@ public class Elements {
 	}
 	
 	public static Element get(String name) {
+		name = name.toUpperCase();
 		if(id_name.containsValue(name)) {
 			for(int key : id_name.keySet())
 				if(id_name.get(key).equals(name)) return el_map.get(key);
@@ -54,8 +55,17 @@ public class Elements {
 		return el_map.get(0);
 	}
 	
+	public static int getID(String name) {
+		name = name.toUpperCase();
+		if(id_name.containsValue(name)) {
+			for(int key : id_name.keySet())
+				if(id_name.get(key).equals(name)) return key;
+		}
+		return 0;
+	}
+	
 	public static void add(int id, Element e) {
-		id_name.put(id, e.name);
+		id_name.put(id, e.name.toUpperCase());
 		el_map.put(id, e);
 	}
 	
@@ -98,7 +108,7 @@ public class Elements {
         
         public Particle collide;
         public boolean rad_collide(double x, double y) {
-        	return (collide = Cells.getParticleAt((int)x, (int)y)) != null &&
+        	return (collide = Grid.getStackTop((int)x, (int)y)) != null &&
         			(collide.el != Elements.radp || collide.el != Elements.phot);
         }
     };
@@ -151,7 +161,7 @@ public class Elements {
             for (int w = 0; w < 3; w++)
                 for (int h = 0; h < 3; h++) {
                 	Particle o;
-                	if((o = Cells.getParticleAt(p.x +w-1, p.y+h-1)) != null && o.burn()) {
+                	if((o = Grid.getStackTop(p.x +w-1, p.y+h-1)) != null && o.burn()) {
                         o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
                     }
                 }
@@ -180,7 +190,7 @@ public class Elements {
         }
         
         public void update(Particle p) {
-            for (Particle part : Cells.getSurroundingParticles(p.x, p.y)) {
+            for (Particle part : Grid.getSurrounding(p.x, p.y)) {
                 if(part!=null && part.el == Elements.plut) {
                     part.life = 1;
                 }
@@ -189,8 +199,7 @@ public class Elements {
     };
 
     static ParticleBehaviour pb_sprk = new ParticleBehaviour() {
-        public void init(Particle p) {
-        }
+        public void init(Particle p) {}
         public void update(Particle p) {
             if (p.life == 4)
                 for (int w = 0; w < 5; w++)
@@ -198,7 +207,7 @@ public class Elements {
                         int x = p.x - (w - 2);
                         int y = p.y - (h - 2);
                         Particle o;
-                        if (Cells.valid(x, y, 0) && (o=Cells.getParticleAt(x, y))!=null) {
+                        if (Grid.valid(x, y, 0) && (o=Grid.getStackTop(x, y))!=null) {
                         	if (o.el.conducts && o.life == 0) o.morph(sprk, Particle.MORPH_FULL, true);
                         }
                     }
@@ -224,7 +233,7 @@ public class Elements {
             for (int w = 0; w < 3; w++)
                 for (int h = 0; h < 3; h++) {
                 	Particle o;
-                	if((o = Cells.getParticleAt(p.x+(w-1), p.y+(h-1)))!=null && o.burn())
+                	if((o = Grid.getStackTop(p.x+(w-1), p.y+(h-1)))!=null && o.burn())
                 		o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
                 }
         }
@@ -239,11 +248,17 @@ public class Elements {
             if (p.ctype == 0) return; // Won't create anything when newly placed.
 			for(int w=-1; w<2; w++)
 				for(int h=-1; h<2; h++)
-					if(!Cells.particleAt(p.x+w, p.y+h)) {
+					if(Grid.cell(p.x+w, p.y+h).empty()) {
 						int x = p.x+w;
 						int y = p.y+h;
-						Cells.setParticleAt(x, y, new Particle(get(p.ctype), x, y), false);
+						Grid.cell(x, y).add(get(p.ctype));
+					} else {
+						Particle o;
+						if((o = Grid.getStackTop(p.x+w, p.y+h))!=null) {
+							if(o.el == clne && o.ctype==0) p.ctype = p.ctype;
+						}
 					}
+			
 		}
     };
 
@@ -270,14 +285,14 @@ public class Elements {
 		public void update(Particle p) {
 			if(p.tmp==0) {
 				p.tmp = 1;
-				if(!Cells.particleAt(p.x+1, p.y)) set(p.x+1, p.y);
-				if(!Cells.particleAt(p.x-1, p.y)) set(p.x-1, p.y);
-				if(!Cells.particleAt(p.x, p.y+1)) set(p.x, p.y+1);
-				if(!Cells.particleAt(p.x, p.y-1)) set(p.x, p.y-1);
+				if(Grid.empty(p.x+1, p.y)) set(p.x+1, p.y);
+				if(Grid.empty(p.x-1, p.y)) set(p.x-1, p.y);
+				if(Grid.empty(p.x, p.y+1)) set(p.x, p.y+1);
+				if(Grid.empty(p.x, p.y-1)) set(p.x, p.y-1);
 			}
 		}
 		public void set(int x, int y) {
-			Cells.setParticleAt(x, y, new Particle(fill, x, y), false);
+			Grid.cell(x, y).add(fill);
 		}
 	};
 
@@ -346,11 +361,13 @@ public class Elements {
 		phot = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
 		phot.setMovement(em_phot);
 		phot.setParticleBehaviour(pb_phot);
+		phot.stackable = true;
 		
 		radp = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
 		radp.setMovement(em_radioactive);
 		radp.setParticleBehaviour(pb_radio);
 		radp.celcius = 982;
+		radp.stackable = true;
 		
 		gas = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
 		gas.setMovement(em_gas);
@@ -407,7 +424,7 @@ public class Elements {
 					if(angle==90) ny -= 1;
 					if(angle==270) ny += 1;
 					System.out.println(p.life+", "+angle+" , "+ x+"."+y+" , "+nx+"."+ny);
-					Particle o = Cells.getParticleAt(nx, ny);
+					/*Particle o = Cells.getParticleAt(nx, ny);
 					if(o==null) {
 						p.tmp = 1;
 						Particle dead = new Particle(Elements.coal, x, y);
@@ -418,7 +435,7 @@ public class Elements {
 						p.tmp = 2;
 						Cells.setParticleAt(nx, ny, p, true);
 						Cells.deleteParticle(x, y);
-					}
+					}*/
 				}
 			}
 		});
@@ -446,7 +463,7 @@ public class Elements {
 	
 	public static final Item[] powder = {dust, stne, salt, bcol};
 	public static final Item[] liquid = {watr, lava, ln2, oil};
-	public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice};
+	public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice, clne};
 	public static final Item[] gasses = {gas, fire, plsm, stm};
 	public static final Item[] radio = {phot, radp, plut, warp};
 	public static final Item[] tools = {none, sprk, fill, ant, Walls.wall, Walls.air, Walls.wvoid};

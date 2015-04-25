@@ -10,6 +10,11 @@ public class BigCell {
 	public Wall wall;
 	public double pressure = 0;
 	
+	public void reset() {
+		wall = null;
+		pressure = 0;
+	}
+	
 	public Color getColor() {
 		if(wall!=null) return wall.color;
 		int c = (int) (255 * Math.abs(pressure) / Game.MAX_AIR);

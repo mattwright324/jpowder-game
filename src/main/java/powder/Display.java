@@ -50,10 +50,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public Display() {
 		for (int w = 0; w < Display.width; w++)
 			for (int h = 0; h < Display.height; h++) 
-				Cells.cells[w][h] = new Cell(w, h);
+				Grid.pgrid[w][h] = new Cell(w, h);
 		for (int w = 0; w < Display.width/4; w++)
 			for (int h = 0; h < Display.height/4; h++) 
-				Cells.cellsb[w][h] = new BigCell(w, h);
+				Grid.agrid[w][h] = new BigCell(w, h);
 		game.startUpdateThread();
 		timer.start();
 		dfps.start();
@@ -70,12 +70,12 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		
 		setKeyBindings();
 		
-		Cells.cellsb[25][25].wall = Walls.wall;
-		Cells.cellsb[26][25].wall = Walls.wall;
-		Cells.cellsb[27][25].wall = Walls.air;
-		Cells.cellsb[28][25].wall = Walls.air;
-		Cells.cellsb[29][25].wall = Walls.wvoid;
-		Cells.cellsb[30][25].wall = Walls.wvoid;
+		Grid.bigcell(25, 25).wall = Walls.wall;
+		Grid.bigcell(26, 25).wall = Walls.wall;
+		Grid.bigcell(27, 25).wall = Walls.air;
+		Grid.bigcell(28, 25).wall = Walls.air;
+		Grid.bigcell(29, 25).wall = Walls.wvoid;
+		Grid.bigcell(30, 25).wall = Walls.wvoid;
 	}
 
 	static void makeSmall() {
@@ -104,13 +104,13 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		b2d.setColor(Color.BLACK);
 		b2d.fillRect(0, 0, getWidth(), getHeight());
 		
-		for(int w=0; w<Cells.cellsb.length; w++)
-			for(int h=0; h<Cells.cellsb[0].length; h++)
-				draw_bigcell(Cells.cellsb[w][h]);
+		for(int w=0; w<Grid.agrid.length; w++)
+			for(int h=0; h<Grid.agrid[0].length; h++)
+				draw_bigcell(Grid.bigcell(w, h));
 		size = 0;
 		for(int w=0; w<width; w++)
 			for(int h=0; h<height; h++)
-				draw_cell(Cells.cells[w][h]);
+				draw_cell(Grid.cell(w, h));
 		b2d.setColor(Color.LIGHT_GRAY);
 		int sx = mstart.x * scale; int w = (mstop.x-mstart.x) * scale;
 		int sy = mstart.y * scale; int h = (mstop.y-mstart.y) * scale;
@@ -148,7 +148,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		w2d.drawString("X:"+mouse.x+" Y:"+mouse.y, 5, getHeight()-25);
 		Particle p;
 		String info = "Empty";
-		if((p = Cells.getParticleAt(mouse.x, mouse.y))!=null) {
+		if((p = Grid.getStackTop(mouse.x, mouse.y))!=null) {
 			if(p.el!=null) {
 				info = p.el.name;
 				if(!(p.ctype==0) && Elements.exists(p.ctype)) info += "("+Elements.get(p.ctype)+")";
@@ -163,12 +163,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void draw_cell(Cell c) {
-		if (c.part == null) return;
-		for (int pnum = 0; pnum < 9; pnum++) {
-			if (c.part == null) continue; // Required for plutonium, because it does something special.
-			if (c.part[pnum] != null && c.part[pnum].display()) {
-				size++;
-				b2d.setColor(c.part[pnum].getColor());
+		Particle p;
+		if(!c.empty() && (p = Grid.getStackTop(c.x, c.y))!=null && p.display()) {
+			if(p!=null) {
+				size+=c.count();
+				b2d.setColor(p.getColor());
 				b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
 			}
 		}
@@ -185,7 +184,25 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		w2d.drawLine(mouse_drag.x, mouse_drag.y, mouse.x, mouse.y);
 		for (int x = mstart.x; x <= mstop.x; x++) {
 			for (int y = mstart.y; y <= mstop.y; y++) {
-				Particle p = Cells.getParticleAt(x, y);
+				if(e instanceof Element && Grid.valid(x, y, 0)) {
+					Element el = (Element) e;
+					Cell c = Grid.cell(x, y);
+					Particle p = Grid.getStackTop(x, y);
+					if(el==Elements.none) {
+						Grid.remStackTop(x, y);
+					} else if(p!=null && p.el.conducts && e==Elements.sprk) {
+						p.ctype = p.el.id;
+						p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
+					} else if(p!=null && p.el==Elements.clne) {
+						p.ctype = el.id;
+					} else if(c.addable(el)) {
+						Grid.cell(x, y).add(el);
+					}
+				}
+				if(e instanceof Wall) {
+					
+				}
+				/*Particle p = Cells.getParticleAt(x, y);
 				if(e == Elements.none) {
 					// Delete the particle. Not set it to none. None is still a particle.
 					Cells.deleteParticle(x, y);
@@ -198,7 +215,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 						Cells.setParticleAt(x, y, new Particle((Element) e, x, y), false);
 					if(e instanceof Wall)
 						;//
-				}
+				}*/
 			}
 		}
 	}
@@ -250,10 +267,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		if(SwingUtilities.isRightMouseButton(e))
 			place(right);
 		if(SwingUtilities.isMiddleMouseButton(e)) {
-			Particle m = Cells.getParticleAt(mouse.x, mouse.y);
-			Wall w = Cells.cellsb[mouse.x/4][mouse.y/4].wall;
+			Particle m = Grid.getStackTop(mouse.x, mouse.y);
+			//Wall w = Cells.cellsb[mouse.x/4][mouse.y/4].wall;
 			if(m!=null) left = m.el;
-			if(w!=null) left = w;
+			//if(w!=null) left = w;
 		}
 	}
 
@@ -281,6 +298,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		addKeyBinding(' ', "pause", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				Display.toggle_pause();
+				if(Game.paused) {
+					for(int w=0; w<width; w++)
+						for(int h=0; h<height; h++)
+							Grid.cell(w, h).cleanStack();
+				}
 			}
 		});
 		addKeyBinding('s', "resize", new AbstractAction(){

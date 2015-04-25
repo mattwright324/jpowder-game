@@ -5,13 +5,11 @@ import java.awt.Point;
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 
+@Deprecated
 public class Cells {
 	
-	// TODO Wall & Air Grid
-	
-	public static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4];
-	// Final bad
-    public static Cell[][] cells = new Cell[Display.width][Display.height];
+	public static BigCell[][] cellsb = new BigCell[Display.width/4][Display.height/4]; // Air Grid (Walls, Gravity .. )
+    public static Cell[][] cells = new Cell[Display.width][Display.height]; // Particle Grid
     
     public static boolean valid(int x, int y, int offset) {
         return !(x < offset || y < offset || x >= Display.width-offset || y >= Display.height-offset);
@@ -117,7 +115,7 @@ public class Cells {
      * Move from (x1, y1) to (x2, y2). Original spot set null.
      */
     public static void moveTo(int x1, int y1, int x2, int y2) {
-        if (!Cells.valid(x2, y2, 0)) return;
+        if (!valid(x2, y2, 0)) return;
         Particle a = getParticleAt(x1, y1);
         deleteParticle(x1, y1);
         setParticleAt(x2, y2, a, true);

@@ -17,6 +17,7 @@ public class Element extends Item {
     public double heatTransfer = 0.3;
     public boolean display = true;
     public double air_movement = 0;
+    public boolean stackable = false;
     
     public long life = 0;
     public boolean life_decay = true;

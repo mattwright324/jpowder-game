@@ -1,9 +1,6 @@
 package main.java.powder;
 
-import main.java.powder.particles.Particle;
-
 import java.util.Random;
-
 
 public class Game extends Thread {
 	
@@ -23,7 +20,7 @@ public class Game extends Thread {
 	public void run() {
 		gfps.start();
 		while (isAlive()) {
-			if(Cells.cells[0][0] != null && !paused) update();
+			if(Grid.cell(0,0) != null && !paused) update();
 			try {
 				Thread.sleep(25);
 			} catch (InterruptedException e) {}
@@ -33,18 +30,19 @@ public class Game extends Thread {
 	static void update() {
 		for(int w = 0; w < Display.width; w++) {
 			for(int h = 0; h < Display.height; h++) {
-				if(Cells.particleAt(w, h)) {
-					Particle p;
-					for(int s=0; s<9; s++) {
-						if((p = Cells.getParticleAt(w, h, s))!=null) {
-							if(p.remove()) {
-								Cells.deleteParticle(w, h);
-							} else {
+				Grid.cell(w, h).update();
+				/*Cell cell = Grid.cell(w, h);
+				if(!cell.empty()) {
+					for(int pos=0; pos<cell.count(); pos++) {
+						Particle p = cell.part(pos);
+						if(p!=null) {
+							if(p.remove())
+								cell.rem(pos);
+							else
 								p.update();
-							}
 						}
 					}
-				}
+				}*/
 			}
 		}
 		gfps.add();
