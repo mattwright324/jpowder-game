@@ -1,21 +1,21 @@
 package main.java.powder;
 
-import java.awt.Point;
-import java.util.Arrays;
-
 import main.java.powder.elements.Elements;
 import main.java.powder.particles.Particle;
 
+import java.awt.*;
+import java.util.Arrays;
+
 public class Grid {
 	
-	public static Cell[][] pgrid = new Cell[Display.width][Display.height]; // Particle Grid
+	public static GridPosition[][] pgrid = new GridPosition[Display.width][Display.height]; // Particle Grid
     public static BigCell[][] agrid = new BigCell[Display.width/4][Display.height/4]; // Air Grid (Walls, Gravity .. )
     
     static final int TEMP = 0;
     static final int TYPE = 1;
     static final int CTYPE = 2;
     
-    public static Cell cell(int x, int y) {
+    public static GridPosition cell(int x, int y) {
     	if(x>Display.width-1) x = Display.width-1;
     	if(y>Display.height-1) y = Display.height-1;
     	if(x<0) x = 0;
@@ -118,23 +118,23 @@ public class Grid {
     	if(Elements.exists(id))
     	for(int w=0; w<Display.width; w++)
     		for(int h=0; h<Display.height; h++) {
-    			Cell cell = cell(w, h);
-    			if(!cell.empty()) {
-    				for(int pos=0; pos<cell.stack.length; pos++) {
-    					if(cell.stack[pos]!=null) {
+    			GridPosition gridPosition = cell(w, h);
+    			if(!gridPosition.empty()) {
+    				for(int pos=0; pos< gridPosition.stack.length; pos++) {
+    					if(gridPosition.stack[pos]!=null) {
     						changed++;
     						switch(method) {
                 			case(TEMP):
-                				cell.stack[pos].celcius = val;
+                				gridPosition.stack[pos].celcius = val;
                 				break;
                 			case(TYPE):
                 				if(val==0)
-                					cell.stack[pos] = null;
+                					gridPosition.stack[pos] = null;
                 				else
-                					cell.stack[pos].morph(Elements.get(id), Particle.MORPH_FULL, false);
+                					gridPosition.stack[pos].morph(Elements.get(id), Particle.MORPH_FULL, false);
                 				break;
                 			case(CTYPE):
-                				cell.stack[pos].ctype = (int) val;
+                				gridPosition.stack[pos].ctype = (int) val;
                 				break;
                 			}
     					}

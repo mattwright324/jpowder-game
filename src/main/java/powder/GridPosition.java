@@ -1,12 +1,13 @@
 package main.java.powder;
 
-import java.util.Arrays;
-
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 import main.java.powder.walls.Wall;
 
-public class Cell {
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class GridPosition {
 	
     public int x, y;
     public Particle[] part;
@@ -16,7 +17,7 @@ public class Cell {
     	stack = new Particle[1];
     }
     
-    public Cell(int x, int y) {
+    public GridPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -150,7 +151,7 @@ public class Cell {
      * Should not be used often, preferred on pause.
      */
     public void cleanStack() {
-    	if(stack.length>0 && empty()) {
+    	/*if(stack.length>0 && empty()) {
     		stack = new Particle[0];
     	} else {
     		int nulls = 0;
@@ -168,6 +169,16 @@ public class Cell {
     		}
         	if(nulls>0)
         		Arrays.copyOf(stack, stack.length-nulls);
-    	}
+    	}*/
+		// Use an array sort. Is faster.
+        Arrays.sort(stack, new Comparator<Particle>() {
+            public int compare(Particle p1, Particle p2) {
+              if (p2 == null) {
+                  return -1;
+              } else {
+                  return 1;
+              }
+            }
+        });
     }
 }

@@ -1,8 +1,8 @@
 package main.java.powder.particles;
 
-import main.java.powder.Cell;
 import main.java.powder.Display;
 import main.java.powder.Grid;
+import main.java.powder.GridPosition;
 import main.java.powder.Window;
 import main.java.powder.elements.Conversion;
 import main.java.powder.elements.Element;
@@ -174,7 +174,7 @@ public class Particle {
                     }
                 }
             }
-            if(el.tmp_decay) {
+            else if(el.tmp_decay) {
             	if(tmp>0) tmp--;
             	if(tmp-1==0) {
                     switch (el.tmp_decay_mode) {
@@ -195,22 +195,22 @@ public class Particle {
     
     public void tryMove(int nx, int ny) { 
     	if(Grid.valid(nx, ny, 0)) {
-    		Cell cell = Grid.cell(x, y);
-    		Cell cell2 = Grid.cell(nx, ny);
-    		if(cell2.contains(Elements.void_)) {
-    			cell.rem(pos);
+    		GridPosition gridPosition = Grid.cell(x, y);
+    		GridPosition gridPosition2 = Grid.cell(nx, ny);
+    		if(gridPosition2.contains(Elements.VOID)) {
+    			gridPosition.rem(pos);
     			return;
     		}
     		Particle o;
-    		if(!(toWall()!=null && !toWall().parts) && (cell2.addable(this) || cell2.displaceable(this))) {
-    			cell.rem(pos);
-    			for(int i=0; i<cell2.stack.length; i++) {
-    				if((o=cell2.part(i))!=null) {
-    					cell.add(o);
-        				cell2.rem(i);
+    		if(!(toWall()!=null && !toWall().parts) && (gridPosition2.addable(this) || gridPosition2.displaceable(this))) {
+    			gridPosition.rem(pos);
+    			for(int i=0; i< gridPosition2.stack.length; i++) {
+    				if((o= gridPosition2.part(i))!=null) {
+    					gridPosition.add(o);
+        				gridPosition2.rem(i);
     				}
     			}
-    			cell2.add(this);
+    			gridPosition2.add(this);
     		}
     	}
     }
