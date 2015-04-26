@@ -75,7 +75,24 @@ public class Elements {
 		add(id, e);
 		return e;
 	}
-	
+	public static Element create(int id, String name, String desc, Color c, int weight, ParticleBehaviour behaviour) {
+		Element e = new Element(id, name, desc, c, behaviour, null);
+		e.weight = weight;
+		add(id, e);
+		return e;
+	}
+	public static Element create(int id, String name, String desc, Color c, int weight, ElementMovement movement) {
+		Element e = new Element(id, name, desc, c, null, movement);
+		e.weight = weight;
+		add(id, e);
+		return e;
+	}
+	public static Element create(int id, String name, String desc, Color c, int weight, ParticleBehaviour behaviour, ElementMovement movement) {
+		Element e = new Element(id, name, desc, c, behaviour, movement);
+		e.weight = weight;
+		add(id, e);
+		return e;
+	}
 	static ElementMovement em_phot = new ElementMovement() {
         public void move(Particle p) {
             int ny = p.y + (int) p.vy;
@@ -347,20 +364,16 @@ public class Elements {
 		none = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
 		none.remove = true;
 		
-		dust = create(1, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER-1);
-		dust.setMovement(em_powder);
+		dust = create(1, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER-1, em_powder);
 		dust.flammibility = 0.6;
 		
-		stne = create(2, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER);
-		stne.setMovement(em_powder);
+		stne = create(2, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER, em_powder);
 		
 		salt = create(3, "SALT", "Salt", new Color(243, 243, 243), WEIGHT_POWDER-1);
-		salt.setMovement(em_powder);
 		
-		bcol = create(4, "BCOL", "Broken Coal", Color.GRAY.brighter(), WEIGHT_POWDER);
-		bcol.setMovement(em_powder);
+		bcol = create(4, "BCOL", "Broken Coal", Color.GRAY.brighter(), WEIGHT_POWDER, em_powder);
 		
-		metl = create(5, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID);
+		metl = create(5, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID, em_powder);
 		metl.conducts = true;
 		
 		qrtz = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
@@ -376,91 +389,72 @@ public class Elements {
 		insl.heatTransfer = 0;
 		insl.flammibility = 0.1;
 		
-		plut = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
-		plut.setParticleBehaviour(pb_plut);
-		plut.setMovement(em_powder);
+		plut = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER, pb_plut, em_powder);
 		plut.glow = true;
 		
-		sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
-		sprk.setParticleBehaviour(pb_sprk);
+		sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID, pb_sprk);
 		sprk.life_decay_mode = DECAY_CTYPE;
 		sprk.life = 4;
 		
-		watr = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
-		watr.setMovement(em_liquid);
+		watr = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID, em_liquid);
 		watr.conducts = true;
 		watr.glow = true;
 		
-		lava = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
-		lava.setMovement(em_liquid);
-		lava.setParticleBehaviour(pb_lava);
+		lava = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID, pb_lava, em_liquid);
 		lava.celcius = 1522;
 		lava.glow = true;
 		
-		ln2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
+		ln2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID, em_liquid);
 		ln2.setMovement(em_liquid);
 		ln2.celcius = MIN_TEMP;
 		ln2.glow = true;
 		
-		oil = create(15, "OIL", "Oil", Color.GREEN.darker(), WEIGHT_LIQUID);
-		oil.setMovement(em_liquid);
+		oil = create(15, "OIL", "Oil", Color.GREEN.darker(), WEIGHT_LIQUID, em_liquid);
 		oil.flammibility = 0.3;
 		oil.glow = true;
 		
-		phot = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
-		phot.setMovement(em_phot);
-		phot.setParticleBehaviour(pb_phot);
+		phot = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO, pb_phot, em_phot);
 		phot.stackable = true;
 		phot.glow = true;
 		
-		radp = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
-		radp.setMovement(em_radioactive);
-		radp.setParticleBehaviour(pb_radio);
+		radp = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO, pb_radio, em_radioactive);
 		radp.celcius = 982;
 		radp.stackable = true;
 		radp.glow = true;
 		
-		gas = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
-		gas.setMovement(em_gas);
+		gas = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS, em_gas);
 		gas.flammibility = 0.8;
 		gas.glow = true;
 		
-		warp = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND-1);
-		warp.setMovement(em_gas);
+		warp = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND-1, em_gas);
 		warp.life = 500;
 		warp.life_decay_mode = DECAY_DIE;
 		
-		fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
-		fire.setMovement(em_gas);
-		fire.setParticleBehaviour(pb_fire);
+		fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS, pb_fire, em_gas);
 		fire.celcius = 450;
 		fire.life_decay_mode = DECAY_DIE;
 		fire.life = 120;
 		fire.glow = true;
 		
-		plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
-		plsm.setParticleBehaviour(pb_plsm);
+		plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS, pb_plsm);
 		plsm.celcius = MAX_TEMP;
 		plsm.life_decay_mode = DECAY_DIE;
 		plsm.life = 120;
 		plsm.glow = true;
 		
-		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
-		clne.setParticleBehaviour(pb_clne);
+		clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID, pb_clne);
 		
-		stm = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
-		stm.setMovement(em_gas);
+		stm = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS, em_gas);
 		stm.glow = true;
 		
 		ice = create(24, "ICE", "Ice", new Color(200, 200, 255), WEIGHT_SOLID);
 		ice.celcius = -25;
 		
-		fill = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
+		fill = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND, pb_fill);
 		fill.tmp_decay = false;
 		fill.heatTransfer = 0.5;
-		fill.setParticleBehaviour(pb_fill);
 		
-		ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
+		ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND, pb_ant);
 		ant.tmp_decay = false;
 		ant.life_decay = false;
 		ant.setParticleBehaviour(pb_ant);
