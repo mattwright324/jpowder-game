@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,6 +51,8 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	
 	public List<Button> buttons = new ArrayList<Button>();
 	
+	public Point mouse = new Point(0,0);
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g2d = (Graphics2D) g;
@@ -88,15 +91,16 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	}
 	
 	public void mousePressed(MouseEvent e) {
-		if(clear.contains(e.getPoint())) {
+		mouse = e.getPoint();
+		if(clear.contains(mouse)) {
 			Game.paused = true;
 			Grid.newGame();
 		}
-		if(resize.contains(e.getPoint())) Display.toggle_size();
-		if(pause.contains(e.getPoint())) Display.toggle_pause();
-		if(view.contains(e.getPoint())) if(Display.view == 0) Display.setView(1); else Display.setView(0); {
+		if(resize.contains(mouse)) Display.toggle_size();
+		if(pause.contains(mouse)) Display.toggle_pause();
+		if(view.contains(mouse)) if(Display.view == 0) Display.setView(1); else Display.setView(0); {
 			for(Button b : buttons) {
-				if(b.contains(e.getPoint())) {
+				if(b.contains(mouse)) {
 					if(SwingUtilities.isLeftMouseButton(e))
 						Display.left = b.item;
 					if(SwingUtilities.isRightMouseButton(e))
@@ -104,7 +108,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 				}
 			}
 		}
-		if(help.contains(e.getPoint())) {
+		if(help.contains(mouse)) {
 			Display.help = !Display.help;
 		}
 	}
@@ -129,6 +133,18 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 			g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
 			g2d.setPaintMode();
 			g2d.fill(b);
+			if(b.contains(mouse)) {
+				g2d.setColor(new Color(255,0,0,128));
+				g2d.drawRect(b.x, b.y, b.width, b.height);
+			}
+			if(b.item == Display.left) {
+				g2d.setColor(new Color(255,0,0));
+				g2d.drawRect(b.x, b.y, b.width, b.height);
+			}
+			if(b.item == Display.right) {
+				g2d.setColor(new Color(0,0,255));
+				g2d.drawRect(b.x, b.y, b.width, b.height);
+			}
 			g2d.setColor(Color.WHITE);
 			g2d.drawString(b.item.name, b.x+2, b.y+b_h/2+5);
 		}
@@ -156,12 +172,13 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	}
 	
 	public void mouseDragged(MouseEvent e) {
+		mouse = e.getPoint();
 		Window.updateMouseInFrame(e.getPoint(), this);
 		repaint();
 	}
 
 	public void mouseMoved(MouseEvent e) {
+		mouse = e.getPoint();
 		Window.updateMouseInFrame(e.getPoint(), this);
-		repaint();
 	}
 }

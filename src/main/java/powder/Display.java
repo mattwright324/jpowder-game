@@ -44,6 +44,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	static boolean hud = true;
 	static boolean help = false;
+	public boolean mouse_square = false;
 	
 	public Display() {
 		for (int w = 0; w < Display.width; w++)
@@ -67,13 +68,6 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		setCursor(blankCursor);
 		
 		setKeyBindings();
-		
-		Grid.bigcell(25, 25).wall = Walls.wall;
-		Grid.bigcell(26, 25).wall = Walls.wall;
-		Grid.bigcell(27, 25).wall = Walls.air;
-		Grid.bigcell(28, 25).wall = Walls.air;
-		Grid.bigcell(29, 25).wall = Walls.wvoid;
-		Grid.bigcell(30, 25).wall = Walls.wvoid;
 	}
 
 	static void makeSmall() {
@@ -110,19 +104,28 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		for(int w=0; w<width; w++)
 			for(int h=0; h<height; h++)
 				draw_cell(Grid.cell(w, h));
+		
 		b2d.setColor(Color.LIGHT_GRAY);
 		int sx = mstart.x * scale; int w = (mstop.x-mstart.x) * scale;
 		int sy = mstart.y * scale; int h = (mstop.y-mstart.y) * scale;
-		b2d.drawRect(sx, sy, w, h);
+		if(mouse_square) {
+			b2d.drawRect(sx, sy, w, h); // Size
+			b2d.setColor(new Color(244, 244, 244, 32));
+			b2d.fillRect(sx, sy, w, h); // Size overlay
+		} else {
+			b2d.drawOval(sx, sy, w, h); // Size
+			b2d.setColor(new Color(244, 244, 244, 32));
+			b2d.fillOval(sx, sy, w, h); // Size overlay
+		}
 		int mx = sx + w / 2;
 		int my = sy + h / 2;
-		b2d.drawRect(mx, my, scale - 1, scale - 1);
+		b2d.drawRect(mx, my, scale - 1, scale - 1); // Center Dot
+		
+		// Edge-lines to find mouse location.
 		b2d.drawLine(mx, 0, mx, 4); 
 		b2d.drawLine(mx, getHeight()-4, mx, getHeight());
 		b2d.drawLine(0, my, 4, my);
 		b2d.drawLine(getWidth() - 4, my, getWidth(), my);
-		b2d.setColor(new Color(244, 244, 244, 32));
-		b2d.fillRect(sx, sy, w, h);
 		
 		w2d.drawImage(img, null, 0, 0);
 		if(hud) {
@@ -132,12 +135,13 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			int line = 1;
 			int spacing = w2d.getFontMetrics().getHeight();
 			w2d.drawString("FPS    "+dfps.fps()+", UPS    "+Game.gfps.fps(), 5, spacing*line++);
-			w2d.drawString("Parts       "+size, 5, spacing*line++);
-			w2d.drawString("Null Cells  "+nsize, 5, spacing*line++);
+			w2d.drawString("Parts             "+size, 5, spacing*line++);
+			w2d.drawString("Null Stack-Cells  "+nsize, 5, spacing*line++); // As in nulls within a Cell's stack[]
 			w2d.drawString(left.name+" || "+right.name, 5, spacing*line++);
 			if(help) {
 				w2d.drawString("", 5, spacing*line++);
 				w2d.drawString("KEY      ACTION         STATE", 5, spacing*line++);
+				w2d.drawString("T        mouse type     "+(mouse_square ? "Square" : "Circle"), 5, spacing*line++);
 				w2d.drawString("F        single frame   ", 5, spacing*line++);
 				w2d.drawString("H        toggle hud     ", 5, spacing*line++);
 				w2d.drawString("[ ]      mouse size     "+draw_size, 5, spacing*line++);
@@ -172,9 +176,10 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				Color col = p.getColor();
 				b2d.setColor(col);
 				b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
-				if(view==3) { // "Fancy" Display; not great on fps
+				if(view==3 && p.el.glow) { // "Fancy" Display; not great on fps
 					b2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
-					b2d.fillRect(c.screen_x()-1, c.screen_y()-1, scale+2, scale+2);
+					int s = scale; // Small flicker
+					b2d.fillRect(c.screen_x()-s, c.screen_y()-s, scale+s*2, scale+s*2);
 				}
 			}
 		}
@@ -189,32 +194,45 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void place(Item e, Point pt, int size) {
 		if(pt==null) return;
-		Point start = new Point(pt.x-size, pt.y-size);
-		Point end = new Point(pt.x+size/2, pt.y+size/2);
+		Point start = new Point(pt.x-size/2, pt.y-size/2);
+		Point end = new Point(start.x+size, start.y+size);
 		for (int x = start.x; x <= end.x; x++) {
 			for (int y = start.y; y <= end.y; y++) {
-				if(e instanceof Element && Grid.valid(x, y, 0)) {
-					Element el = (Element) e;
-					Cell c = Grid.cell(x, y);
-					Particle p = Grid.getStackTop(x, y);
-					if(el==Elements.none) {
-						Grid.remStackTop(x, y);
-					} else if(p!=null && p.el.conducts && e==Elements.sprk) {
-						p.ctype = p.el.id;
-						p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
-					} else if(p!=null && p.el==Elements.clne) {
-						p.ctype = el.id;
-					} else if(c.addable(el)) {
-						Grid.cell(x, y).add(el);
+				if(mouse_square) placeAt(e, x, y); else {
+					if(Math.sqrt(Math.pow(x-pt.x,2)+Math.pow(y-pt.y,2))<=size/2) {
+						placeAt(e, x, y);
 					}
 				}
-				if(e instanceof Wall) {
-					Wall wl = (Wall) e;
-					BigCell bc = Grid.bigcell(x/4, y/4);
-					
-					bc.wall = wl;
-				}
 			}
+		}
+	}
+	
+	public void placeAt(Item e, int x, int y) {
+		if(e instanceof Element && Grid.valid(x, y, 0)) {
+			Element el = (Element) e;
+			Cell c = Grid.cell(x, y);
+			Particle p = Grid.getStackTop(x, y);
+			if(el==Elements.none) {
+				Grid.remStackTop(x, y);
+			} else if(e==Elements.sprk) {
+				if(p!=null && p.el.conducts) {
+					p.ctype = p.el.id;
+					p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
+				}
+			} else if(p!=null && el!=Elements.clne && p.el==Elements.clne) {
+				p.ctype = el.id;
+			} else if(c.addable(el)) {
+				Grid.cell(x, y).add(el);
+			}
+		}
+		if(e instanceof Wall && Grid.valid_big(x/4, y/4, 0)) {
+			Wall wl = (Wall) e;
+			BigCell bc = Grid.bigcell(x/4, y/4);
+			
+			if(wl==Walls.none)
+				bc.wall = null;
+			else
+				bc.wall = wl;
 		}
 	}
 	
@@ -273,7 +291,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	public void mouseReleased(MouseEvent e) {
-
+		
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -293,7 +311,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	
 	@SuppressWarnings("serial")
 	public void setKeyBindings() {
-		addKeyBinding(' ', "pause", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				Display.toggle_pause();
 				if(Game.paused) {
@@ -303,59 +321,64 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 				}
 			}
 		});
-		addKeyBinding('s', "resize", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_S, "resize", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				Display.toggle_size();
 			}
 		});
-		addKeyBinding('f', "frame", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_F, "frame", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				Game.paused = true;
 				Game.update();
 			}
 		});
-		addKeyBinding('[', "mouse_small", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_OPEN_BRACKET, "mouse_small", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				draw_size-=2; updateMouse(mouse);
 				if(draw_size<0) draw_size = 0;
 			}
 		});
-		addKeyBinding(']', "mouse_big", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_CLOSE_BRACKET, "mouse_big", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				draw_size+=2; updateMouse(mouse);
 				if(draw_size<0) draw_size = 0;
 			}
 		});
-		addKeyBinding('h', "hud", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_H, "hud", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				hud = !hud;
 			}
 		});
-		addKeyBinding('1', "view1", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_1, "view1", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(0);
 			}
 		});
-		addKeyBinding('2', "view2", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_2, "view2", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(1);
 			}
 		});
-		addKeyBinding('3', "view3", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_3, "view3", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(2);
 			}
 		});
-		addKeyBinding('4', "view4", new AbstractAction(){
+		addKeyBinding(KeyEvent.VK_4, "view4", new AbstractAction(){
 			public void actionPerformed(ActionEvent e) {
 				setView(3);
 			}
 		});
+		addKeyBinding(KeyEvent.VK_T, "mouse_shape", new AbstractAction(){
+			public void actionPerformed(ActionEvent e) {
+				mouse_square = !mouse_square;
+			}
+		});
 	}
 	
-	public void addKeyBinding(char c, String name, Action action) {
-		im.put(KeyStroke.getKeyStroke(c), name);
-		am.put(name, action);
+	public void addKeyBinding(int c, String name, Action action) {
+		im.put(KeyStroke.getKeyStroke(c, 0), name);
+		am.put(name, action); 
 	}
 	
 	static void setView(int i) {

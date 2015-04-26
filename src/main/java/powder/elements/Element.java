@@ -13,11 +13,14 @@ public class Element extends Item {
     public boolean remove = false;
     public double flammibility = 0;
     public boolean conducts = false;
-    public boolean sandEffect = false;
+    
     public double heatTransfer = 0.3;
-    public boolean display = true;
     public double air_movement = 0;
     public boolean stackable = false;
+    
+    public boolean display = true;
+    public boolean sandEffect = false;
+    public boolean glow = false;
     
     public long life = 0;
     public boolean life_decay = true;

@@ -13,7 +13,7 @@ public class Cell {
     
     public void reset() {
     	part = null;
-    	stack = new Particle[0];
+    	stack = new Particle[1];
     }
     
     public Cell(int x, int y) {
@@ -73,6 +73,22 @@ public class Cell {
     	return true;
     }
     
+    public boolean displaceable(Particle p) {
+    	return displaceable(p.el);
+    }
+    
+    public boolean displaceable(Element e) {
+    	for(int i=0; i<stack.length; i++)
+    		if(stack[i]!=null && e.heavierThan(stack[i].el)) return false;
+    	return true;
+    }
+    
+    public boolean contains(Element e) {
+    	for(int i=0; i<stack.length; i++)
+    		if(stack[i]!=null && stack[i].el==e) return true;
+    	return false;
+    }
+    
     public Particle part(int pos) {
     	if(empty()) return null;
     	return stack[pos];
@@ -122,6 +138,9 @@ public class Cell {
     			else
     				p.update();
     		}
+    		if(stack.length>0 && empty()) {
+        		stack = new Particle[1];
+        	}
     	}
     }
     

@@ -42,13 +42,18 @@ public class Grid {
         return !(x < offset || y < offset || x >= Display.width-offset || y >= Display.height-offset);
     }
     
+    public static boolean valid_big(int x, int y, int offset) { // Air Grid
+        return !(x < offset || y < offset || x >= Display.width/4-offset || y >= Display.height/4-offset);
+    }
+    
     /**
      * Returns uppermost particle in stack.
      */
     public static Particle getStackTop(int x, int y) {
-    	if(!valid(x, y, 0) || cell(x, y).empty()) return null;
+    	if(!valid(x, y, 0) && cell(x, y).empty()) return null;
     	for(int i=0; i<cell(x, y).stack.length; i++)
     		if(cell(x, y).stack[i]!=null) return cell(x, y).stack[i];
+    	if(cell(x, y).stack.length==0) return null;
     	return cell(x, y).stack[0];
     }
     

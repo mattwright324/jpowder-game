@@ -1,5 +1,6 @@
 package main.java.powder.particles;
 
+import main.java.powder.Cell;
 import main.java.powder.Display;
 import main.java.powder.Grid;
 import main.java.powder.Window;
@@ -17,6 +18,7 @@ public class Particle {
 	
 	public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
+    public static final int MORPH_EL_ONLY = 2;
 	
     public int x, y, pos=0;
     public Element el;
@@ -69,12 +71,12 @@ public class Particle {
     	return celcius > p.celcius;
     }
     
-    public boolean heavierThan(Particle p) {
-        return el.weight > p.el.weight;
+    public boolean heavierThan(Element e) {
+        return el.weight > e.weight;
     }
-
-    public boolean lighterThan(Particle p) {
-        return el.weight < p.el.weight;
+    
+    public boolean heavierThan(Particle p) {
+    	return heavierThan(p.el);
     }
     
     public double temp() {
@@ -126,7 +128,7 @@ public class Particle {
     }
     
     public boolean remove() {
-        return remove || (toWall() != null && !toWall().parts);
+        return remove || (toWall()!=null);
     }
 
     public boolean ready() {
@@ -191,11 +193,25 @@ public class Particle {
         }
     }
     
-    public void tryMove(int nx, int ny) {
-    	if(Grid.valid(nx, ny, 0) && Grid.cell(nx, ny).addable(this)) {
-    		//System.out.println(pos+" >> "+x+"."+y+" -> "+nx+"."+ny);
-    		Grid.cell(x, y).rem(pos);
-    		Grid.cell(nx, ny).add(this);
+    public void tryMove(int nx, int ny) { 
+    	if(Grid.valid(nx, ny, 0)) {
+    		Cell cell = Grid.cell(x, y);
+    		Cell cell2 = Grid.cell(nx, ny);
+    		if(cell2.contains(Elements.void_)) {
+    			cell.rem(pos);
+    			return;
+    		}
+    		Particle o;
+    		if(!(toWall()!=null && !toWall().parts) && (cell2.addable(this) || cell2.displaceable(this))) {
+    			cell.rem(pos);
+    			for(int i=0; i<cell2.stack.length; i++) {
+    				if((o=cell2.part(i))!=null) {
+    					cell.add(o);
+        				cell2.rem(i);
+    				}
+    			}
+    			cell2.add(this);
+    		}
     	}
     }
     
@@ -208,6 +224,9 @@ public class Particle {
     		double temp = celcius;
     		init(e, x, y); 
     		celcius = temp; break;
+    	case(MORPH_EL_ONLY):
+    		el = e;
+    		break;
     	default:
     		init(e, x, y); break;
     	}
