@@ -5,6 +5,7 @@ import main.java.powder.particles.Particle;
 import main.java.powder.walls.Wall;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class GridPosition {
 	
@@ -150,7 +151,7 @@ public class GridPosition {
      * Should not be used often, preferred on pause.
      */
     public void cleanStack() {
-    	if(stack.length>0 && empty()) {
+    	/*if(stack.length>0 && empty()) {
     		stack = new Particle[0];
     	} else {
     		int nulls = 0;
@@ -168,6 +169,16 @@ public class GridPosition {
     		}
         	if(nulls>0)
         		Arrays.copyOf(stack, stack.length-nulls);
-    	}
+    	}*/
+		// Use an array sort. Is faster.
+        Arrays.sort(stack, new Comparator<Particle>() {
+            public int compare(Particle p1, Particle p2) {
+              if (p2 == null) {
+                  return -1;
+              } else {
+                  return 1;
+              }
+            }
+        });
     }
 }
