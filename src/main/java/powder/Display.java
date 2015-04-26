@@ -7,7 +7,6 @@ import main.java.powder.walls.Wall;
 import main.java.powder.walls.Walls;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -49,7 +48,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public Display() {
 		for (int w = 0; w < Display.width; w++)
 			for (int h = 0; h < Display.height; h++) 
-				Grid.pgrid[w][h] = new Cell(w, h);
+				Grid.pgrid[w][h] = new GridPosition(w, h);
 		for (int w = 0; w < Display.width/4; w++)
 			for (int h = 0; h < Display.height/4; h++) 
 				Grid.agrid[w][h] = new BigCell(w, h);
@@ -136,7 +135,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 			int spacing = w2d.getFontMetrics().getHeight();
 			w2d.drawString("FPS    "+dfps.fps()+", UPS    "+Game.gfps.fps(), 5, spacing*line++);
 			w2d.drawString("Parts             "+size, 5, spacing*line++);
-			w2d.drawString("Null Stack-Cells  "+nsize, 5, spacing*line++); // As in nulls within a Cell's stack[]
+			w2d.drawString("Null Stack-Cells  "+nsize, 5, spacing*line++); // As in nulls within a GridPosition's stack[]
 			w2d.drawString(left.name+" || "+right.name, 5, spacing*line++);
 			if(help) {
 				w2d.drawString("", 5, spacing*line++);
@@ -168,7 +167,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 		dfps.add();
 	}
 	
-	public void draw_cell(Cell c) {
+	public void draw_cell(GridPosition c) {
 		Particle p;
 		if(!c.empty() && (p = Grid.getStackTop(c.x, c.y))!=null && p.display()) {
 			if(p!=null) {
@@ -210,7 +209,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 	public void placeAt(Item e, int x, int y) {
 		if(e instanceof Element && Grid.valid(x, y, 0)) {
 			Element el = (Element) e;
-			Cell c = Grid.cell(x, y);
+			GridPosition c = Grid.cell(x, y);
 			Particle p = Grid.getStackTop(x, y);
 			if(el==Elements.none) {
 				Grid.remStackTop(x, y);

@@ -1,12 +1,12 @@
 package main.java.powder;
 
-import java.util.Arrays;
-
 import main.java.powder.elements.Element;
 import main.java.powder.particles.Particle;
 import main.java.powder.walls.Wall;
 
-public class Cell {
+import java.util.Arrays;
+
+public class GridPosition {
 	
     public int x, y;
     public Particle[] part;
@@ -16,7 +16,7 @@ public class Cell {
     	stack = new Particle[1];
     }
     
-    public Cell(int x, int y) {
+    public GridPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
