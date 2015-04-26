@@ -16,10 +16,18 @@ public class Grid {
     static final int CTYPE = 2;
     
     public static Cell cell(int x, int y) {
+    	if(x>Display.width-1) x = Display.width-1;
+    	if(y>Display.height-1) y = Display.height-1;
+    	if(x<0) x = 0;
+    	if(y<0) y = 0;
     	return pgrid[x][y];
     }
     
     public static BigCell bigcell(int x, int y) {
+    	if(x>Display.width/4) x = Display.width/4;
+    	if(y>Display.height/4) y = Display.height/4;
+    	if(x<0) x = 0;
+    	if(y<0) y = 0;
     	return agrid[x][y];
     }
     
