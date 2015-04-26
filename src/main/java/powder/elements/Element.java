@@ -55,7 +55,21 @@ public class Element extends Item {
         description = desc;
         setColor(c);
     }
-    
+    public Element(int eid, String name, String desc, Color c, ParticleBehaviour behaviour) {
+        this.id = eid;
+        this.name = name;
+        this.description = desc;
+        this.setColor(c);
+        this.setParticleBehaviour(behaviour);
+    }
+    public Element(int eid, String name, String desc, Color c, ParticleBehaviour behaviour, ElementMovement movement) {
+        this.id = eid;
+        this.name = name;
+        this.description = desc;
+        this.setColor(c);
+        this.setParticleBehaviour(behaviour);
+        this.setMovement(movement);
+    }
     public String toString() {
     	return name;
     }
