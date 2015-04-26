@@ -174,7 +174,7 @@ public class Particle {
                     }
                 }
             }
-            if(el.tmp_decay) {
+            else if(el.tmp_decay) {
             	if(tmp>0) tmp--;
             	if(tmp-1==0) {
                     switch (el.tmp_decay_mode) {
@@ -197,7 +197,7 @@ public class Particle {
     	if(Grid.valid(nx, ny, 0)) {
     		Cell cell = Grid.cell(x, y);
     		Cell cell2 = Grid.cell(nx, ny);
-    		if(cell2.contains(Elements.void_)) {
+    		if(cell2.contains(Elements.VOID)) {
     			cell.rem(pos);
     			return;
     		}

@@ -339,7 +339,7 @@ public class Elements {
 	
 	public static final Element none, sprk, fill, ant;
 	public static final Element dust, stne, salt, bcol, plut;
-	public static final Element metl, qrtz, dmnd, coal, insl, clne, ice, void_;
+	public static final Element metl, qrtz, dmnd, coal, insl, clne, ice, VOID;
 	public static final Element watr, lava, ln2, oil;
 	public static final Element phot, radp;
 	public static final Element gas, warp, fire, plsm, stm;
@@ -465,7 +465,7 @@ public class Elements {
 		ant.life_decay = false;
 		ant.setParticleBehaviour(pb_ant);
 		
-		void_ = create(27, "VOID", "Removes interacting particles", new Color(255,96,96), WEIGHT_DMND);
+		VOID = create(27, "VOID", "Removes interacting particles", new Color(255,96,96), WEIGHT_DMND);
 	}
 	
 	static { // Conversions
@@ -490,7 +490,7 @@ public class Elements {
 	
 	public static final Item[] powder = {dust, stne, salt, bcol};
 	public static final Item[] liquid = {watr, lava, ln2, oil};
-	public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice, clne, void_};
+	public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice, clne, VOID};
 	public static final Item[] gasses = {gas, fire, plsm, stm};
 	public static final Item[] radio = {phot, radp, plut, warp};
 	public static final Item[] tools = {none, sprk, fill, ant, Walls.none, Walls.wall, Walls.air, Walls.wvoid};
