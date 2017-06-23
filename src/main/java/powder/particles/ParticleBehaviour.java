@@ -1,4 +1,4 @@
-package main.java.powder.particles;
+package powder.particles;
 
 public abstract class ParticleBehaviour {
     /**

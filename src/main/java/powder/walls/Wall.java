@@ -1,8 +1,22 @@
-package main.java.powder.walls;
+package powder.walls;
 
 import java.awt.Color;
 
-public class Wall {
+import powder.Item;
+
+public class Wall extends Item {
+	
+	// Pass-through flags.
+	public boolean air = false;
+	public boolean parts = false;
+	/*public boolean powders = false;
+	public boolean liquids = false;
+	public boolean gasses = false;
+	public boolean solids = false;*/
+	
+	public boolean conduct = false;
+	
+	public boolean remove = false;
 	
 	public Wall(String n, Color c) {
 		name = n;
@@ -14,20 +28,4 @@ public class Wall {
 		description = d;
 		color = c;
 	}
-	
-	public String name = "Wall";
-	public String description = "Blocks everything.";
-	
-	public Color color = Color.GRAY;
-	
-	// Pass-through flags.
-	public boolean air = false;
-	public boolean powders = false;
-	public boolean liquids = false;
-	public boolean gasses = false;
-	public boolean solids = false;
-	
-	public boolean conduct = false;
-	
-	public boolean remove = false;
 }

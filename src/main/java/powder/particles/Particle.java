@@ -1,30 +1,44 @@
-package main.java.powder.particles;
+package powder.particles;
 
-import main.java.powder.Cells;
-import main.java.powder.Game;
-import main.java.powder.Window;
-import main.java.powder.elements.Element;
+import powder.Cell;
+import powder.Display;
+import powder.Grid;
+import powder.Window;
+import powder.elements.Conversion;
+import powder.elements.Element;
+import powder.elements.Elements;
+import powder.walls.Wall;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Random;
 
 public class Particle {
 	
+	public static final Random r = new Random();
+	
 	public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
+    public static final int MORPH_EL_ONLY = 2;
 	
-    public Random r = new Random();
+    public int x, y, pos=0;
     public Element el;
-    public int x, y;
+    public long update = 50;
+    public long last_update = System.currentTimeMillis();
+    
     public int ctype = 0;
+    public int tmp = 0;
     public Color deco;
     public double vx = 0, vy = 0;
     public long life = 0;
     public double celcius = 0.0;
     public boolean remove = false;
-    public long update = 50;
-    public long last_update = System.currentTimeMillis();
-
+    
+    /*final long cid = r.nextLong();
+    public boolean same(Particle p) {
+    	//System.out.println(x+"."+y+","+cid+" =? "+p.x+"."+p.y+","+p.cid);
+    	return cid==p.cid;
+    }*/
+    
     public Particle(Element e, int x, int y) {
     	init(e, x, y);
     }
@@ -35,40 +49,34 @@ public class Particle {
         this.y = y;
         this.life = el.life;
         this.celcius = el.celcius;
-        setRemove(el.remove);
+        //setRemove(el.remove);
         deco = null;
         if (el.sandEffect) addSandEffect();
         if (el.behaviour != null) el.behaviour.init(this);
+    }
+    
+    public Wall toWall() {
+    	return Grid.bigcell(x/4, y/4).wall;
+    }
+    
+    public boolean display() {
+    	return !remove() || el.display;
     }
     
     public boolean burn() {
         return Math.random() < el.flammibility;
     }
     
-    public boolean convert() {
-    	if(!el.convert) return false;
-    	switch(el.conv_sign) {
-    	case(Element.CS_GTR):
-    		return el.conv_temp < celcius;
-    	case(Element.CS_LSS):
-    		return el.conv_temp > celcius;
-    	case(Element.CS_EQ):
-    		return (int) el.conv_temp == (int) celcius;
-    	default:
-    		return el.conv_temp < celcius;
-    	}
-    }
-    
     public boolean warmerThan(Particle p) {
     	return celcius > p.celcius;
     }
     
-    public boolean heavierThan(Particle p) {
-        return el.weight > p.el.weight;
+    public boolean heavierThan(Element e) {
+        return el.weight > e.weight;
     }
-
-    public boolean lighterThan(Particle p) {
-        return el.weight < p.el.weight;
+    
+    public boolean heavierThan(Particle p) {
+    	return heavierThan(p.el);
     }
     
     public double temp() {
@@ -76,12 +84,19 @@ public class Particle {
     }
     
     public Color getColor() { // EW
-        return deco != null ? deco : el.getColor();
+    	switch(Display.view) {
+    	case(1):
+    		return getTempColor();
+    	case(2):
+    		return getLifeGradient();
+    	default:
+    		return deco != null ? deco : el.getColor();
+    	}
     }
     
     public Color getTempColor() { // Colorized temperature with no affect on performance!
     	int w = Window.heatColorStrip.getWidth();
-		int x = (int) (w * (celcius + Math.abs(Game.MIN_TEMP)) / (Math.abs(Game.MAX_TEMP)+ Math.abs(Game.MIN_TEMP)));
+		int x = (int) (w * (celcius + Math.abs(Elements.MIN_TEMP)) / (Math.abs(Elements.MAX_TEMP)+ Math.abs(Elements.MIN_TEMP)));
 		if(w <= x) x = w-1;
 		if(x < 0) x = 0;
 		int color = Window.heatColorStrip.getRGB(x, 0);
@@ -111,9 +126,9 @@ public class Particle {
     public void setRemove(boolean b) {
         remove = b;
     }
-
+    
     public boolean remove() {
-        return remove;
+        return remove || (toWall()!=null);
     }
 
     public boolean ready() {
@@ -121,53 +136,83 @@ public class Particle {
     }
 
     public void update() {
-        if (ready()) {
+        if(ready()) {
             if (el.behaviour != null)
                 el.behaviour.update(this);
             if (el.movement != null)
                 el.movement.move(this);
             
+            
             for(int w=-1; w<2; w++)
             	for(int h=-1; h<2; h++)
-            		if(Cells.particleAt(x+w, y+h) && !(w==0 && h==0)) {
-            			Particle p = Cells.getParticleAt(x+w, y+h);
+            		if(Grid.valid(x+w, y+h, 0) && !Grid.cell(x+w, y+h).empty() && !(w==0 && h==0)) {
+            			Particle p = Grid.getStackTop(x+w, y+h);
+                        if (p == null) continue; // What? Why the hell is this NullPointering?!?!
             			double diff = (celcius - p.celcius);
             			double trans = p.el.heatTransfer;
             			p.celcius += (diff * trans);
         				celcius = celcius - (diff * trans);
-        				if(celcius < Game.MIN_TEMP) celcius = Game.MIN_TEMP;
-        				if(celcius > Game.MAX_TEMP) celcius = Game.MAX_TEMP;
+        				if(celcius < Elements.MIN_TEMP) celcius = Elements.MIN_TEMP;
+        				if(celcius > Elements.MAX_TEMP) celcius = Elements.MAX_TEMP;
             		}
             
-            if(convert()) {
-            	if(el.conv_method==Element.CM_TYPE)
-            		morph(el.conv, MORPH_KEEP_TEMP, true);
-            	else if(el.conv_method==Element.CM_CTYPE)
-            		morph(Element.getID(ctype), MORPH_KEEP_TEMP, true);
-            }
+            for(Conversion c : el.convs) {
+        		if(c!=null && c.shouldConvert(this)) c.doConversion(this);
+        	}
             
-            if (life > 0 && el.life_decay) life--;
-            if (life - 1 == 0) {
-                // Delete mode
-                if (el.life_dmode == 1){
-                    setRemove(true);
-                    if (el.behaviour != null) el.behaviour.destruct(this);
+            if(el.life_decay) {
+            	if(life>0) life--;
+            	if(life-1==0) {
+                    switch(el.life_decay_mode) {
+                        case (Elements.DECAY_DIE):
+                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            setRemove(true);
+                            break;
+                        case (Elements.DECAY_CTYPE):
+                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                            break;
+                    }
                 }
-                // Decay mode
-                if (el.life_dmode == 2) morph(Element.getID(ctype), MORPH_KEEP_TEMP, false); //Cells.setParticleAt(x, y, new Particle(Element.el_map.get(ctype), x, y), true);
             }
-            if (!Cells.validGame(x, y)) setRemove(true);
+            if(el.tmp_decay) {
+            	if(tmp>0) tmp--;
+            	if(tmp-1==0) {
+                    switch (el.tmp_decay_mode) {
+                        case (Elements.DECAY_DIE):
+                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            setRemove(true);
+                            break;
+                        case (Elements.DECAY_CTYPE):
+                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                            break;
+                    }
+                }
+            }
+            if (!Grid.valid(x, y, 4)) setRemove(true);
             last_update = System.currentTimeMillis();
         }
     }
-
-    public void tryMove(int nx, int ny) {
-        Particle o = Cells.getParticleAt(nx, ny);
-        if (o != null) {
-            if (heavierThan(o)) Cells.swap(x, y, nx, ny);
-        } else {
-            Cells.moveTo(x, y, nx, ny);
-        }
+    
+    public void tryMove(int nx, int ny) { 
+    	if(Grid.valid(nx, ny, 0)) {
+    		Cell cell = Grid.cell(x, y);
+    		Cell cell2 = Grid.cell(nx, ny);
+    		if(cell2.contains(Elements.void_)) {
+    			cell.rem(pos);
+    			return;
+    		}
+    		Particle o;
+    		if(!(toWall()!=null && !toWall().parts) && (cell2.addable(this) || cell2.displaceable(this))) {
+    			cell.rem(pos);
+    			for(int i=0; i<cell2.stack.length; i++) {
+    				if((o=cell2.part(i))!=null) {
+    					cell.add(o);
+        				cell2.rem(i);
+    				}
+    			}
+    			cell2.add(this);
+    		}
+    	}
     }
     
     public void morph(Element e, int type, boolean makectype) {
@@ -179,6 +224,9 @@ public class Particle {
     		double temp = celcius;
     		init(e, x, y); 
     		celcius = temp; break;
+    	case(MORPH_EL_ONLY):
+    		el = e;
+    		break;
     	default:
     		init(e, x, y); break;
     	}

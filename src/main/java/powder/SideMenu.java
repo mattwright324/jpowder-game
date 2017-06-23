@@ -1,6 +1,6 @@
-package main.java.powder;
+package powder;
 
-import main.java.powder.elements.Element;
+import powder.elements.Elements;
 
 import javax.swing.*;
 
@@ -49,7 +49,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 	public Rectangle ral = new Rectangle(5, 5+(b_h+5)*4, b_w, b_h);
 	public Rectangle tl = new Rectangle(5, 5+(b_h+5)*5, b_w, b_h);
 	
-	static Element[] selected = Element.solids;
+	static Item[] selected = Elements.solid;
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -71,22 +71,22 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 		
 		b2d.setColor(Color.WHITE);
 		b2d.drawString("Solid", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.solids.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.solid.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.drawString("Liquid", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.liquids.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.liquid.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.drawString("Gass", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.gasses.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.gasses.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.drawString("Powder", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.powders.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.powder.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.drawString("Radio", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.radioactive.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.radio.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.drawString("Tools", 10, b_txt+(b_h+5)*line);
-		b2d.drawString(Element.tools.length+"", 10, b_txtn+(b_h+5)*line++);
+		b2d.drawString(Elements.tools.length+"", 10, b_txtn+(b_h+5)*line++);
 		
 		b2d.setPaintMode();
 		g2d.drawImage(img, null, 0, 0);
@@ -110,12 +110,12 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
 	public void mousePressed(MouseEvent e) {
 		Point p = e.getPoint();
-		if(sl.contains(p)) selected = Element.solids;
-		if(ll.contains(p)) selected = Element.liquids;
-		if(gl.contains(p)) selected = Element.gasses;
-		if(pl.contains(p)) selected = Element.powders;
-		if(ral.contains(p)) selected = Element.radioactive;
-		if(tl.contains(p)) selected = Element.tools;
+		if(sl.contains(p)) selected = Elements.solid;
+		if(ll.contains(p)) selected = Elements.liquid;
+		if(gl.contains(p)) selected = Elements.gasses;
+		if(pl.contains(p)) selected = Elements.powder;
+		if(ral.contains(p)) selected = Elements.radio;
+		if(tl.contains(p)) selected = Elements.tools;
 		Window.menub.repaint();
 	}
 

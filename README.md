@@ -1,16 +1,11 @@
-# jpowder-game
-A java cellular automata based on The Powder Toy.
+# JPowder
 
-Thread located at [powdertoy.co.uk](http://powdertoy.co.uk/Discussions/Thread/View.html?Thread=19989&PageNum=0)
+JPowder is a cellular sandbox game inspired by [The Powder Toy](http://powdertoy.co.uk/). 
+It will hopefully recreate most of the features of TPT while providing its own feel. [[1]](http://powdertoy.co.uk/Discussions/Thread/View.html?Thread=19989)
 
-TODO:
-* Walls and Pressure
-* Display Options:
-  - Temp (color) - done
-  - Life Gradient - done, not viewable
-  - Fire-life effect - ?
-  - Other effects - ?
-* Particle Stacking
-* Gravity
-* Improved liquid movement
+![menu screen](http://i.imgur.com/filB6QH.png)
 
+### What's Different
+1. JPowder may be resized to fit the size of any screen.
+2. The sandbox is not constrained to 612x384 and may be changed to fit the needs of a creation.
+3. todo
