@@ -1,4 +1,4 @@
-package main.java.powder;
+package powder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -22,10 +22,10 @@ public class Window extends JFrame {
 		window.setVisible(true);
 		try {
 			// Gradle knows best
-			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/colorstrip.png"));
+			heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/colorstrip.png"));
 		} catch (IOException e) {}
 		try {
-			iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/jpowder.png"));
+			iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("img/powder/jpowder.png"));
 			window.setIconImage(iconImg);
 		} catch(IOException e) {}
     }

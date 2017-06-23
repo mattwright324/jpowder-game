@@ -1,10 +1,10 @@
-package main.java.powder;
+package powder;
 
 import java.awt.Point;
 import java.util.Arrays;
 
-import main.java.powder.elements.Elements;
-import main.java.powder.particles.Particle;
+import powder.elements.Elements;
+import powder.particles.Particle;
 
 public class Grid {
 	

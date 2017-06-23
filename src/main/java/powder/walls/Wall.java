@@ -1,8 +1,8 @@
-package main.java.powder.walls;
+package powder.walls;
 
 import java.awt.Color;
 
-import main.java.powder.Item;
+import powder.Item;
 
 public class Wall extends Item {
 	

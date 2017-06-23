@@ -1,4 +1,4 @@
-package main.java.powder;
+package powder;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -18,8 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import main.java.powder.elements.Element;
-import main.java.powder.walls.Wall;
+import powder.elements.Element;
+import powder.walls.Wall;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	
@@ -49,7 +49,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 	
 	public JFrame helpWindow = new JFrame();
 	
-	public List<Button> buttons = new ArrayList<Button>();
+	public List<Button> buttons = new ArrayList<>();
 	
 	public Point mouse = new Point(0,0);
 	

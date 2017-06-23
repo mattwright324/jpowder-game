@@ -1,6 +1,6 @@
-package main.java.powder.elements;
+package powder.elements;
 
-import main.java.powder.particles.Particle;
+import powder.particles.Particle;
 
 public class Conversion {
 	

@@ -1,4 +1,4 @@
-package main.java.powder.walls;
+package powder.walls;
 
 import java.awt.Color;
 

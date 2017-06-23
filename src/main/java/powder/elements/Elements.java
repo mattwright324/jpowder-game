@@ -1,10 +1,10 @@
-package main.java.powder.elements;
+package powder.elements;
 
-import main.java.powder.Grid;
-import main.java.powder.Item;
-import main.java.powder.particles.Particle;
-import main.java.powder.particles.ParticleBehaviour;
-import main.java.powder.walls.Walls;
+import powder.Grid;
+import powder.Item;
+import powder.particles.Particle;
+import powder.particles.ParticleBehaviour;
+import powder.walls.Walls;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -15,8 +15,8 @@ public class Elements {
 	
 	public static Random r = new Random();
 	
-	public static final Map<Integer, String> id_name = new HashMap<Integer, String>();
-	public static final Map<Integer, Element> el_map = new HashMap<Integer, Element>();
+	public static final Map<Integer, String> id_name = new HashMap<>();
+	public static final Map<Integer, Element> el_map = new HashMap<>();
 	
 	public static final double MIN_TEMP = -273.15;
 	public static final double DEFAULT_TEMP = 22.0;
@@ -76,16 +76,14 @@ public class Elements {
 		return e;
 	}
 	
-	static ElementMovement em_phot = new ElementMovement() {
-        public void move(Particle p) {
-            int ny = p.y + (int) p.vy;
-            int nx = p.x + (int) p.vx;
-            p.tryMove(nx, ny);
-            /*if (!Cells.particleAt(nx, ny))
-                Cells.moveTo(p.x, p.y, nx, ny);
-            else
-                p.setRemove(true);*/
-        }
+	static ElementMovement em_phot = p -> {
+        int ny = p.y + (int) p.vy;
+        int nx = p.x + (int) p.vx;
+        p.tryMove(nx, ny);
+        /*if (!Cells.particleAt(nx, ny))
+            Cells.moveTo(p.x, p.y, nx, ny);
+        else
+            p.setRemove(true);*/
     };
 
     static ElementMovement em_radioactive = new ElementMovement() {
@@ -113,29 +111,23 @@ public class Elements {
         }
     };
 	
-	static ElementMovement em_powder = new ElementMovement() {
-		public void move(Particle p) {
-			int y = p.y + 1;
-			p.tryMove(p.x, y);
-			int x = p.x + (r.nextBoolean() ? -1 : 1);
-			p.tryMove(x, y);
-		}
-	};
-	
-	static ElementMovement em_gas = new ElementMovement() {
-        public void move(Particle p) {
-            int ny = p.y + (r.nextInt(3) - 1) + (int) p.vy;
-            int nx = p.x + (r.nextInt(3) - 1) + (int) p.vx;
-            p.tryMove(nx, ny);
-        }
+	static ElementMovement em_powder = p -> {
+        int y = p.y + 1;
+        p.tryMove(p.x, y);
+        int x = p.x + (r.nextBoolean() ? -1 : 1);
+        p.tryMove(x, y);
     };
-    static ElementMovement em_liquid = new ElementMovement() {
-        public void move(Particle p) {
-            int nx = p.x + r.nextInt(5) - 2;
-            p.tryMove(nx, p.y);
-            int ny = p.y + r.nextInt(2);
-            p.tryMove(nx, ny);
-        }
+	
+	static ElementMovement em_gas = p -> {
+        int ny = p.y + (r.nextInt(3) - 1) + (int) p.vy;
+        int nx = p.x + (r.nextInt(3) - 1) + (int) p.vx;
+        p.tryMove(nx, ny);
+    };
+    static ElementMovement em_liquid = p -> {
+        int nx = p.x + r.nextInt(5) - 2;
+        p.tryMove(nx, p.y);
+        int ny = p.y + r.nextInt(2);
+        p.tryMove(nx, ny);
     };
 
     static ParticleBehaviour pb_phot = new ParticleBehaviour() {

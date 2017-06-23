@@ -1,4 +1,4 @@
-package main.java.powder;
+package powder;
 
 import java.util.Random;
 

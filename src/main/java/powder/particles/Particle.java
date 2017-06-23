@@ -1,13 +1,13 @@
-package main.java.powder.particles;
+package powder.particles;
 
-import main.java.powder.Cell;
-import main.java.powder.Display;
-import main.java.powder.Grid;
-import main.java.powder.Window;
-import main.java.powder.elements.Conversion;
-import main.java.powder.elements.Element;
-import main.java.powder.elements.Elements;
-import main.java.powder.walls.Wall;
+import powder.Cell;
+import powder.Display;
+import powder.Grid;
+import powder.Window;
+import powder.elements.Conversion;
+import powder.elements.Element;
+import powder.elements.Elements;
+import powder.walls.Wall;
 
 import java.awt.*;
 import java.util.Random;

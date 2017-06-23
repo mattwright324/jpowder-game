@@ -1,10 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
-sourceCompatibility = 1.5
-version = '0.0.1'
-mainClassName = "main.java.powder.Window"
+sourceCompatibility = 1.8
+version = '0.0.2'
+mainClassName = "powder.Window"
 repositories {
     mavenCentral()
 }

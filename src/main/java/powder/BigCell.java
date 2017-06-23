@@ -1,8 +1,8 @@
-package main.java.powder;
+package powder;
 
 import java.awt.Color;
 
-import main.java.powder.walls.Wall;
+import powder.walls.Wall;
 
 public class BigCell {
 	

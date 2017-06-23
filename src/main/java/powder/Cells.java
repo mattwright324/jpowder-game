@@ -1,9 +1,9 @@
-package main.java.powder;
+package powder;
 
 import java.awt.Point;
 
-import main.java.powder.elements.Element;
-import main.java.powder.particles.Particle;
+import powder.elements.Element;
+import powder.particles.Particle;
 
 @Deprecated
 public class Cells {

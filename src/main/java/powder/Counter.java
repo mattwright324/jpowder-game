@@ -1,4 +1,4 @@
-package main.java.powder;
+package powder;
 
 public class Counter extends Thread {
 	public double seconds = 0;

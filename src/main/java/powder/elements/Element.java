@@ -1,7 +1,7 @@
-package main.java.powder.elements;
+package powder.elements;
 
-import main.java.powder.Item;
-import main.java.powder.particles.ParticleBehaviour;
+import powder.Item;
+import powder.particles.ParticleBehaviour;
 
 import java.awt.*;
 import java.util.Arrays;

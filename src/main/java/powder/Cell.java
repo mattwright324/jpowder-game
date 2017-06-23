@@ -1,10 +1,10 @@
-package main.java.powder;
+package powder;
 
 import java.util.Arrays;
 
-import main.java.powder.elements.Element;
-import main.java.powder.particles.Particle;
-import main.java.powder.walls.Wall;
+import powder.elements.Element;
+import powder.particles.Particle;
+import powder.walls.Wall;
 
 public class Cell {
 	
@@ -48,8 +48,7 @@ public class Cell {
     
     public int count() {
     	int s = 0;
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null) s++;
+		for (Particle aStack : stack) if (aStack != null) s++;
     	return s;
     }
     
@@ -58,8 +57,7 @@ public class Cell {
     }
     
     public boolean empty() {
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null) return false;
+		for (Particle aStack : stack) if (aStack != null) return false;
     	return true;
     }
     
@@ -68,8 +66,7 @@ public class Cell {
     }
     
     public boolean addable(Element e) {
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null && !stack[i].el.stackable) return false;
+		for (Particle aStack : stack) if (aStack != null && !aStack.el.stackable) return false;
     	return true;
     }
     
@@ -78,14 +75,12 @@ public class Cell {
     }
     
     public boolean displaceable(Element e) {
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null && e.heavierThan(stack[i].el)) return false;
+		for (Particle aStack : stack) if (aStack != null && e.heavierThan(aStack.el)) return false;
     	return true;
     }
     
     public boolean contains(Element e) {
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null && stack[i].el==e) return true;
+		for (Particle aStack : stack) if (aStack != null && aStack.el == e) return true;
     	return false;
     }
     

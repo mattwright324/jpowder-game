@@ -1,10 +1,10 @@
-package main.java.powder;
+package powder;
 
-import main.java.powder.elements.Element;
-import main.java.powder.elements.Elements;
-import main.java.powder.particles.Particle;
-import main.java.powder.walls.Wall;
-import main.java.powder.walls.Walls;
+import powder.elements.Element;
+import powder.elements.Elements;
+import powder.particles.Particle;
+import powder.walls.Wall;
+import powder.walls.Walls;
 
 import javax.swing.*;
 
