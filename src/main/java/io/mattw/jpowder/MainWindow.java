@@ -19,8 +19,8 @@ public class MainWindow extends JFrame {
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
     static Display game;
-    static SideMenu menu;
-    static BottomMenu menub;
+    static SideMenu sideMenu;
+    static BottomMenu bottomMenu;
 
     public MainWindow() throws Exception {
         logger.trace("MainWindow()");
@@ -114,13 +114,13 @@ public class MainWindow extends JFrame {
         game = new Display();
         add(game, BorderLayout.CENTER);
 
-        menu = new SideMenu();
-        menu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
-        add(menu, BorderLayout.EAST);
+        sideMenu = new SideMenu();
+        sideMenu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
+        add(sideMenu, BorderLayout.EAST);
 
-        menub = new BottomMenu();
-        menub.setPreferredSize(new Dimension(BottomMenu.WIDTH, BottomMenu.HEIGHT));
-        add(menub, BorderLayout.SOUTH);
+        bottomMenu = new BottomMenu();
+        bottomMenu.setPreferredSize(new Dimension(BottomMenu.WIDTH, BottomMenu.HEIGHT));
+        add(bottomMenu, BorderLayout.SOUTH);
 
         resize();
     }
@@ -129,7 +129,7 @@ public class MainWindow extends JFrame {
         SwingUtilities.convertPointToScreen(p, c);
         SwingUtilities.convertPointFromScreen(p, window);
         mouse = p;
-        menub.repaint();
+        bottomMenu.repaint();
     }
 
     public void resize() {

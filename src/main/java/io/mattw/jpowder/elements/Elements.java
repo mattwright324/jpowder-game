@@ -161,7 +161,7 @@ public class Elements {
                         int x = p.getX() - (w - 2);
                         int y = p.getY() - (h - 2);
                         Particle o;
-                        if (Grid.valid(x, y, 0) && (o = Grid.getStackTop(x, y)) != null) {
+                        if (Grid.validCell(x, y, 0) && (o = Grid.getStackTop(x, y)) != null) {
                             if (o.getEl().isConducts() && o.getLife() == 0) {
                                 o.morph(sprk, Particle.MORPH_FULL, true);
                             }
@@ -264,7 +264,7 @@ public class Elements {
         }
 
         public void set(int x, int y) {
-            if (Grid.valid(x, y, 0) && Grid.cell(x, y).addable(fill)) {
+            if (Grid.validCell(x, y, 0) && Grid.cell(x, y).addable(fill)) {
                 Grid.cell(x, y).add(fill);
             }
         }

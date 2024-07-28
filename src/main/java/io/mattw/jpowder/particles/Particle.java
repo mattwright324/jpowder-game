@@ -148,7 +148,7 @@ public class Particle {
 
             for (int w = -1; w < 2; w++) {
                 for (int h = -1; h < 2; h++) {
-                    if (Grid.valid(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
+                    if (Grid.validCell(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
                         Particle p = Grid.getStackTop(x + w, y + h);
                         if (p == null) {
                             continue; // What? Why the hell is this NullPointering?!?!
@@ -209,7 +209,7 @@ public class Particle {
                     }
                 }
             }
-            if (!Grid.valid(x, y, 4)) {
+            if (!Grid.validCell(x, y, 4)) {
                 setRemove(true);
             }
             lastUpdate = System.currentTimeMillis();
@@ -217,7 +217,7 @@ public class Particle {
     }
 
     public void tryMove(int nx, int ny) {
-        if (Grid.valid(nx, ny, 0)) {
+        if (Grid.validCell(nx, ny, 0)) {
             Cell cell = Grid.cell(x, y);
             Cell cell2 = Grid.cell(nx, ny);
             if (cell2.contains(Elements.void_)) {

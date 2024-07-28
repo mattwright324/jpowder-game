@@ -5,16 +5,12 @@ import io.mattw.jpowder.elements.Elements;
 import io.mattw.jpowder.particles.Particle;
 import io.mattw.jpowder.walls.Wall;
 import io.mattw.jpowder.walls.Walls;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
-@Getter
-@Setter
 public class Display extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     public final static int WIDTH = 612; // 612
@@ -44,17 +40,17 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     private Point mstart = new Point(0, 0), mstop = new Point(0, 0);
     private boolean mouseSquare = false;
     private InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-    private ActionMap am = getAm();
+    private ActionMap am = getActionMap();
 
     public Display() {
         for (int w = 0; w < Display.WIDTH; w++) {
             for (int h = 0; h < Display.HEIGHT; h++) {
-                Grid.pgrid[w][h] = new Cell(w, h);
+                Grid.PART_GRID[w][h] = new Cell(w, h);
             }
         }
         for (int w = 0; w < Display.WIDTH / 4; w++) {
             for (int h = 0; h < Display.HEIGHT / 4; h++) {
-                Grid.agrid[w][h] = new BigCell(w, h);
+                Grid.BIG_GRID[w][h] = new BigCell(w, h);
             }
         }
         game.startUpdateThread();
@@ -119,7 +115,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
     public static void togglePause() {
         Game.paused = !Game.paused;
-        MainWindow.menub.repaint();
+        MainWindow.bottomMenu.repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -128,8 +124,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         game2d.setColor(Color.BLACK);
         game2d.fillRect(0, 0, getWidth(), getHeight());
 
-        for (int w = 0; w < Grid.agrid.length; w++) {
-            for (int h = 0; h < Grid.agrid[0].length; h++) {
+        for (int w = 0; w < Grid.BIG_GRID.length; w++) {
+            for (int h = 0; h < Grid.BIG_GRID[0].length; h++) {
                 drawBigCell(Grid.bigcell(w, h));
             }
         }
@@ -188,21 +184,20 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
                 hud2d.drawString("1-3      display type   " + viewName, 5, spacing * line);
             }
 
-
             hud2d.drawString("X:" + mouse.x + " Y:" + mouse.y, 5, getHeight() - 25);
-            Particle p;
+            Particle particle;
             String info = "Empty";
-            if ((p = Grid.getStackTop(mouse.x, mouse.y)) != null) {
-                if (p.getEl() != null) {
-                    info = p.getEl().getName();
-                    if (!(p.getCtype() == 0) && Elements.exists(p.getCtype())) {
-                        info += "(" + Elements.get(p.getCtype()) + ")";
+            if ((particle = Grid.getStackTop(mouse.x, mouse.y)) != null) {
+                if (particle.getEl() != null) {
+                    info = particle.getEl().getName();
+                    if (!(particle.getCtype() == 0) && Elements.exists(particle.getCtype())) {
+                        info += "(" + Elements.get(particle.getCtype()) + ")";
                     }
-                    info += ", Temp:" + p.temp();
-                    info += ", Life:" + p.getLife();
-                    info += ", TMP:" + p.getTmp();
+                    info += ", Temp:" + particle.temp();
+                    info += ", Life:" + particle.getLife();
+                    info += ", TMP:" + particle.getTmp();
                 } else {
-                    p.setRemove(true);
+                    particle.setRemove(true);
                 }
             }
             hud2d.drawString(info, 5, getHeight() - 10);
@@ -210,75 +205,75 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         drawFps.add();
     }
 
-    public void drawCell(Cell c) {
-        Particle p;
-        if (!c.empty() && (p = Grid.getStackTop(c.getX(), c.getY())) != null && p.display()) {
-            csize += c.count();
-            Color col = p.getColor();
+    public void drawCell(Cell cell) {
+        Particle particle;
+        if (!cell.empty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
+            csize += cell.count();
+            Color col = particle.getColor();
             game2d.setColor(col);
-            game2d.fillRect(c.screenX(), c.screenY(), scale, scale);
-            if (view == 3 && p.getEl().isGlow()) { // "Fancy" Display; not great on fps
+            game2d.fillRect(cell.screenX(), cell.screenY(), scale, scale);
+            if (view == 3 && particle.getEl().isGlow()) { // "Fancy" Display; not great on fps
                 game2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
                 int s = scale; // Small flicker
-                game2d.fillRect(c.screenX() - s, c.screenY() - s, scale + s * 2, scale + s * 2);
+                game2d.fillRect(cell.screenX() - s, cell.screenY() - s, scale + s * 2, scale + s * 2);
             }
         }
-        nsize += c.nullCount();
+        nsize += cell.nullCount();
     }
 
-    public void drawBigCell(BigCell c) {
-        if (c.getWall() == null) {
+    public void drawBigCell(BigCell bigCell) {
+        if (bigCell.getWall() == null) {
             return;
         }
-        game2d.setColor(c.getWall().getColor());
-        game2d.fillRect(c.screenX(), c.screenY(), (scale) * 4, (scale) * 4);
+        game2d.setColor(bigCell.getWall().getColor());
+        game2d.fillRect(bigCell.screenX(), bigCell.screenY(), (scale) * 4, (scale) * 4);
     }
 
-    public void place(Item e, Point pt, int size) {
-        if (pt == null) {
+    public void place(Item element, Point point, int size) {
+        if (point == null) {
             return;
         }
-        Point start = new Point(pt.x - size / 2, pt.y - size / 2);
+        Point start = new Point(point.x - size / 2, point.y - size / 2);
         Point end = new Point(start.x + size, start.y + size);
         for (int x = start.x; x <= end.x; x++) {
             for (int y = start.y; y <= end.y; y++) {
                 if (mouseSquare) {
-                    placeAt(e, x, y);
+                    placeAt(element, x, y);
                 } else {
-                    if (Math.sqrt(Math.pow(x - pt.x, 2) + Math.pow(y - pt.y, 2)) <= (double) size / 2) {
-                        placeAt(e, x, y);
+                    if (Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2)) <= (double) size / 2) {
+                        placeAt(element, x, y);
                     }
                 }
             }
         }
     }
 
-    public void placeAt(Item e, int x, int y) {
-        if (e instanceof Element && Grid.valid(x, y, 0)) {
-            Element el = (Element) e;
-            Cell c = Grid.cell(x, y);
-            Particle p = Grid.getStackTop(x, y);
+    public void placeAt(Item element, int x, int y) {
+        if (element instanceof Element && Grid.validCell(x, y, 0)) {
+            Element el = (Element) element;
+            Cell cell = Grid.cell(x, y);
+            Particle particle = Grid.getStackTop(x, y);
             if (el == Elements.none) {
                 Grid.remStackTop(x, y);
-            } else if (e == Elements.sprk) {
-                if (p != null && p.getEl().isConducts()) {
-                    p.setCtype(p.getEl().getId());
-                    p.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
+            } else if (element == Elements.sprk) {
+                if (particle != null && particle.getEl().isConducts()) {
+                    particle.setCtype(particle.getEl().getId());
+                    particle.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
                 }
-            } else if (p != null && el != Elements.clne && p.getEl() == Elements.clne) {
-                p.setCtype(el.getId());
-            } else if (c.addable(el)) {
+            } else if (particle != null && el != Elements.clne && particle.getEl() == Elements.clne) {
+                particle.setCtype(el.getId());
+            } else if (cell.addable(el)) {
                 Grid.cell(x, y).add(el);
             }
         }
-        if (e instanceof Wall && Grid.valid_big(x / 4, y / 4, 0)) {
-            Wall wl = (Wall) e;
-            BigCell bc = Grid.bigcell(x / 4, y / 4);
+        if (element instanceof Wall && Grid.validBigCell(x / 4, y / 4, 0)) {
+            Wall wall = (Wall) element;
+            BigCell bigCell = Grid.bigcell(x / 4, y / 4);
 
-            if (wl == Walls.none) {
-                bc.setWall(null);
+            if (wall == Walls.none) {
+                bigCell.setWall(null);
             } else {
-                bc.setWall(wl);
+                bigCell.setWall(wall);
             }
         }
     }

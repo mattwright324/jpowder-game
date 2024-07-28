@@ -11,8 +11,8 @@ public class Grid {
     private static final int TEMP = 0;
     private static final int TYPE = 1;
     private static final int CTYPE = 2;
-    public static final Cell[][] pgrid = new Cell[Display.WIDTH][Display.HEIGHT]; // Particle Grid
-    public static final BigCell[][] agrid = new BigCell[Display.WIDTH / 4][Display.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
+    public static final Cell[][] PART_GRID = new Cell[Display.WIDTH][Display.HEIGHT]; // Particle Grid
+    public static final BigCell[][] BIG_GRID = new BigCell[Display.WIDTH / 4][Display.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
 
     public static Cell cell(int x, int y) {
         if (x > Display.WIDTH - 1) {
@@ -27,7 +27,7 @@ public class Grid {
         if (y < 0) {
             y = 0;
         }
-        return pgrid[x][y];
+        return PART_GRID[x][y];
     }
 
     public static BigCell bigcell(int x, int y) {
@@ -43,7 +43,7 @@ public class Grid {
         if (y < 0) {
             y = 0;
         }
-        return agrid[x][y];
+        return BIG_GRID[x][y];
     }
 
     public static void newGame() {
@@ -65,11 +65,11 @@ public class Grid {
      * Returns if a coordinate is within the particle grid or a distance from the edge within.
      * offset=4 for one-layer wall to surround remaining cells
      */
-    public static boolean valid(int x, int y, int offset) {
+    public static boolean validCell(int x, int y, int offset) {
         return !(x < offset || y < offset || x >= Display.WIDTH - offset || y >= Display.HEIGHT - offset);
     }
 
-    public static boolean valid_big(int x, int y, int offset) { // Air Grid
+    public static boolean validBigCell(int x, int y, int offset) { // Air Grid
         return !(x < offset || y < offset || x >= Display.WIDTH / 4 - offset || y >= Display.HEIGHT / 4 - offset);
     }
 
@@ -77,7 +77,7 @@ public class Grid {
      * Returns uppermost particle in stack.
      */
     public static Particle getStackTop(int x, int y) {
-        if (!valid(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0) && cell(x, y).empty()) {
             return null;
         }
         for (int i = 0; i < cell(x, y).getStack().length; i++) {
@@ -92,14 +92,14 @@ public class Grid {
     }
 
     public static Particle[] getStack(int x, int y) {
-        if (!valid(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0) && cell(x, y).empty()) {
             return null;
         }
         return cell(x, y).getStack();
     }
 
     public static void remStackTop(int x, int y) {
-        if (!valid(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0) && cell(x, y).empty()) {
             return;
         }
         for (int i = 0; i < cell(x, y).getStack().length; i++) {
@@ -111,7 +111,7 @@ public class Grid {
     }
 
     public static void remStack(int x, int y) {
-        if (!valid(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0) && cell(x, y).empty()) {
             return;
         }
         cell(x, y).reset();

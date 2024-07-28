@@ -118,7 +118,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         if (toolsRect.contains(p)) {
             selectedCategory = Elements.tools;
         }
-        MainWindow.menub.repaint();
+        MainWindow.bottomMenu.repaint();
     }
 
     public void mouseReleased(MouseEvent e) {
