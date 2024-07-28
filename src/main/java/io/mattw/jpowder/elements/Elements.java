@@ -31,18 +31,13 @@ public class Elements {
     public static final int CS_LSS = 10; // Converts less than temp.
     public static final int CS_GTR = 11; // Converts greater than temp.
     public static final int CS_EQ = 12; // Converts equal to temp.
-    public static Element none, sprk, fill, ant;
-    public static Element dust, stne, salt, bcol, plut;
-    public static Element metl, qrtz, dmnd, coal, insl, clne, ice, void_;
-    public static Element watr, lava, ln2, oil;
-    public static Element phot, radp;
-    public static Element gas, warp, fire, plsm, stm;
-    public static final Item[] powder = {dust, stne, salt, bcol};
-    public static final Item[] liquid = {watr, lava, ln2, oil};
-    public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice, clne, void_};
-    public static final Item[] gasses = {gas, fire, plsm, stm};
-    public static final Item[] radio = {phot, radp, plut, warp};
-    public static final Item[] tools = {none, sprk, fill, ant, Walls.none, Walls.wall, Walls.air, Walls.wvoid};
+    public static final Element none, sprk, fill, ant;
+    public static final Element dust, stne, salt, bcol, plut;
+    public static final Element metl, qrtz, dmnd, coal, insl, clne, ice, void_;
+    public static final Element watr, lava, ln2, oil;
+    public static final Element phot, radp;
+    public static final Element gas, warp, fire, plsm, stm;
+
     public static Random r = new Random();
     static ElementMovement em_phot = p -> {
         int ny = p.y + (int) p.vy;
@@ -421,6 +416,13 @@ public class Elements {
 
         void_ = create(27, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);
     }
+
+    public static final Item[] powder = {dust, stne, salt, bcol};
+    public static final Item[] liquid = {watr, lava, ln2, oil};
+    public static final Item[] solid = {metl, qrtz, dmnd, coal, insl, ice, clne, void_};
+    public static final Item[] gasses = {gas, fire, plsm, stm};
+    public static final Item[] radio = {phot, radp, plut, warp};
+    public static final Item[] tools = {none, sprk, fill, ant, Walls.none, Walls.wall, Walls.air, Walls.wvoid};
 
     static { // Conversions
         lava.addCtypeConvert(CS_LSS, 700);
