@@ -9,23 +9,24 @@ import java.awt.image.BufferedImage;
 
 public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    static int width = 60;
-    static int height = Display.height;
-    static Item[] selected = Elements.solid;
-    public BufferedImage img;
-    public Graphics2D g2d;
-    public Graphics2D b2d;
-    public boolean init = true;
-    public int b_h = 40;
-    public int b_w = width - 10;
-    public int b_txt = b_h / 2;
-    public int b_txtn = b_h / 2 + 15;
-    public Rectangle sl = new Rectangle(5, 5, b_w, b_h);
-    public Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
-    public Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
-    public Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
-    public Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
-    public Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
+    public static int width = 60;
+    public static int height = Display.height;
+    public static Item[] selected = Elements.solid;
+
+    private BufferedImage img;
+    private Graphics2D g2d;
+    private Graphics2D b2d;
+    private boolean init = true;
+    private int b_h = 40;
+    private int b_w = width - 10;
+    private int b_txt = b_h / 2;
+    private int b_txtn = b_h / 2 + 15;
+    private Rectangle sl = new Rectangle(5, 5, b_w, b_h);
+    private Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
+    private Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
+    private Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
+    private Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
+    private Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
 
     public SideMenu() {
         setFocusable(true);

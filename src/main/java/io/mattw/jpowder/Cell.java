@@ -3,14 +3,18 @@ package io.mattw.jpowder;
 import io.mattw.jpowder.elements.Element;
 import io.mattw.jpowder.particles.Particle;
 import io.mattw.jpowder.walls.Wall;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 
+@Getter
+@Setter
 public class Cell {
 
-    public int x, y;
-    public Particle[] part;
-    public Particle[] stack = new Particle[0];
+    private int x, y;
+    private Particle[] part;
+    private Particle[] stack = new Particle[0];
 
     public Cell(int x, int y) {
         this.x = x;
@@ -40,18 +44,18 @@ public class Cell {
             if (this.part[i] == null) {
                 continue;
             }
-            this.part[i].x = this.x;
-            this.part[i].y = this.y;
+            this.part[i].setX(this.x);
+            this.part[i].setY(this.y);
         }
     }
 
     public Wall toWall() {
-        return Grid.bigcell(x / 4, y / 4).wall;
+        return Grid.bigcell(x / 4, y / 4).getWall();
     }
 
     public int count() {
         int s = 0;
-        for (Particle particle : stack) {
+        for (var particle : stack) {
             if (particle != null) {
                 s++;
             }
@@ -64,7 +68,7 @@ public class Cell {
     }
 
     public boolean empty() {
-        for (Particle particle : stack) {
+        for (var particle : stack) {
             if (particle != null) {
                 return false;
             }
@@ -73,12 +77,12 @@ public class Cell {
     }
 
     public boolean addable(Particle p) {
-        return addable(p.el);
+        return addable(p.getEl());
     }
 
     public boolean addable(Element e) {
-        for (Particle particle : stack) {
-            if (particle != null && !particle.el.stackable) {
+        for (var particle : stack) {
+            if (particle != null && !particle.getEl().isStackable()) {
                 return false;
             }
         }
@@ -86,12 +90,12 @@ public class Cell {
     }
 
     public boolean displaceable(Particle p) {
-        return displaceable(p.el);
+        return displaceable(p.getEl());
     }
 
     public boolean displaceable(Element e) {
         for (Particle particle : stack) {
-            if (particle != null && e.heavierThan(particle.el)) {
+            if (particle != null && e.heavierThan(particle.getEl())) {
                 return false;
             }
         }
@@ -100,7 +104,7 @@ public class Cell {
 
     public boolean contains(Element e) {
         for (Particle particle : stack) {
-            if (particle != null && particle.el == e) {
+            if (particle != null && particle.getEl() == e) {
                 return true;
             }
         }
@@ -130,9 +134,9 @@ public class Cell {
     public void add(Particle p) {
         for (int i = 0; i < stack.length; i++) {
             if (stack[i] == null) {
-                p.x = x;
-                p.y = y;
-                p.pos = i;
+                p.setX(x);
+                p.setY(y);
+                p.setPos(i);
                 stack[i] = p;
                 return;
             }
@@ -140,9 +144,9 @@ public class Cell {
 
         stack = Arrays.copyOf(stack, stack.length + 1);
         stack[stack.length - 1] = p;
-        p.pos = stack.length - 1;
-        p.x = x;
-        p.y = y;
+        p.setPos(stack.length - 1);
+        p.setX(x);
+        p.setY(y);
     }
 
     public void add(Element e) {
@@ -156,7 +160,7 @@ public class Cell {
         Particle p;
         for (int i = 0; i < stack.length; i++) {
             if ((p = stack[i]) != null) {
-                if (p.remove) {
+                if (p.isRemove()) {
                     stack[i] = null;
                 } else {
                     p.update();

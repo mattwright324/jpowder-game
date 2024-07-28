@@ -1,14 +1,18 @@
 package io.mattw.jpowder;
 
 import io.mattw.jpowder.walls.Wall;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 
+@Getter
+@Setter
 public class BigCell {
 
-    public int x, y;
-    public Wall wall;
-    public double pressure = 0;
+    private int x, y;
+    private Wall wall;
+    private double pressure = 0;
 
     public BigCell(int x, int y) {
         this.x = x;
@@ -22,7 +26,7 @@ public class BigCell {
 
     public Color getColor() {
         if (wall != null) {
-            return wall.color;
+            return wall.getColor();
         }
         int c = (int) (255 * Math.abs(pressure) / Game.MAX_AIR);
         if (pressure < 0) {

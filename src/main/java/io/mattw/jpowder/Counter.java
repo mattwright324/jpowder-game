@@ -1,13 +1,19 @@
 package io.mattw.jpowder;
 
-public class Counter extends Thread {
-    public double seconds = 0;
-    public long total = 0;
-    public double avg = 0;
+import lombok.Getter;
+import lombok.Setter;
 
-    public long count = 0;
-    public long fps = 0;
-    public long last_fps = System.currentTimeMillis();
+@Getter
+@Setter
+public class Counter extends Thread {
+
+    private double seconds = 0;
+    private long total = 0;
+    private double avg = 0;
+
+    private long count = 0;
+    private long fps = 0;
+    private long last_fps = System.currentTimeMillis();
 
     public void add() {
         count++;

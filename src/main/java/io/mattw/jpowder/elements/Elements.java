@@ -37,10 +37,11 @@ public class Elements {
     public static final Element watr, lava, ln2, oil;
     public static final Element phot, radp;
     public static final Element gas, warp, fire, plsm, stm;
-    public static Random r = new Random();
+    public static final Random random = new Random();
+
     static ElementMovement em_phot = p -> {
-        int ny = p.y + (int) p.vy;
-        int nx = p.x + (int) p.vx;
+        int ny = p.getY() + (int) p.getVy();
+        int nx = p.getX() + (int) p.getVx();
         p.tryMove(nx, ny);
         /*if (!Cells.particleAt(nx, ny))
             Cells.moveTo(p.x, p.y, nx, ny);
@@ -51,49 +52,49 @@ public class Elements {
         public Particle collide;
 
         public void move(Particle p) {
-            double plottedX = p.x + p.vx;
-            double plottedY = p.y + p.vy;
+            double plottedX = p.getX() + p.getVx();
+            double plottedY = p.getY() + p.getVy();
             // Shitty particle detection
             // Please improve
             // Added check for no collision with other radioactive particles
             if (rad_collide(plottedX, plottedY)) {
-                p.vy = -p.vy;
-                p.vx = -p.vx;
-            } else if (rad_collide(plottedX, p.y)) {
-                p.vx = -p.vx;
-            } else if (rad_collide(p.x, plottedY)) {
-                p.vy = -p.vy;
+                p.setVy(-p.getVy());
+                p.setVx(-p.getVx());
+            } else if (rad_collide(plottedX, p.getY())) {
+                p.setVx(-p.getVx());
+            } else if (rad_collide(p.getX(), plottedY)) {
+                p.setVy(-p.getVy());
             }
             p.tryMove((int) plottedX, (int) plottedY);
         }
 
         public boolean rad_collide(double x, double y) {
             return (collide = Grid.getStackTop((int) x, (int) y)) != null &&
-                    (collide.el != Elements.radp || collide.el != Elements.phot);
+                    (collide.getEl() != Elements.radp || collide.getEl() != Elements.phot);
         }
     };
     static ElementMovement em_powder = p -> {
-        int y = p.y + 1;
-        p.tryMove(p.x, y);
-        int x = p.x + (r.nextBoolean() ? -1 : 1);
+        int y = p.getY() + 1;
+        p.tryMove(p.getX(), y);
+        int x = p.getX() + (random.nextBoolean() ? -1 : 1);
         p.tryMove(x, y);
     };
     static ElementMovement em_gas = p -> {
-        int ny = p.y + (r.nextInt(3) - 1) + (int) p.vy;
-        int nx = p.x + (r.nextInt(3) - 1) + (int) p.vx;
+        int ny = p.getY() + (random.nextInt(3) - 1) + (int) p.getVy();
+        int nx = p.getX() + (random.nextInt(3) - 1) + (int) p.getVx();
         p.tryMove(nx, ny);
     };
     static ElementMovement em_liquid = p -> {
-        int nx = p.x + r.nextInt(5) - 2;
-        p.tryMove(nx, p.y);
-        int ny = p.y + r.nextInt(2);
+        int nx = p.getX() + random.nextInt(5) - 2;
+        p.tryMove(nx, p.getY());
+        int ny = p.getY() + random.nextInt(2);
         p.tryMove(nx, ny);
     };
     static ParticleBehaviour pb_phot = new ParticleBehaviour() {
         public void init(Particle p) {
-            while (p.vx == 0 && p.vy == 0) {
-                p.vx = 3 * (r.nextInt(3) - 1);
-                p.vy = 3 * (r.nextInt(3) - 1);
+            while (p.getVx() == 0 && p.getVy() == 0) {
+                p.setVx(3 * (random.nextInt(3) - 1));
+                p.setVy(3 * (random.nextInt(3) - 1));
             }
         }
 
@@ -102,27 +103,27 @@ public class Elements {
     };
     static ParticleBehaviour pb_fire = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.life += r.nextInt(50);
-            p.celcius += r.nextInt(20);
+            p.setLife(p.getLife() + random.nextInt(50));
+            p.setCelcius(p.getCelcius() + random.nextInt(20));
         }
 
         public void update(Particle p) {
-            p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
+            p.tryMove(p.getX(), p.getY() - (random.nextInt(4) - 1));
             for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
-                    if ((o = Grid.getStackTop(p.x + w - 1, p.y + h - 1)) != null && o.burn()) {
+                    if ((o = Grid.getStackTop(p.getX() + w - 1, p.getY() + h - 1)) != null && o.burn()) {
                         o.morph(fire, Particle.MORPH_FULL, false);
                     }
                 }
             }
 
-            p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
+            p.setDeco(new Color((int) p.getLife(), random.nextInt(20), random.nextInt(20)));
         }
     };
     static ParticleBehaviour pb_plut = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.life = r.nextInt(400) + 100;
+            p.setLife(random.nextInt(400) + 100);
         }
 
         public void update(Particle p) {
@@ -130,21 +131,21 @@ public class Elements {
 
         public void destruct(Particle p) {
             p.morph(radp, Particle.MORPH_KEEP_TEMP, true);
-            p.celcius += 4500; // Decay should result in a lot of heat + pressure (when added)
+            p.setCelcius(p.getCelcius() + 4500); // Decay should result in a lot of heat + pressure (when added)
         }
     };
     static ParticleBehaviour pb_radio = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.life = r.nextInt(50) + 1;
-            p.celcius = 982;
-            p.vx = r.nextInt(4) + 1;
-            p.vy = r.nextInt(4) + 1;
+            p.setLife(random.nextInt(50) + 1);
+            p.setCelcius(982);
+            p.setVx(random.nextInt(4) + 1);
+            p.setVy(random.nextInt(4) + 1);
         }
 
         public void update(Particle p) {
-            for (Particle part : Grid.getSurrounding(p.x, p.y)) {
-                if (part != null && part.el == Elements.plut) {
-                    part.life = 1;
+            for (Particle part : Grid.getSurrounding(p.getX(), p.getY())) {
+                if (part != null && part.getEl() == Elements.plut) {
+                    part.setLife(1);
                 }
             }
         }
@@ -154,45 +155,45 @@ public class Elements {
         }
 
         public void update(Particle p) {
-            if (p.life == 4) {
+            if (p.getLife() == 4) {
                 for (int w = 0; w < 5; w++) {
                     for (int h = 0; h < 5; h++) {
-                        int x = p.x - (w - 2);
-                        int y = p.y - (h - 2);
+                        int x = p.getX() - (w - 2);
+                        int y = p.getY() - (h - 2);
                         Particle o;
                         if (Grid.valid(x, y, 0) && (o = Grid.getStackTop(x, y)) != null) {
-                            if (o.el.conducts && o.life == 0) {
+                            if (o.getEl().isConducts() && o.getLife() == 0) {
                                 o.morph(sprk, Particle.MORPH_FULL, true);
                             }
                         }
                     }
                 }
             }
-            if (p.life == 0) {
-                if (p.ctype != 0) {
-                    p.morph(get(p.ctype), Particle.MORPH_FULL, false);
+            if (p.getLife() == 0) {
+                if (p.getCtype() != 0) {
+                    p.morph(get(p.getCtype()), Particle.MORPH_FULL, false);
                 }
-                if (p.celcius < 300) {
-                    p.celcius += 50;
+                if (p.getCelcius() < 300) {
+                    p.setCelcius(p.getCelcius() + 50);
                 } else {
-                    p.celcius -= 50;
+                    p.setCelcius(p.getCelcius() - 50);
                 }
-                p.life = 6;
+                p.setLife(6);
             }
         }
     };
     static ParticleBehaviour pb_plsm = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.life += r.nextInt(50);
-            p.celcius += r.nextInt(20);
+            p.setLife(p.getLife() + random.nextInt(50));
+            p.setCelcius(p.getCelcius() + random.nextInt(20));
         }
 
         public void update(Particle p) {
-            p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
+            p.tryMove(p.getX() + (random.nextInt(3) - 1), p.getY() - (random.nextInt(4) - 1));
             for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
-                    if ((o = Grid.getStackTop(p.x + (w - 1), p.y + (h - 1))) != null && o.burn()) {
+                    if ((o = Grid.getStackTop(p.getX() + (w - 1), p.getY() + (h - 1))) != null && o.burn()) {
                         o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
                     }
                 }
@@ -202,24 +203,24 @@ public class Elements {
     static ParticleBehaviour pb_clne = new ParticleBehaviour() {
         public void init(Particle p) {
             // Needs to be set ctype on click
-            p.ctype = none.id;
+            p.setCtype(none.getId());
         }
 
         public void update(Particle p) {
-            if (p.ctype == 0) {
+            if (p.getCtype() == 0) {
                 return; // Won't create anything when newly placed.
             }
             for (int w = -1; w < 2; w++) {
                 for (int h = -1; h < 2; h++) {
-                    if (Grid.cell(p.x + w, p.y + h).empty()) {
-                        int x = p.x + w;
-                        int y = p.y + h;
-                        Grid.cell(x, y).add(get(p.ctype));
+                    if (Grid.cell(p.getX() + w, p.getY() + h).empty()) {
+                        int x = p.getX() + w;
+                        int y = p.getY() + h;
+                        Grid.cell(x, y).add(get(p.getCtype()));
                     } else {
                         Particle o;
-                        if ((o = Grid.getStackTop(p.x + w, p.y + h)) != null) {
-                            if (o.el == clne && o.ctype == 0) {
-                                o.ctype = p.ctype;
+                        if ((o = Grid.getStackTop(p.getX() + w, p.getY() + h)) != null) {
+                            if (o.getEl() == clne && o.getCtype() == 0) {
+                                o.setCtype(p.getCtype());
                             }
                         }
                     }
@@ -230,7 +231,7 @@ public class Elements {
     };
     static ParticleBehaviour pb_lava = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.ctype = stne.id;
+            p.setCtype(stne.getId());
         }
 
         public void update(Particle p) {
@@ -238,12 +239,12 @@ public class Elements {
     };
     static ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.tmp = r.nextInt(10);
-            p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.tmp / 10.0))));
+            p.setTmp(random.nextInt(10));
+            p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.getTmp() / 10.0))));
         }
 
         public void update(Particle p) {
-            if (p.celcius > 1670 && Math.random() < 0.01) {
+            if (p.getCelcius() > 1670 && Math.random() < 0.01) {
                 p.morph(lava, Particle.MORPH_KEEP_TEMP, true);
             }
         }
@@ -253,12 +254,12 @@ public class Elements {
         }
 
         public void update(Particle p) {
-            if (p.tmp == 0) {
-                p.tmp = 1;
-                set(p.x + 1, p.y);
-                set(p.x - 1, p.y);
-                set(p.x, p.y + 1);
-                set(p.x, p.y - 1);
+            if (p.getTmp() == 0) {
+                p.setTmp(1);
+                set(p.getX() + 1, p.getY());
+                set(p.getX() - 1, p.getY());
+                set(p.getX(), p.getY() + 1);
+                set(p.getX(), p.getY() - 1);
             }
         }
 
@@ -270,21 +271,23 @@ public class Elements {
     };
     static ParticleBehaviour pb_ant = new ParticleBehaviour() {
         public void init(Particle p) {
-            p.life = 180;
-            p.tmp = 1; // tmp 0 = dead, 1 = right, 2 = left
+            p.setLife(180);
+            p.setTmp(1); // tmp 0 = dead, 1 = right, 2 = left
         }
 
         public void update(Particle p) { // TODO Works ok but doesn't act as Langton's Ant should.
-            if (p.tmp == 0) {
+            if (p.getTmp() == 0) {
                 p.setDeco(Color.GRAY);
             }
-            if (p.tmp == 1 || p.tmp == 2) {
+            if (p.getTmp() == 1 || p.getTmp() == 2) {
                 int angle = 0;
-                if (p.tmp == 1) {
-                    angle = (int) (p.life -= 90);
+                if (p.getTmp() == 1) {
+                    p.setLife(p.getLife() - 90);
+                    angle = (int) p.getLife();
                 }
-                if (p.tmp == 2) {
-                    angle = (int) (p.life += 90);
+                if (p.getTmp() == 2) {
+                    p.setLife(p.getLife() + 90);
+                    angle = (int) p.getLife();
                 }
                 if (angle < 0) {
                     angle = 360 + angle;
@@ -292,11 +295,11 @@ public class Elements {
                 if (angle > 270) {
                     angle = angle - 270;
                 }
-                p.life = angle;
-                int x = p.x;
-                int y = p.y;
-                int nx = p.x;
-                int ny = p.y;
+                p.setLife(angle);
+                int x = p.getX();
+                int y = p.getY();
+                int nx = p.getX();
+                int ny = p.getY();
                 if (angle == 0) {
                     nx += 1;
                 }
@@ -309,16 +312,16 @@ public class Elements {
                 if (angle == 270) {
                     ny += 1;
                 }
-                System.out.println(p.life + ", " + angle + " , " + x + "." + y + " , " + nx + "." + ny);
+                System.out.println(p.getLife() + ", " + angle + " , " + x + "." + y + " , " + nx + "." + ny);
                 Particle o = Grid.getStackTop(nx, ny);
                 if (o == null) {
-                    p.tmp = 1;
+                    p.setTmp(1);
                     Particle dead = new Particle(Elements.coal, x, y);
-                    dead.tmp = 0;
+                    dead.setTmp(0);
                     Grid.setStack(nx, ny, p);
                     Grid.setStack(x, y, dead);
                 } else {
-                    p.tmp = 2;
+                    p.setTmp(2);
                     Grid.setStack(nx, ny, p);
                     Grid.remStack(x, y);
                 }
@@ -328,11 +331,11 @@ public class Elements {
 
     static {
         none = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
-        none.remove = true;
+        none.setRemove(true);
 
         dust = create(1, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER - 1);
         dust.setMovement(em_powder);
-        dust.flammibility = 0.6;
+        dust.setFlammibility(0.6);
 
         stne = create(2, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER);
         stne.setMovement(em_powder);
@@ -344,108 +347,108 @@ public class Elements {
         bcol.setMovement(em_powder);
 
         metl = create(5, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID);
-        metl.conducts = true;
+        metl.setConducts(true);
 
         qrtz = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
-        qrtz.tmp_decay = false;
+        qrtz.setTmp_decay(false);
         qrtz.setParticleBehaviour(pb_qrtz);
 
         dmnd = create(7, "DMND", "Diamond", new Color(32, 248, 228), WEIGHT_DMND);
 
         coal = create(8, "COAL", "Coal", Color.GRAY, WEIGHT_SOLID);
-        coal.flammibility = 0.2;
+        coal.setFlammibility(0.2);
 
         insl = create(9, "INSL", "Insulator", new Color(170, 170, 170), WEIGHT_SOLID);
-        insl.heatTransfer = 0;
-        insl.flammibility = 0.1;
+        insl.setHeatTransfer(0);
+        insl.setFlammibility(0.1);
 
         plut = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
         plut.setParticleBehaviour(pb_plut);
         plut.setMovement(em_powder);
-        plut.glow = true;
+        plut.setGlow(true);
 
         sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
         sprk.setParticleBehaviour(pb_sprk);
-        sprk.life_decay_mode = DECAY_CTYPE;
-        sprk.life = 4;
+        sprk.setLife_decay_mode(DECAY_CTYPE);
+        sprk.setLife(4);
 
         watr = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
         watr.setMovement(em_liquid);
-        watr.conducts = true;
-        watr.glow = true;
+        watr.setConducts(true);
+        watr.setGlow(true);
 
         lava = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
         lava.setMovement(em_liquid);
         lava.setParticleBehaviour(pb_lava);
-        lava.celcius = 1522;
-        lava.glow = true;
+        lava.setCelcius(1522);
+        lava.setGlow(true);
 
         ln2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
         ln2.setMovement(em_liquid);
-        ln2.celcius = MIN_TEMP;
-        ln2.glow = true;
+        ln2.setCelcius(MIN_TEMP);
+        ln2.setGlow(true);
 
         oil = create(15, "OIL", "Oil", Color.GREEN.darker(), WEIGHT_LIQUID);
         oil.setMovement(em_liquid);
-        oil.flammibility = 0.3;
-        oil.glow = true;
+        oil.setFlammibility(0.3);
+        oil.setGlow(true);
 
         phot = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
         phot.setMovement(em_phot);
         phot.setParticleBehaviour(pb_phot);
-        phot.stackable = true;
-        phot.glow = true;
+        phot.setStackable(true);
+        phot.setGlow(true);
 
         radp = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
         radp.setMovement(em_radioactive);
         radp.setParticleBehaviour(pb_radio);
-        radp.celcius = 982;
-        radp.stackable = true;
-        radp.glow = true;
+        radp.setCelcius(982);
+        radp.setStackable(true);
+        radp.setGlow(true);
 
         gas = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
         gas.setMovement(em_gas);
-        gas.flammibility = 0.8;
-        gas.glow = true;
+        gas.setFlammibility(0.8);
+        gas.setGlow(true);
 
         warp = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND - 1);
         warp.setMovement(em_gas);
-        warp.life = 500;
-        warp.life_decay_mode = DECAY_DIE;
+        warp.setLife(500);
+        warp.setLife_decay_mode(DECAY_DIE);
 
         fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
         fire.setMovement(em_gas);
         fire.setParticleBehaviour(pb_fire);
-        fire.celcius = 450;
-        fire.life_decay_mode = DECAY_DIE;
-        fire.life = 120;
-        fire.glow = true;
+        fire.setCelcius(450);
+        fire.setLife_decay_mode(DECAY_DIE);
+        fire.setLife(120);
+        fire.setGlow(true);
 
         plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
         plsm.setParticleBehaviour(pb_plsm);
-        plsm.celcius = MAX_TEMP;
-        plsm.life_decay_mode = DECAY_DIE;
-        plsm.life = 120;
-        plsm.glow = true;
+        plsm.setCelcius(MAX_TEMP);
+        plsm.setLife_decay_mode(DECAY_DIE);
+        plsm.setLife(120);
+        plsm.setGlow(true);
 
         clne = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
         clne.setParticleBehaviour(pb_clne);
 
         stm = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
         stm.setMovement(em_gas);
-        stm.glow = true;
+        stm.setGlow(true);
 
         ice = create(24, "ICE", "Ice", new Color(200, 200, 255), WEIGHT_SOLID);
-        ice.celcius = -25;
+        ice.setCelcius(-25);
 
         fill = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
-        fill.tmp_decay = false;
-        fill.heatTransfer = 0.5;
+        fill.setTmp_decay(false);
+        fill.setHeatTransfer(0.5);
         fill.setParticleBehaviour(pb_fill);
 
         ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
-        ant.tmp_decay = false;
-        ant.life_decay = false;
+        ant.setTmp_decay(false);
+        ant.setLife_decay(false);
         ant.setParticleBehaviour(pb_ant);
 
         void_ = create(27, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);
@@ -511,13 +514,13 @@ public class Elements {
     }
 
     public static void add(int id, Element e) {
-        id_name.put(id, e.name.toUpperCase());
+        id_name.put(id, e.getName().toUpperCase());
         el_map.put(id, e);
     }
 
     public static Element create(int id, String name, String desc, Color c, int weight) {
         Element e = new Element(id, name, desc, c);
-        e.weight = weight;
+        e.setWeight(weight);
         add(id, e);
         return e;
     }

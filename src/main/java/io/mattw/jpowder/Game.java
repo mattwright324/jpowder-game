@@ -1,15 +1,12 @@
 package io.mattw.jpowder;
 
-import java.util.Random;
-
 public class Game extends Thread {
 
     public static final int MAX_AIR = 256;
-    public static final int MIN_AIR = -256;
-    public static final int MAX_PARTS = Display.width * Display.height;
-    static boolean paused = false;
-    static Counter gfps = new Counter();
-    static Random r = new Random();
+    private static final int MIN_AIR = -256;
+    private static final int MAX_PARTS = Display.width * Display.height;
+    public static boolean paused = false;
+    public static Counter gfps = new Counter();
 
     static void update() {
         for (int w = 0; w < Display.width; w++) {

@@ -8,9 +8,9 @@ import java.util.Arrays;
 
 public class Grid {
 
-    static final int TEMP = 0;
-    static final int TYPE = 1;
-    static final int CTYPE = 2;
+    private static final int TEMP = 0;
+    private static final int TYPE = 1;
+    private static final int CTYPE = 2;
     public static Cell[][] pgrid = new Cell[Display.width][Display.height]; // Particle Grid
     public static BigCell[][] agrid = new BigCell[Display.width / 4][Display.height / 4]; // Air Grid (Walls, Gravity .. )
 
@@ -80,31 +80,31 @@ public class Grid {
         if (!valid(x, y, 0) && cell(x, y).empty()) {
             return null;
         }
-        for (int i = 0; i < cell(x, y).stack.length; i++) {
-            if (cell(x, y).stack[i] != null) {
-                return cell(x, y).stack[i];
+        for (int i = 0; i < cell(x, y).getStack().length; i++) {
+            if (cell(x, y).getStack()[i] != null) {
+                return cell(x, y).getStack()[i];
             }
         }
-        if (cell(x, y).stack.length == 0) {
+        if (cell(x, y).getStack().length == 0) {
             return null;
         }
-        return cell(x, y).stack[0];
+        return cell(x, y).getStack()[0];
     }
 
     public static Particle[] getStack(int x, int y) {
         if (!valid(x, y, 0) && cell(x, y).empty()) {
             return null;
         }
-        return cell(x, y).stack;
+        return cell(x, y).getStack();
     }
 
     public static void remStackTop(int x, int y) {
         if (!valid(x, y, 0) && cell(x, y).empty()) {
             return;
         }
-        for (int i = 0; i < cell(x, y).stack.length; i++) {
-            if (cell(x, y).stack[i] != null) {
-                cell(x, y).stack[i] = null;
+        for (int i = 0; i < cell(x, y).getStack().length; i++) {
+            if (cell(x, y).getStack()[i] != null) {
+                cell(x, y).getStack()[i] = null;
                 return;
             }
         }
@@ -159,22 +159,22 @@ public class Grid {
                 for (int h = 0; h < Display.height; h++) {
                     Cell cell = cell(w, h);
                     if (!cell.empty()) {
-                        for (int pos = 0; pos < cell.stack.length; pos++) {
-                            if (cell.stack[pos] != null) {
+                        for (int pos = 0; pos < cell.getStack().length; pos++) {
+                            if (cell.getStack()[pos] != null) {
                                 changed++;
                                 switch (method) {
                                     case (TEMP):
-                                        cell.stack[pos].celcius = val;
+                                        cell.getStack()[pos].setCelcius(val);
                                         break;
                                     case (TYPE):
                                         if (val == 0) {
-                                            cell.stack[pos] = null;
+                                            cell.getStack()[pos] = null;
                                         } else {
-                                            cell.stack[pos].morph(Elements.get(id), Particle.MORPH_FULL, false);
+                                            cell.getStack()[pos].morph(Elements.get(id), Particle.MORPH_FULL, false);
                                         }
                                         break;
                                     case (CTYPE):
-                                        cell.stack[pos].ctype = (int) val;
+                                        cell.getStack()[pos].setCtype((int) val);
                                         break;
                                 }
                             }

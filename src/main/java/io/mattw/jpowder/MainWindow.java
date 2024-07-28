@@ -41,28 +41,73 @@ public class MainWindow extends JFrame {
 
         FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#0094FF"));
 
-        var exitButton = new JButton("Exit");
-        exitButton.addActionListener(e -> System.exit(0));
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.add(exitButton);
+        var newGame = new JMenuItem("New Game");
+        newGame.addActionListener(e -> Grid.newGame());
 
-        var largeView = new JRadioButtonMenuItem("Large View");
+        var pauseGame = new JCheckBoxMenuItem("Pause Game");
+        pauseGame.addActionListener(e -> {
+            Display.toggle_pause();
+            pauseGame.setSelected(Game.paused);
+        });
+
+        var exitButton = new JMenuItem("Exit");
+        exitButton.addActionListener(e -> System.exit(0));
+
+        var gameMenu = new JMenu("Game");
+        gameMenu.add(newGame);
+        gameMenu.add(pauseGame);
+        gameMenu.add(new JSeparator());
+        gameMenu.add(exitButton);
+
+        var keybindHelp = new JCheckBoxMenuItem("Show Keybind Help");
+        keybindHelp.addActionListener(e -> {
+            Display.help = !Display.help;
+            SwingUtilities.invokeLater(() -> keybindHelp.setSelected(Display.help));
+        });
+
+        var largeView = new JRadioButtonMenuItem("Large Window (2x)");
         largeView.setSelected(true);
         largeView.addActionListener(e -> Display.makeLarge());
 
-        var smallView = new JRadioButtonMenuItem("Small View");
+        var smallView = new JRadioButtonMenuItem("Small Window (1x)");
         smallView.addActionListener(e -> Display.makeSmall());
 
-        var group = new ButtonGroup();
-        group.add(largeView);
-        group.add(smallView);
+        var group1 = new ButtonGroup();
+        group1.add(largeView);
+        group1.add(smallView);
+
+        var defaultView = new JRadioButtonMenuItem("Default View");
+        defaultView.setSelected(true);
+        defaultView.addActionListener(e -> Display.setView(0));
+
+        var tempView = new JRadioButtonMenuItem("Temp View");
+        tempView.addActionListener(e -> Display.setView(1));
+
+        var lifeGradientView = new JRadioButtonMenuItem("Life Gradient View");
+        lifeGradientView.addActionListener(e -> Display.setView(2));
+
+        var fancyView = new JRadioButtonMenuItem("Fancy View");
+        fancyView.addActionListener(e -> Display.setView(3));
+
+        var group2 = new ButtonGroup();
+        group2.add(defaultView);
+        group2.add(tempView);
+        group2.add(lifeGradientView);
+        group2.add(fancyView);
 
         var viewMenu = new JMenu("View");
+        viewMenu.add(keybindHelp);
+        viewMenu.add(new JSeparator());
         viewMenu.add(largeView);
         viewMenu.add(smallView);
+        viewMenu.add(new JSeparator());
+        viewMenu.add(defaultView);
+        viewMenu.add(tempView);
+        viewMenu.add(lifeGradientView);
+        viewMenu.add(fancyView);
 
         var menuBar = new JMenuBar();
-        menuBar.add(fileMenu);
+        menuBar.add(gameMenu);
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
 

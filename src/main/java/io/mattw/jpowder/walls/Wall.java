@@ -1,31 +1,28 @@
 package io.mattw.jpowder.walls;
 
 import io.mattw.jpowder.Item;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 
+@Getter
+@Setter
 public class Wall extends Item {
 
     // Pass-through flags.
-    public boolean air = false;
-    public boolean parts = false;
-	/*public boolean powders = false;
-	public boolean liquids = false;
-	public boolean gasses = false;
-	public boolean solids = false;*/
+    private boolean air = false;
+    private boolean parts = false;
+    private boolean remove = false;
 
-    public boolean conduct = false;
-
-    public boolean remove = false;
-
-    public Wall(String n, Color c) {
-        name = n;
-        color = c;
+    public Wall(String name, Color color) {
+        setName(name);
+        setColor(color);
     }
 
-    public Wall(String n, String d, Color c) {
-        name = n;
-        description = d;
-        color = c;
+    public Wall(String name, String desc, Color color) {
+        setName(name);
+        setDescription(desc);
+        setColor(color);
     }
 }

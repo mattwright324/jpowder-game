@@ -1,10 +1,15 @@
 package io.mattw.jpowder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.awt.*;
 
+@Getter
+@Setter
 public class Item {
-    public int id = 0;
-    public String name = "Item";
-    public String description = "Description";
-    public Color color = Color.GRAY;
+    private int id = 0;
+    private String name = "Item";
+    private String description = "Description";
+    private Color color = Color.GRAY;
 }

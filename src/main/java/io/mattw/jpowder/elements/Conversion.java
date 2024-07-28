@@ -7,10 +7,10 @@ public class Conversion {
     public static final int CM_TYPE = 0;
     public static final int CM_CTYPE = 1;
 
-    public int method = CM_TYPE;
-    public int sign = Elements.CS_GTR;
-    public Element el;
-    public double value = 0;
+    private final int method;
+    private final int sign;
+    private final Element el;
+    private final double value;
 
     public Conversion(int m, Element e, int sign, double temp) {
         this.method = m;
@@ -22,13 +22,13 @@ public class Conversion {
     public boolean shouldConvert(Particle p) {
         switch (sign) {
             case (Elements.CS_GTR):
-                return value < p.celcius;
+                return value < p.getCelcius();
             case (Elements.CS_LSS):
-                return value > p.celcius;
+                return value > p.getCelcius();
             case (Elements.CS_EQ):
-                return (int) value == (int) p.celcius;
+                return (int) value == (int) p.getCelcius();
             default:
-                return value < p.celcius;
+                return value < p.getCelcius();
         }
     }
 
@@ -38,7 +38,7 @@ public class Conversion {
                 p.morph(el, Particle.MORPH_KEEP_TEMP, true);
                 break;
             case (CM_CTYPE):
-                p.morph(Elements.get(p.ctype), Particle.MORPH_KEEP_TEMP, true);
+                p.morph(Elements.get(p.getCtype()), Particle.MORPH_KEEP_TEMP, true);
                 break;
         }
     }

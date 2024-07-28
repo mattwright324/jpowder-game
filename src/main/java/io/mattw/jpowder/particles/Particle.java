@@ -8,30 +8,34 @@ import io.mattw.jpowder.elements.Conversion;
 import io.mattw.jpowder.elements.Element;
 import io.mattw.jpowder.elements.Elements;
 import io.mattw.jpowder.walls.Wall;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 import java.util.Random;
 
+@Getter
+@Setter
 public class Particle {
 
-    public static final Random r = new Random();
+    public static final Random random = new Random();
 
     public static final int MORPH_FULL = 0;
     public static final int MORPH_KEEP_TEMP = 1;
     public static final int MORPH_EL_ONLY = 2;
 
-    public int x, y, pos = 0;
-    public Element el;
-    public long update = 50;
-    public long last_update = System.currentTimeMillis();
+    private int x, y, pos = 0;
+    private Element el;
+    private long update = 50;
+    private long last_update = System.currentTimeMillis();
 
-    public int ctype = 0;
-    public int tmp = 0;
-    public Color deco;
-    public double vx = 0, vy = 0;
-    public long life = 0;
-    public double celcius = 0.0;
-    public boolean remove = false;
+    private int ctype = 0;
+    private int tmp = 0;
+    private Color deco;
+    private double vx = 0, vy = 0;
+    private long life = 0;
+    private double celcius = 0.0;
+    private boolean remove = false;
     
     /*final long cid = r.nextLong();
     public boolean same(Particle p) {
@@ -47,11 +51,11 @@ public class Particle {
         el = e;
         this.x = x;
         this.y = y;
-        this.life = el.life;
-        this.celcius = el.celcius;
+        this.life = el.getLife();
+        this.celcius = el.getCelcius();
         //setRemove(el.remove);
         deco = null;
-        if (el.sandEffect) {
+        if (el.isSandEffect()) {
             addSandEffect();
         }
         if (el.behaviour != null) {
@@ -60,15 +64,15 @@ public class Particle {
     }
 
     public Wall toWall() {
-        return Grid.bigcell(x / 4, y / 4).wall;
+        return Grid.bigcell(x / 4, y / 4).getWall();
     }
 
     public boolean display() {
-        return !remove() || el.display;
+        return !remove() || el.isDisplay();
     }
 
     public boolean burn() {
-        return Math.random() < el.flammibility;
+        return Math.random() < el.getFlammibility();
     }
 
     public boolean warmerThan(Particle p) {
@@ -76,7 +80,7 @@ public class Particle {
     }
 
     public boolean heavierThan(Element e) {
-        return el.weight > e.weight;
+        return el.getWeight() > e.getWeight();
     }
 
     public boolean heavierThan(Particle p) {
@@ -125,9 +129,9 @@ public class Particle {
 
     public void addSandEffect() {
         Color color = el.getColor();
-        int red = (color.getRed() + (r.nextInt(19) - 10));
-        int green = (color.getGreen() + (r.nextInt(19) - 10));
-        int blue = (color.getBlue() + (r.nextInt(19) - 10));
+        int red = (color.getRed() + (random.nextInt(19) - 10));
+        int green = (color.getGreen() + (random.nextInt(19) - 10));
+        int blue = (color.getBlue() + (random.nextInt(19) - 10));
         setDeco(new Color(Math.abs(red) % 256, Math.abs(green) % 256, Math.abs(blue) % 256, color.getAlpha()));
     }
 
@@ -161,7 +165,7 @@ public class Particle {
                             continue; // What? Why the hell is this NullPointering?!?!
                         }
                         double diff = (celcius - p.celcius);
-                        double trans = p.el.heatTransfer;
+                        double trans = p.el.getHeatTransfer();
                         p.celcius += (diff * trans);
                         celcius = celcius - (diff * trans);
                         if (celcius < Elements.MIN_TEMP) {
@@ -180,12 +184,12 @@ public class Particle {
                 }
             }
 
-            if (el.life_decay) {
+            if (el.isLife_decay()) {
                 if (life > 0) {
                     life--;
                 }
                 if (life - 1 == 0) {
-                    switch (el.life_decay_mode) {
+                    switch (el.getLife_decay_mode()) {
                         case (Elements.DECAY_DIE):
                             if (el.behaviour != null) {
                                 el.behaviour.destruct(this);
@@ -198,12 +202,12 @@ public class Particle {
                     }
                 }
             }
-            if (el.tmp_decay) {
+            if (el.isTmp_decay()) {
                 if (tmp > 0) {
                     tmp--;
                 }
                 if (tmp - 1 == 0) {
-                    switch (el.tmp_decay_mode) {
+                    switch (el.getTmp_decay_mode()) {
                         case (Elements.DECAY_DIE):
                             if (el.behaviour != null) {
                                 el.behaviour.destruct(this);
@@ -232,9 +236,9 @@ public class Particle {
                 return;
             }
             Particle o;
-            if (!(toWall() != null && !toWall().parts) && (cell2.addable(this) || cell2.displaceable(this))) {
+            if (!(toWall() != null && !toWall().isParts()) && (cell2.addable(this) || cell2.displaceable(this))) {
                 cell.rem(pos);
-                for (int i = 0; i < cell2.stack.length; i++) {
+                for (int i = 0; i < cell2.getStack().length; i++) {
                     if ((o = cell2.part(i)) != null) {
                         cell.add(o);
                         cell2.rem(i);
@@ -246,7 +250,7 @@ public class Particle {
     }
 
     public void morph(Element e, int type, boolean makectype) {
-        int id = el.id;
+        int id = el.getId();
         switch (type) {
             case (MORPH_FULL):
                 init(e, x, y);
