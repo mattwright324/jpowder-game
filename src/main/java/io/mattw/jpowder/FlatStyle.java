@@ -20,26 +20,14 @@ public enum FlatStyle {
     INTELLIJ_LIGHT("IntelliJ Light", FlatLightLaf::setup),
     ;
 
-    private String displayName;
-    private String prefName;
-    private Callable<Boolean> lafSetup;
+    private final String displayName;
+    private final String prefName;
+    private final Callable<Boolean> lafSetup;
 
     FlatStyle(String displayName, Callable<Boolean> lafSetup) {
         this.displayName = displayName;
         this.prefName = name().toLowerCase();
         this.lafSetup = lafSetup;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getPrefName() {
-        return prefName;
-    }
-
-    public Callable<Boolean> getLafSetup() {
-        return lafSetup;
     }
 
     public static FlatStyle fromPrefName(String prefName) {
@@ -65,6 +53,18 @@ public enum FlatStyle {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getPrefName() {
+        return prefName;
+    }
+
+    public Callable<Boolean> getLafSetup() {
+        return lafSetup;
     }
 
 }

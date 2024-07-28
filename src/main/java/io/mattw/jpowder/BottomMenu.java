@@ -45,7 +45,9 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         g2d.fill(resize);
         g2d.fill(view);
         g2d.fill(help);
-        if (Game.paused) g2d.setColor(new Color(255, 64, 128, 128));
+        if (Game.paused) {
+            g2d.setColor(new Color(255, 64, 128, 128));
+        }
         g2d.fill(pause);
         makeButtons();
         draw_buttons();
@@ -76,17 +78,28 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             Game.paused = true;
             Grid.newGame();
         }
-        if (resize.contains(mouse)) Display.toggle_size();
-        if (pause.contains(mouse)) Display.toggle_pause();
-        if (view.contains(mouse)) if (Display.view == 0) Display.setView(1);
-        else Display.setView(0);
+        if (resize.contains(mouse)) {
+            Display.toggle_size();
+        }
+        if (pause.contains(mouse)) {
+            Display.toggle_pause();
+        }
+        if (view.contains(mouse)) {
+            if (Display.view == 0) {
+                Display.setView(1);
+            } else {
+                Display.setView(0);
+            }
+        }
         {
             for (Button b : buttons) {
                 if (b.contains(mouse)) {
-                    if (SwingUtilities.isLeftMouseButton(e))
+                    if (SwingUtilities.isLeftMouseButton(e)) {
                         Display.left = b.item;
-                    if (SwingUtilities.isRightMouseButton(e))
+                    }
+                    if (SwingUtilities.isRightMouseButton(e)) {
                         Display.right = b.item;
+                    }
                 }
             }
         }
@@ -100,7 +113,9 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         int i = 0;
         for (Item e : SideMenu.selected) {
             int x = MainWindow.mouse.x;
-            if (x > MainWindow.window.getWidth() / 2) x = MainWindow.window.getWidth() / 2;
+            if (x > MainWindow.window.getWidth() / 2) {
+                x = MainWindow.window.getWidth() / 2;
+            }
             Button b = new Button(getWidth() - b_w - (5 + (b_w + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, b_w, b_h);
             b.setItem(e);
             buttons.add(b);
@@ -110,8 +125,12 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public void draw_buttons() {
         for (Button b : buttons) {
             Color c = Color.GRAY;
-            if (b.item instanceof Element) c = ((Element) b.item).getColor();
-            if (b.item instanceof Wall) c = b.item.color;
+            if (b.item instanceof Element) {
+                c = ((Element) b.item).getColor();
+            }
+            if (b.item instanceof Wall) {
+                c = b.item.color;
+            }
             g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
             g2d.setPaintMode();
             g2d.fill(b);

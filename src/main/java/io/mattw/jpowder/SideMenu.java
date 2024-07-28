@@ -26,6 +26,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
     public Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
     public Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
+
     public SideMenu() {
         setFocusable(true);
         addMouseListener(this);
@@ -41,7 +42,9 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2d = (Graphics2D) g;
-        if (init) init();
+        if (init) {
+            init();
+        }
 
         b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, width, 0, Color.WHITE));
         b2d.fillRect(0, 0, width, height * 2);
@@ -97,12 +100,24 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
-        if (sl.contains(p)) selected = Elements.solid;
-        if (ll.contains(p)) selected = Elements.liquid;
-        if (gl.contains(p)) selected = Elements.gasses;
-        if (pl.contains(p)) selected = Elements.powder;
-        if (ral.contains(p)) selected = Elements.radio;
-        if (tl.contains(p)) selected = Elements.tools;
+        if (sl.contains(p)) {
+            selected = Elements.solid;
+        }
+        if (ll.contains(p)) {
+            selected = Elements.liquid;
+        }
+        if (gl.contains(p)) {
+            selected = Elements.gasses;
+        }
+        if (pl.contains(p)) {
+            selected = Elements.powder;
+        }
+        if (ral.contains(p)) {
+            selected = Elements.radio;
+        }
+        if (tl.contains(p)) {
+            selected = Elements.tools;
+        }
         MainWindow.menub.repaint();
     }
 

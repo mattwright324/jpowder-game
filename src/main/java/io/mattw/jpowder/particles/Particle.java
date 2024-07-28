@@ -51,8 +51,12 @@ public class Particle {
         this.celcius = el.celcius;
         //setRemove(el.remove);
         deco = null;
-        if (el.sandEffect) addSandEffect();
-        if (el.behaviour != null) el.behaviour.init(this);
+        if (el.sandEffect) {
+            addSandEffect();
+        }
+        if (el.behaviour != null) {
+            el.behaviour.init(this);
+        }
     }
 
     public Wall toWall() {
@@ -97,8 +101,12 @@ public class Particle {
     public Color getTempColor() { // Colorized temperature with no affect on performance!
         int w = MainWindow.heatColorStrip.getWidth();
         int x = (int) (w * (celcius + Math.abs(Elements.MIN_TEMP)) / (Math.abs(Elements.MAX_TEMP) + Math.abs(Elements.MIN_TEMP)));
-        if (w <= x) x = w - 1;
-        if (x < 0) x = 0;
+        if (w <= x) {
+            x = w - 1;
+        }
+        if (x < 0) {
+            x = 0;
+        }
         int color = MainWindow.heatColorStrip.getRGB(x, 0);
         int red = (color & 0x00ff0000) >> 16;
         int green = (color & 0x0000ff00) >> 8;
@@ -137,35 +145,51 @@ public class Particle {
 
     public void update() {
         if (ready()) {
-            if (el.behaviour != null)
+            if (el.behaviour != null) {
                 el.behaviour.update(this);
-            if (el.movement != null)
+            }
+            if (el.movement != null) {
                 el.movement.move(this);
+            }
 
 
-            for (int w = -1; w < 2; w++)
-                for (int h = -1; h < 2; h++)
+            for (int w = -1; w < 2; w++) {
+                for (int h = -1; h < 2; h++) {
                     if (Grid.valid(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
                         Particle p = Grid.getStackTop(x + w, y + h);
-                        if (p == null) continue; // What? Why the hell is this NullPointering?!?!
+                        if (p == null) {
+                            continue; // What? Why the hell is this NullPointering?!?!
+                        }
                         double diff = (celcius - p.celcius);
                         double trans = p.el.heatTransfer;
                         p.celcius += (diff * trans);
                         celcius = celcius - (diff * trans);
-                        if (celcius < Elements.MIN_TEMP) celcius = Elements.MIN_TEMP;
-                        if (celcius > Elements.MAX_TEMP) celcius = Elements.MAX_TEMP;
+                        if (celcius < Elements.MIN_TEMP) {
+                            celcius = Elements.MIN_TEMP;
+                        }
+                        if (celcius > Elements.MAX_TEMP) {
+                            celcius = Elements.MAX_TEMP;
+                        }
                     }
+                }
+            }
 
             for (Conversion c : el.convs) {
-                if (c != null && c.shouldConvert(this)) c.doConversion(this);
+                if (c != null && c.shouldConvert(this)) {
+                    c.doConversion(this);
+                }
             }
 
             if (el.life_decay) {
-                if (life > 0) life--;
+                if (life > 0) {
+                    life--;
+                }
                 if (life - 1 == 0) {
                     switch (el.life_decay_mode) {
                         case (Elements.DECAY_DIE):
-                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            if (el.behaviour != null) {
+                                el.behaviour.destruct(this);
+                            }
                             setRemove(true);
                             break;
                         case (Elements.DECAY_CTYPE):
@@ -175,11 +199,15 @@ public class Particle {
                 }
             }
             if (el.tmp_decay) {
-                if (tmp > 0) tmp--;
+                if (tmp > 0) {
+                    tmp--;
+                }
                 if (tmp - 1 == 0) {
                     switch (el.tmp_decay_mode) {
                         case (Elements.DECAY_DIE):
-                            if (el.behaviour != null) el.behaviour.destruct(this);
+                            if (el.behaviour != null) {
+                                el.behaviour.destruct(this);
+                            }
                             setRemove(true);
                             break;
                         case (Elements.DECAY_CTYPE):
@@ -188,7 +216,9 @@ public class Particle {
                     }
                 }
             }
-            if (!Grid.valid(x, y, 4)) setRemove(true);
+            if (!Grid.valid(x, y, 4)) {
+                setRemove(true);
+            }
             last_update = System.currentTimeMillis();
         }
     }
@@ -233,7 +263,9 @@ public class Particle {
                 init(e, x, y);
                 break;
         }
-        if (makectype) ctype = id;
+        if (makectype) {
+            ctype = id;
+        }
     }
 
 }

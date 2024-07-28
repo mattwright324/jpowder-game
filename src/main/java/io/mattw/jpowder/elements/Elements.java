@@ -37,7 +37,6 @@ public class Elements {
     public static final Element watr, lava, ln2, oil;
     public static final Element phot, radp;
     public static final Element gas, warp, fire, plsm, stm;
-
     public static Random r = new Random();
     static ElementMovement em_phot = p -> {
         int ny = p.y + (int) p.vy;
@@ -109,13 +108,14 @@ public class Elements {
 
         public void update(Particle p) {
             p.tryMove(p.x, p.y - (r.nextInt(4) - 1));
-            for (int w = 0; w < 3; w++)
+            for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
                     if ((o = Grid.getStackTop(p.x + w - 1, p.y + h - 1)) != null && o.burn()) {
                         o.morph(fire, Particle.MORPH_FULL, false);
                     }
                 }
+            }
 
             p.setDeco(new Color((int) p.life, r.nextInt(20), r.nextInt(20)));
         }
@@ -154,23 +154,29 @@ public class Elements {
         }
 
         public void update(Particle p) {
-            if (p.life == 4)
-                for (int w = 0; w < 5; w++)
+            if (p.life == 4) {
+                for (int w = 0; w < 5; w++) {
                     for (int h = 0; h < 5; h++) {
                         int x = p.x - (w - 2);
                         int y = p.y - (h - 2);
                         Particle o;
                         if (Grid.valid(x, y, 0) && (o = Grid.getStackTop(x, y)) != null) {
-                            if (o.el.conducts && o.life == 0) o.morph(sprk, Particle.MORPH_FULL, true);
+                            if (o.el.conducts && o.life == 0) {
+                                o.morph(sprk, Particle.MORPH_FULL, true);
+                            }
                         }
                     }
+                }
+            }
             if (p.life == 0) {
-                if (p.ctype != 0)
+                if (p.ctype != 0) {
                     p.morph(get(p.ctype), Particle.MORPH_FULL, false);
-                if (p.celcius < 300)
+                }
+                if (p.celcius < 300) {
                     p.celcius += 50;
-                else
+                } else {
                     p.celcius -= 50;
+                }
                 p.life = 6;
             }
         }
@@ -183,12 +189,14 @@ public class Elements {
 
         public void update(Particle p) {
             p.tryMove(p.x + (r.nextInt(3) - 1), p.y - (r.nextInt(4) - 1));
-            for (int w = 0; w < 3; w++)
+            for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
-                    if ((o = Grid.getStackTop(p.x + (w - 1), p.y + (h - 1))) != null && o.burn())
+                    if ((o = Grid.getStackTop(p.x + (w - 1), p.y + (h - 1))) != null && o.burn()) {
                         o.morph(fire, Particle.MORPH_KEEP_TEMP, false);
+                    }
                 }
+            }
         }
     };
     static ParticleBehaviour pb_clne = new ParticleBehaviour() {
@@ -198,9 +206,11 @@ public class Elements {
         }
 
         public void update(Particle p) {
-            if (p.ctype == 0) return; // Won't create anything when newly placed.
-            for (int w = -1; w < 2; w++)
-                for (int h = -1; h < 2; h++)
+            if (p.ctype == 0) {
+                return; // Won't create anything when newly placed.
+            }
+            for (int w = -1; w < 2; w++) {
+                for (int h = -1; h < 2; h++) {
                     if (Grid.cell(p.x + w, p.y + h).empty()) {
                         int x = p.x + w;
                         int y = p.y + h;
@@ -208,9 +218,13 @@ public class Elements {
                     } else {
                         Particle o;
                         if ((o = Grid.getStackTop(p.x + w, p.y + h)) != null) {
-                            if (o.el == clne && o.ctype == 0) o.ctype = p.ctype;
+                            if (o.el == clne && o.ctype == 0) {
+                                o.ctype = p.ctype;
+                            }
                         }
                     }
+                }
+            }
 
         }
     };
@@ -229,8 +243,9 @@ public class Elements {
         }
 
         public void update(Particle p) {
-            if (p.celcius > 1670 && Math.random() < 0.01)
+            if (p.celcius > 1670 && Math.random() < 0.01) {
                 p.morph(lava, Particle.MORPH_KEEP_TEMP, true);
+            }
         }
     };
     static ParticleBehaviour pb_fill = new ParticleBehaviour() {
@@ -248,8 +263,9 @@ public class Elements {
         }
 
         public void set(int x, int y) {
-            if (Grid.valid(x, y, 0) && Grid.cell(x, y).addable(fill))
+            if (Grid.valid(x, y, 0) && Grid.cell(x, y).addable(fill)) {
                 Grid.cell(x, y).add(fill);
+            }
         }
     };
     static ParticleBehaviour pb_ant = new ParticleBehaviour() {
@@ -259,22 +275,40 @@ public class Elements {
         }
 
         public void update(Particle p) { // TODO Works ok but doesn't act as Langton's Ant should.
-            if (p.tmp == 0) p.setDeco(Color.GRAY);
+            if (p.tmp == 0) {
+                p.setDeco(Color.GRAY);
+            }
             if (p.tmp == 1 || p.tmp == 2) {
                 int angle = 0;
-                if (p.tmp == 1) angle = (int) (p.life -= 90);
-                if (p.tmp == 2) angle = (int) (p.life += 90);
-                if (angle < 0) angle = 360 + angle;
-                if (angle > 270) angle = angle - 270;
+                if (p.tmp == 1) {
+                    angle = (int) (p.life -= 90);
+                }
+                if (p.tmp == 2) {
+                    angle = (int) (p.life += 90);
+                }
+                if (angle < 0) {
+                    angle = 360 + angle;
+                }
+                if (angle > 270) {
+                    angle = angle - 270;
+                }
                 p.life = angle;
                 int x = p.x;
                 int y = p.y;
                 int nx = p.x;
                 int ny = p.y;
-                if (angle == 0) nx += 1;
-                if (angle == 180) nx -= 1;
-                if (angle == 90) ny -= 1;
-                if (angle == 270) ny += 1;
+                if (angle == 0) {
+                    nx += 1;
+                }
+                if (angle == 180) {
+                    nx -= 1;
+                }
+                if (angle == 90) {
+                    ny -= 1;
+                }
+                if (angle == 270) {
+                    ny += 1;
+                }
                 System.out.println(p.life + ", " + angle + " , " + x + "." + y + " , " + nx + "." + ny);
                 Particle o = Grid.getStackTop(nx, ny);
                 if (o == null) {
@@ -455,8 +489,11 @@ public class Elements {
     public static Element get(String name) {
         name = name.toUpperCase();
         if (id_name.containsValue(name)) {
-            for (int key : id_name.keySet())
-                if (id_name.get(key).equals(name)) return el_map.get(key);
+            for (int key : id_name.keySet()) {
+                if (id_name.get(key).equals(name)) {
+                    return el_map.get(key);
+                }
+            }
         }
         return el_map.get(0);
     }
@@ -464,8 +501,11 @@ public class Elements {
     public static int getID(String name) {
         name = name.toUpperCase();
         if (id_name.containsValue(name)) {
-            for (int key : id_name.keySet())
-                if (id_name.get(key).equals(name)) return key;
+            for (int key : id_name.keySet()) {
+                if (id_name.get(key).equals(name)) {
+                    return key;
+                }
+            }
         }
         return 0;
     }

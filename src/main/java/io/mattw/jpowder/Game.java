@@ -27,7 +27,9 @@ public class Game extends Thread {
     public void run() {
         gfps.start();
         while (isAlive()) {
-            if (Grid.cell(0, 0) != null && !paused) update();
+            if (Grid.cell(0, 0) != null && !paused) {
+                update();
+            }
             try {
                 Thread.sleep(25);
             } catch (InterruptedException ignored) {

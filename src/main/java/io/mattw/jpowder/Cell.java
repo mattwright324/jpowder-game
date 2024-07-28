@@ -33,9 +33,13 @@ public class Cell {
     // Stacked Particles
 
     public void cascadeUpdateParticlePositions() {
-        if (this.part == null) return;
+        if (this.part == null) {
+            return;
+        }
         for (int i = 0; i < 9; i++) {
-            if (this.part[i] == null) continue;
+            if (this.part[i] == null) {
+                continue;
+            }
             this.part[i].x = this.x;
             this.part[i].y = this.y;
         }
@@ -47,7 +51,11 @@ public class Cell {
 
     public int count() {
         int s = 0;
-        for (Particle particle : stack) if (particle != null) s++;
+        for (Particle particle : stack) {
+            if (particle != null) {
+                s++;
+            }
+        }
         return s;
     }
 
@@ -56,7 +64,11 @@ public class Cell {
     }
 
     public boolean empty() {
-        for (Particle particle : stack) if (particle != null) return false;
+        for (Particle particle : stack) {
+            if (particle != null) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -65,7 +77,11 @@ public class Cell {
     }
 
     public boolean addable(Element e) {
-        for (Particle particle : stack) if (particle != null && !particle.el.stackable) return false;
+        for (Particle particle : stack) {
+            if (particle != null && !particle.el.stackable) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -74,22 +90,34 @@ public class Cell {
     }
 
     public boolean displaceable(Element e) {
-        for (Particle particle : stack) if (particle != null && e.heavierThan(particle.el)) return false;
+        for (Particle particle : stack) {
+            if (particle != null && e.heavierThan(particle.el)) {
+                return false;
+            }
+        }
         return true;
     }
 
     public boolean contains(Element e) {
-        for (Particle particle : stack) if (particle != null && particle.el == e) return true;
+        for (Particle particle : stack) {
+            if (particle != null && particle.el == e) {
+                return true;
+            }
+        }
         return false;
     }
 
     public Particle part(int pos) {
-        if (empty()) return null;
+        if (empty()) {
+            return null;
+        }
         return stack[pos];
     }
 
     public void rem(int pos) { // Remove
-        if (stack.length <= pos) return;
+        if (stack.length <= pos) {
+            return;
+        }
         stack[pos] = null;
     }
     
@@ -100,7 +128,7 @@ public class Cell {
     }*/
 
     public void add(Particle p) {
-        for (int i = 0; i < stack.length; i++)
+        for (int i = 0; i < stack.length; i++) {
             if (stack[i] == null) {
                 p.x = x;
                 p.y = y;
@@ -108,6 +136,7 @@ public class Cell {
                 stack[i] = p;
                 return;
             }
+        }
 
         stack = Arrays.copyOf(stack, stack.length + 1);
         stack[stack.length - 1] = p;
@@ -127,10 +156,11 @@ public class Cell {
         Particle p;
         for (int i = 0; i < stack.length; i++) {
             if ((p = stack[i]) != null) {
-                if (p.remove)
+                if (p.remove) {
                     stack[i] = null;
-                else
+                } else {
                     p.update();
+                }
             }
             if (stack.length > 0 && empty()) {
                 stack = new Particle[1];

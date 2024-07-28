@@ -1,5 +1,6 @@
 package io.mattw.jpowder;
 
+import com.formdev.flatlaf.FlatLaf;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -7,7 +8,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Objects;
 
 public class MainWindow extends JFrame {
 
@@ -20,42 +22,49 @@ public class MainWindow extends JFrame {
     static SideMenu menu;
     static BottomMenu menub;
 
-    public MainWindow() {
+    public MainWindow() throws Exception {
+        logger.trace("MainWindow()");
+
+        var icon = ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon.png")));
+        heatColorStrip = ImageIO.read(Objects.requireNonNull(getClass().getResource("/heat-color-strip.png")));
+
         window = this;
+        setIconImage(icon);
+        setTitle("JPowder");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setTitle("JPowder");
         setResizable(false);
 
-        JButton exitButton = new JButton("Exit");
+        var centerX = (Toolkit.getDefaultToolkit().getScreenSize().width - Display.width * 2) / 2;
+        var centerY = (Toolkit.getDefaultToolkit().getScreenSize().height - Display.height * 2) / 2;
+        setLocation(centerX, centerY);
+
+        FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#0094FF"));
+
+        var exitButton = new JButton("Exit");
         exitButton.addActionListener(e -> System.exit(0));
         JMenu fileMenu = new JMenu("File");
         fileMenu.add(exitButton);
 
-        JRadioButtonMenuItem largeView = new JRadioButtonMenuItem("Large View");
+        var largeView = new JRadioButtonMenuItem("Large View");
         largeView.setSelected(true);
         largeView.addActionListener(e -> Display.makeLarge());
-        JRadioButtonMenuItem smallView = new JRadioButtonMenuItem("Small View");
+
+        var smallView = new JRadioButtonMenuItem("Small View");
         smallView.addActionListener(e -> Display.makeSmall());
-        ButtonGroup group = new ButtonGroup();
+
+        var group = new ButtonGroup();
         group.add(largeView);
         group.add(smallView);
-        JMenu viewMenu = new JMenu("View");
+
+        var viewMenu = new JMenu("View");
         viewMenu.add(largeView);
         viewMenu.add(smallView);
-        JMenuBar menuBar = new JMenuBar();
+
+        var menuBar = new JMenuBar();
         menuBar.add(fileMenu);
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
-
-        try {
-            BufferedImage iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/jpowder.png"));
-            setIconImage(iconImg);
-
-            heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/colorstrip.png"));
-        } catch (IOException e) {
-            logger.error(e);
-        }
 
         game = new Display();
         add(game, BorderLayout.CENTER);

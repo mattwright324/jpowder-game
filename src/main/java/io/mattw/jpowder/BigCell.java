@@ -21,12 +21,15 @@ public class BigCell {
     }
 
     public Color getColor() {
-        if (wall != null) return wall.color;
+        if (wall != null) {
+            return wall.color;
+        }
         int c = (int) (255 * Math.abs(pressure) / Game.MAX_AIR);
-        if (pressure < 0)
+        if (pressure < 0) {
             return new Color(0, 0, c);
-        else
+        } else {
             return new Color(c, 0, 0);
+        }
     }
 
     public int screen_x() {

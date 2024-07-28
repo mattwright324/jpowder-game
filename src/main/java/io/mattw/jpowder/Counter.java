@@ -24,7 +24,9 @@ public class Counter extends Thread {
 
                 total += fps;
                 avg = total / seconds;
-                if (seconds > 60) resetAverage();
+                if (seconds > 60) {
+                    resetAverage();
+                }
             }
             try {
                 Thread.sleep(25);

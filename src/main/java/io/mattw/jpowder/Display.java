@@ -42,12 +42,16 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     public ActionMap am = getActionMap();
 
     public Display() {
-        for (int w = 0; w < Display.width; w++)
-            for (int h = 0; h < Display.height; h++)
+        for (int w = 0; w < Display.width; w++) {
+            for (int h = 0; h < Display.height; h++) {
                 Grid.pgrid[w][h] = new Cell(w, h);
-        for (int w = 0; w < Display.width / 4; w++)
-            for (int h = 0; h < Display.height / 4; h++)
+            }
+        }
+        for (int w = 0; w < Display.width / 4; w++) {
+            for (int h = 0; h < Display.height / 4; h++) {
                 Grid.agrid[w][h] = new BigCell(w, h);
+            }
+        }
         game.startUpdateThread();
         timer.start();
         dfps.start();
@@ -105,8 +109,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     }
 
     static void toggle_size() {
-        if (small) makeLarge();
-        else makeSmall();
+        if (small) {
+            makeLarge();
+        } else {
+            makeSmall();
+        }
     }
 
     static void toggle_pause() {
@@ -120,14 +127,18 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         b2d.setColor(Color.BLACK);
         b2d.fillRect(0, 0, getWidth(), getHeight());
 
-        for (int w = 0; w < Grid.agrid.length; w++)
-            for (int h = 0; h < Grid.agrid[0].length; h++)
+        for (int w = 0; w < Grid.agrid.length; w++) {
+            for (int h = 0; h < Grid.agrid[0].length; h++) {
                 draw_bigcell(Grid.bigcell(w, h));
+            }
+        }
         size = 0;
         nsize = 0;
-        for (int w = 0; w < width; w++)
-            for (int h = 0; h < height; h++)
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
                 draw_cell(Grid.cell(w, h));
+            }
+        }
 
         b2d.setColor(Color.LIGHT_GRAY);
         int sx = mstart.x * scale;
@@ -183,11 +194,15 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             if ((p = Grid.getStackTop(mouse.x, mouse.y)) != null) {
                 if (p.el != null) {
                     info = p.el.name;
-                    if (!(p.ctype == 0) && Elements.exists(p.ctype)) info += "(" + Elements.get(p.ctype) + ")";
+                    if (!(p.ctype == 0) && Elements.exists(p.ctype)) {
+                        info += "(" + Elements.get(p.ctype) + ")";
+                    }
                     info += ", Temp:" + p.temp();
                     info += ", Life:" + p.life;
                     info += ", TMP:" + p.tmp;
-                } else p.setRemove(true);
+                } else {
+                    p.setRemove(true);
+                }
             }
             w2d.drawString(info, 5, getHeight() - 10);
         }
@@ -211,19 +226,24 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     }
 
     public void draw_bigcell(BigCell c) {
-        if (c.wall == null) return;
+        if (c.wall == null) {
+            return;
+        }
         b2d.setColor(c.wall.color);
         b2d.fillRect(c.screen_x(), c.screen_y(), (scale) * 4, (scale) * 4);
     }
 
     public void place(Item e, Point pt, int size) {
-        if (pt == null) return;
+        if (pt == null) {
+            return;
+        }
         Point start = new Point(pt.x - size / 2, pt.y - size / 2);
         Point end = new Point(start.x + size, start.y + size);
         for (int x = start.x; x <= end.x; x++) {
             for (int y = start.y; y <= end.y; y++) {
-                if (mouse_square) placeAt(e, x, y);
-                else {
+                if (mouse_square) {
+                    placeAt(e, x, y);
+                } else {
                     if (Math.sqrt(Math.pow(x - pt.x, 2) + Math.pow(y - pt.y, 2)) <= (double) size / 2) {
                         placeAt(e, x, y);
                     }
@@ -254,10 +274,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             Wall wl = (Wall) e;
             BigCell bc = Grid.bigcell(x / 4, y / 4);
 
-            if (wl == Walls.none)
+            if (wl == Walls.none) {
                 bc.wall = null;
-            else
+            } else {
                 bc.wall = wl;
+            }
         }
     }
 
@@ -279,12 +300,16 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         mouse_drag = mouse;
         MainWindow.updateMouseInFrame(e.getPoint(), this);
         updateMouse(mouseToCell(e.getPoint()));
-        if (SwingUtilities.isLeftMouseButton(e))
-            for (Point p : Grid.line(mouse_drag, mouse))
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            for (Point p : Grid.line(mouse_drag, mouse)) {
                 place(left, p, draw_size);
-        if (SwingUtilities.isRightMouseButton(e))
-            for (Point p : Grid.line(mouse_drag, mouse))
+            }
+        }
+        if (SwingUtilities.isRightMouseButton(e)) {
+            for (Point p : Grid.line(mouse_drag, mouse)) {
                 place(right, p, draw_size);
+            }
+        }
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -293,13 +318,17 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     }
 
     public void mousePressed(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e))
+        if (SwingUtilities.isLeftMouseButton(e)) {
             place(left, mouse, draw_size);
-        if (SwingUtilities.isRightMouseButton(e))
+        }
+        if (SwingUtilities.isRightMouseButton(e)) {
             place(right, mouse, draw_size);
+        }
         if (SwingUtilities.isMiddleMouseButton(e)) {
             Particle m = Grid.getStackTop(mouse.x, mouse.y);
-            if (m != null) left = m.el;
+            if (m != null) {
+                left = m.el;
+            }
         }
     }
 
@@ -337,9 +366,11 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             public void actionPerformed(ActionEvent e) {
                 Display.toggle_pause();
                 if (Game.paused) {
-                    for (int w = 0; w < width; w++)
-                        for (int h = 0; h < height; h++)
+                    for (int w = 0; w < width; w++) {
+                        for (int h = 0; h < height; h++) {
                             Grid.cell(w, h).cleanStack();
+                        }
+                    }
                 }
             }
         });
@@ -358,14 +389,18 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             public void actionPerformed(ActionEvent e) {
                 draw_size -= 2;
                 updateMouse(mouse);
-                if (draw_size < 0) draw_size = 0;
+                if (draw_size < 0) {
+                    draw_size = 0;
+                }
             }
         });
         addKeyBinding(KeyEvent.VK_CLOSE_BRACKET, "mouse_big", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 draw_size += 2;
                 updateMouse(mouse);
-                if (draw_size < 0) draw_size = 0;
+                if (draw_size < 0) {
+                    draw_size = 0;
+                }
             }
         });
         addKeyBinding(KeyEvent.VK_H, "hud", new AbstractAction() {
@@ -407,7 +442,9 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
     public void mouseWheelMoved(MouseWheelEvent e) {
         draw_size -= e.getWheelRotation();
-        if (draw_size < 0) draw_size = 0;
+        if (draw_size < 0) {
+            draw_size = 0;
+        }
         mstart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
         mstop = new Point(mstart.x + draw_size, mstart.y + draw_size);
     }
