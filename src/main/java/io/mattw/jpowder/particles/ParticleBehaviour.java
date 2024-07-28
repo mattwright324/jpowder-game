@@ -1,4 +1,4 @@
-package main.java.powder.particles;
+package io.mattw.jpowder.particles;
 
 public abstract class ParticleBehaviour {
     /**
@@ -10,13 +10,16 @@ public abstract class ParticleBehaviour {
 
     /**
      * Called every frame to update the particle.
+     *
      * @param p The particle that is being updated.
      */
     public abstract void update(Particle p);
 
     /**
      * Called when the particle decays.
+     *
      * @param p The particle that is destroyed.
      */
-    public void destruct (Particle p) {}
+    public void destruct(Particle p) {
+    }
 }
