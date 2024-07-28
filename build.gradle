@@ -57,7 +57,7 @@ tasks.register('packageJar', Copy) {
 group = "io.mattw.jpowder"
 
 application {
-    mainClassName = "io.mattw.jpowder.Window"
+    mainClassName = "io.mattw.jpowder.Application"
 }
 
 dependencies {

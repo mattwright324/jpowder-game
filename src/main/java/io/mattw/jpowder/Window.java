@@ -1,5 +1,8 @@
 package io.mattw.jpowder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -8,14 +11,17 @@ import java.io.IOException;
 
 public class Window extends JFrame {
 
+    private static final Logger logger = LogManager.getLogger();
+
     public static BufferedImage heatColorStrip;
-    public static Window window = new Window();
+    public static Window window;
     public static Point mouse = new Point(0, 0);
     static Display game;
     static SideMenu menu;
     static BottomMenu menub;
 
     public Window() {
+        window = this;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setTitle("JPowder");
@@ -24,7 +30,10 @@ public class Window extends JFrame {
         try {
             BufferedImage iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/jpowder.png"));
             setIconImage(iconImg);
-        } catch (IOException ignored) {
+
+            heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/colorstrip.png"));
+        } catch (IOException e) {
+            logger.error(e);
         }
 
         game = new Display();
@@ -39,16 +48,6 @@ public class Window extends JFrame {
         add(menub, BorderLayout.SOUTH);
 
         resize();
-    }
-
-    public static void main(String[] args) {
-        window.setVisible(true);
-        try {
-            // Gradle knows best
-            heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/colorstrip.png"));
-        } catch (IOException ignored) {
-        }
-        Display.makeLarge();
     }
 
     public static void updateMouseInFrame(Point p, Component c) {
