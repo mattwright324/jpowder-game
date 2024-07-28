@@ -20,7 +20,7 @@ public class Application {
             JFrame.setDefaultLookAndFeelDecorated(true);
             JDialog.setDefaultLookAndFeelDecorated(true);
 
-            final var window = new Window();
+            final var window = new MainWindow();
             window.setVisible(true);
 
             Display.makeLarge();

@@ -9,23 +9,44 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Window extends JFrame {
+public class MainWindow extends JFrame {
 
     private static final Logger logger = LogManager.getLogger();
 
     public static BufferedImage heatColorStrip;
-    public static Window window;
+    public static MainWindow window;
     public static Point mouse = new Point(0, 0);
     static Display game;
     static SideMenu menu;
     static BottomMenu menub;
 
-    public Window() {
+    public MainWindow() {
         window = this;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setTitle("JPowder");
         setResizable(false);
+
+        JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(e -> System.exit(0));
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(exitButton);
+
+        JRadioButtonMenuItem largeView = new JRadioButtonMenuItem("Large View");
+        largeView.setSelected(true);
+        largeView.addActionListener(e -> Display.makeLarge());
+        JRadioButtonMenuItem smallView = new JRadioButtonMenuItem("Small View");
+        smallView.addActionListener(e -> Display.makeSmall());
+        ButtonGroup group = new ButtonGroup();
+        group.add(largeView);
+        group.add(smallView);
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.add(largeView);
+        viewMenu.add(smallView);
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(fileMenu);
+        menuBar.add(viewMenu);
+        setJMenuBar(menuBar);
 
         try {
             BufferedImage iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/jpowder.png"));

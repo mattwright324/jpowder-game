@@ -3,7 +3,7 @@ package io.mattw.jpowder.particles;
 import io.mattw.jpowder.Cell;
 import io.mattw.jpowder.Display;
 import io.mattw.jpowder.Grid;
-import io.mattw.jpowder.Window;
+import io.mattw.jpowder.MainWindow;
 import io.mattw.jpowder.elements.Conversion;
 import io.mattw.jpowder.elements.Element;
 import io.mattw.jpowder.elements.Elements;
@@ -95,11 +95,11 @@ public class Particle {
     }
 
     public Color getTempColor() { // Colorized temperature with no affect on performance!
-        int w = Window.heatColorStrip.getWidth();
+        int w = MainWindow.heatColorStrip.getWidth();
         int x = (int) (w * (celcius + Math.abs(Elements.MIN_TEMP)) / (Math.abs(Elements.MAX_TEMP) + Math.abs(Elements.MIN_TEMP)));
         if (w <= x) x = w - 1;
         if (x < 0) x = 0;
-        int color = Window.heatColorStrip.getRGB(x, 0);
+        int color = MainWindow.heatColorStrip.getRGB(x, 0);
         int red = (color & 0x00ff0000) >> 16;
         int green = (color & 0x0000ff00) >> 8;
         int blue = color & 0x000000ff;

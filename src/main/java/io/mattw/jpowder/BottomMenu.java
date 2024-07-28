@@ -24,7 +24,6 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public Rectangle pause = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
     public Rectangle view = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
     public Rectangle help = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
-    public JFrame helpWindow = new JFrame();
     public List<Button> buttons = new ArrayList<>();
     public Point mouse = new Point(0, 0);
 
@@ -100,8 +99,8 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         buttons.clear();
         int i = 0;
         for (Item e : SideMenu.selected) {
-            int x = Window.mouse.x;
-            if (x > Window.window.getWidth() / 2) x = Window.window.getWidth() / 2;
+            int x = MainWindow.mouse.x;
+            if (x > MainWindow.window.getWidth() / 2) x = MainWindow.window.getWidth() / 2;
             Button b = new Button(getWidth() - b_w - (5 + (b_w + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, b_w, b_h);
             b.setItem(e);
             buttons.add(b);
@@ -143,13 +142,13 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 
     public void mouseDragged(MouseEvent e) {
         mouse = e.getPoint();
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
         repaint();
     }
 
     public void mouseMoved(MouseEvent e) {
         mouse = e.getPoint();
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
     }
 
     public static class Button extends Rectangle {

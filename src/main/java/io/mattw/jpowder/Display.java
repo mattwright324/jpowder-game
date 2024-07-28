@@ -72,17 +72,17 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_4BYTE_ABGR);
         b2d = img.createGraphics();
         small = true;
-        Window.window.resize();
+        MainWindow.window.resize();
     }
 
-    static void makeLarge() {
+    public static void makeLarge() {
         //img_scale = 2;
         //cell_w = cell_h = 1;
         scale = 2;
         img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_4BYTE_ABGR);
         b2d = img.createGraphics();
         small = false;
-        Window.window.resize();
+        MainWindow.window.resize();
     }
 
     static void setView(int i) {
@@ -111,7 +111,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
     static void toggle_pause() {
         Game.paused = !Game.paused;
-        Window.menub.repaint();
+        MainWindow.menub.repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -277,7 +277,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
     public void mouseDragged(MouseEvent e) {
         mouse_drag = mouse;
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
         updateMouse(mouseToCell(e.getPoint()));
         if (SwingUtilities.isLeftMouseButton(e))
             for (Point p : Grid.line(mouse_drag, mouse))
@@ -288,7 +288,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     }
 
     public void mouseMoved(MouseEvent e) {
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
         updateMouse(mouseToCell(e.getPoint()));
     }
 

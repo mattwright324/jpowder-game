@@ -103,7 +103,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         if (pl.contains(p)) selected = Elements.powder;
         if (ral.contains(p)) selected = Elements.radio;
         if (tl.contains(p)) selected = Elements.tools;
-        Window.menub.repaint();
+        MainWindow.menub.repaint();
     }
 
     public void mouseReleased(MouseEvent e) {
@@ -111,11 +111,11 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     }
 
     public void mouseDragged(MouseEvent e) {
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
     }
 
     public void mouseMoved(MouseEvent e) {
-        Window.updateMouseInFrame(e.getPoint(), this);
+        MainWindow.updateMouseInFrame(e.getPoint(), this);
     }
 
 }
