@@ -6,7 +6,7 @@ public class Game extends Thread {
     private static final int MIN_AIR = -256;
     private static final int MAX_PARTS = Display.width * Display.height;
     public static boolean paused = false;
-    public static Counter gfps = new Counter();
+    public static final Counter gfps = new Counter();
 
     static void update() {
         for (int w = 0; w < Display.width; w++) {

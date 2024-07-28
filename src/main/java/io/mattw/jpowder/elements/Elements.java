@@ -5,6 +5,8 @@ import io.mattw.jpowder.Item;
 import io.mattw.jpowder.particles.Particle;
 import io.mattw.jpowder.particles.ParticleBehaviour;
 import io.mattw.jpowder.walls.Walls;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -13,8 +15,10 @@ import java.util.Random;
 
 public class Elements {
 
-    public static final Map<Integer, String> id_name = new HashMap<>();
-    public static final Map<Integer, Element> el_map = new HashMap<>();
+    private static final Logger logger = LogManager.getLogger();
+
+    public static final Map<Integer, String> ID_NAME = new HashMap<>();
+    public static final Map<Integer, Element> EL_MAP = new HashMap<>();
     public static final double MIN_TEMP = -273.15;
     public static final double DEFAULT_TEMP = 22.0;
     public static final double MAX_TEMP = 9725.85;
@@ -39,16 +43,12 @@ public class Elements {
     public static final Element gas, warp, fire, plsm, stm;
     public static final Random random = new Random();
 
-    static ElementMovement em_phot = p -> {
+    static final ElementMovement em_phot = p -> {
         int ny = p.getY() + (int) p.getVy();
         int nx = p.getX() + (int) p.getVx();
         p.tryMove(nx, ny);
-        /*if (!Cells.particleAt(nx, ny))
-            Cells.moveTo(p.x, p.y, nx, ny);
-        else
-            p.setRemove(true);*/
     };
-    static ElementMovement em_radioactive = new ElementMovement() {
+    static final ElementMovement em_radioactive = new ElementMovement() {
         public Particle collide;
 
         public void move(Particle p) {
@@ -73,24 +73,24 @@ public class Elements {
                     (collide.getEl() != Elements.radp || collide.getEl() != Elements.phot);
         }
     };
-    static ElementMovement em_powder = p -> {
+    static final ElementMovement em_powder = p -> {
         int y = p.getY() + 1;
         p.tryMove(p.getX(), y);
         int x = p.getX() + (random.nextBoolean() ? -1 : 1);
         p.tryMove(x, y);
     };
-    static ElementMovement em_gas = p -> {
+    static final ElementMovement em_gas = p -> {
         int ny = p.getY() + (random.nextInt(3) - 1) + (int) p.getVy();
         int nx = p.getX() + (random.nextInt(3) - 1) + (int) p.getVx();
         p.tryMove(nx, ny);
     };
-    static ElementMovement em_liquid = p -> {
+    static final ElementMovement em_liquid = p -> {
         int nx = p.getX() + random.nextInt(5) - 2;
         p.tryMove(nx, p.getY());
         int ny = p.getY() + random.nextInt(2);
         p.tryMove(nx, ny);
     };
-    static ParticleBehaviour pb_phot = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_phot = new ParticleBehaviour() {
         public void init(Particle p) {
             while (p.getVx() == 0 && p.getVy() == 0) {
                 p.setVx(3 * (random.nextInt(3) - 1));
@@ -101,7 +101,7 @@ public class Elements {
         public void update(Particle p) {
         }
     };
-    static ParticleBehaviour pb_fire = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_fire = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(p.getLife() + random.nextInt(50));
             p.setCelcius(p.getCelcius() + random.nextInt(20));
@@ -121,7 +121,7 @@ public class Elements {
             p.setDeco(new Color((int) p.getLife(), random.nextInt(20), random.nextInt(20)));
         }
     };
-    static ParticleBehaviour pb_plut = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_plut = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(random.nextInt(400) + 100);
         }
@@ -134,7 +134,7 @@ public class Elements {
             p.setCelcius(p.getCelcius() + 4500); // Decay should result in a lot of heat + pressure (when added)
         }
     };
-    static ParticleBehaviour pb_radio = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_radio = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(random.nextInt(50) + 1);
             p.setCelcius(982);
@@ -150,7 +150,7 @@ public class Elements {
             }
         }
     };
-    static ParticleBehaviour pb_sprk = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_sprk = new ParticleBehaviour() {
         public void init(Particle p) {
         }
 
@@ -182,7 +182,7 @@ public class Elements {
             }
         }
     };
-    static ParticleBehaviour pb_plsm = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_plsm = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(p.getLife() + random.nextInt(50));
             p.setCelcius(p.getCelcius() + random.nextInt(20));
@@ -200,7 +200,7 @@ public class Elements {
             }
         }
     };
-    static ParticleBehaviour pb_clne = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_clne = new ParticleBehaviour() {
         public void init(Particle p) {
             // Needs to be set ctype on click
             p.setCtype(none.getId());
@@ -229,7 +229,7 @@ public class Elements {
 
         }
     };
-    static ParticleBehaviour pb_lava = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_lava = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setCtype(stne.getId());
         }
@@ -237,7 +237,7 @@ public class Elements {
         public void update(Particle p) {
         }
     };
-    static ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setTmp(random.nextInt(10));
             p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.getTmp() / 10.0))));
@@ -249,7 +249,7 @@ public class Elements {
             }
         }
     };
-    static ParticleBehaviour pb_fill = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_fill = new ParticleBehaviour() {
         public void init(Particle p) {
         }
 
@@ -269,7 +269,7 @@ public class Elements {
             }
         }
     };
-    static ParticleBehaviour pb_ant = new ParticleBehaviour() {
+    static final ParticleBehaviour pb_ant = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(180);
             p.setTmp(1); // tmp 0 = dead, 1 = right, 2 = left
@@ -312,7 +312,7 @@ public class Elements {
                 if (angle == 270) {
                     ny += 1;
                 }
-                System.out.println(p.getLife() + ", " + angle + " , " + x + "." + y + " , " + nx + "." + ny);
+                logger.info("life: {}, angle: {}, x.y: {}.{} -> nx.ny: {}.{}", p.getLife(), angle, x, y, nx, ny);
                 Particle o = Grid.getStackTop(nx, ny);
                 if (o == null) {
                     p.setTmp(1);
@@ -482,30 +482,30 @@ public class Elements {
     }
 
     public static boolean exists(int id) {
-        return el_map.containsKey(id);
+        return EL_MAP.containsKey(id);
     }
 
     public static Element get(int id) {
-        return el_map.get(id);
+        return EL_MAP.get(id);
     }
 
     public static Element get(String name) {
         name = name.toUpperCase();
-        if (id_name.containsValue(name)) {
-            for (int key : id_name.keySet()) {
-                if (id_name.get(key).equals(name)) {
-                    return el_map.get(key);
+        if (ID_NAME.containsValue(name)) {
+            for (int key : ID_NAME.keySet()) {
+                if (ID_NAME.get(key).equals(name)) {
+                    return EL_MAP.get(key);
                 }
             }
         }
-        return el_map.get(0);
+        return EL_MAP.get(0);
     }
 
     public static int getID(String name) {
         name = name.toUpperCase();
-        if (id_name.containsValue(name)) {
-            for (int key : id_name.keySet()) {
-                if (id_name.get(key).equals(name)) {
+        if (ID_NAME.containsValue(name)) {
+            for (int key : ID_NAME.keySet()) {
+                if (ID_NAME.get(key).equals(name)) {
                     return key;
                 }
             }
@@ -514,8 +514,8 @@ public class Elements {
     }
 
     public static void add(int id, Element e) {
-        id_name.put(id, e.getName().toUpperCase());
-        el_map.put(id, e);
+        ID_NAME.put(id, e.getName().toUpperCase());
+        EL_MAP.put(id, e);
     }
 
     public static Element create(int id, String name, String desc, Color c, int weight) {

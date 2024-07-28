@@ -21,12 +21,11 @@ public class Conversion {
 
     public boolean shouldConvert(Particle p) {
         switch (sign) {
-            case (Elements.CS_GTR):
-                return value < p.getCelcius();
-            case (Elements.CS_LSS):
-                return value > p.getCelcius();
             case (Elements.CS_EQ):
                 return (int) value == (int) p.getCelcius();
+            case (Elements.CS_LSS):
+                return value > p.getCelcius();
+            case (Elements.CS_GTR):
             default:
                 return value < p.getCelcius();
         }

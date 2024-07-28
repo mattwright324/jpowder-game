@@ -9,24 +9,21 @@ import java.awt.image.BufferedImage;
 
 public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    public static int width = 60;
-    public static int height = Display.height;
+    public static final int WIDTH = 60;
+    public static final int HEIGHT = Display.height;
     public static Item[] selected = Elements.solid;
 
     private BufferedImage img;
-    private Graphics2D g2d;
     private Graphics2D b2d;
     private boolean init = true;
-    private int b_h = 40;
-    private int b_w = width - 10;
-    private int b_txt = b_h / 2;
-    private int b_txtn = b_h / 2 + 15;
-    private Rectangle sl = new Rectangle(5, 5, b_w, b_h);
-    private Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
-    private Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
-    private Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
-    private Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
-    private Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
+    private final int b_h = 40;
+    private final int b_w = WIDTH - 10;
+    private final Rectangle sl = new Rectangle(5, 5, b_w, b_h);
+    private final Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
+    private final Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
+    private final Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
+    private final Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
+    private final Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
 
     public SideMenu() {
         setFocusable(true);
@@ -36,19 +33,19 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
     public void init() {
         init = false;
-        img = new BufferedImage(width, height * 2, BufferedImage.TYPE_INT_ARGB);
+        img = new BufferedImage(WIDTH, HEIGHT * 2, BufferedImage.TYPE_INT_ARGB);
         b2d = img.createGraphics();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g;
         if (init) {
             init();
         }
 
-        b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, width, 0, Color.WHITE));
-        b2d.fillRect(0, 0, width, height * 2);
+        b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, WIDTH, 0, Color.WHITE));
+        b2d.fillRect(0, 0, WIDTH, HEIGHT * 2);
 
         b2d.setColor(new Color(128, 128, 128, 128));
         b2d.fill(sl);
@@ -61,7 +58,9 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         int line = 0;
 
         b2d.setColor(Color.WHITE);
+        int b_txt = b_h / 2;
         b2d.drawString("Solid", 10, b_txt + (b_h + 5) * line);
+        int b_txtn = b_h / 2 + 15;
         b2d.drawString(Elements.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         b2d.drawString("Liquid", 10, b_txt + (b_h + 5) * line);
@@ -77,7 +76,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         b2d.drawString(Elements.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         b2d.drawString("Tools", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line++);
+        b2d.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line);
 
         b2d.setPaintMode();
         g2d.drawImage(img, null, 0, 0);

@@ -13,20 +13,19 @@ import java.util.List;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    public static int width = Display.width + SideMenu.width;
-    public static int height = 50;
+    public static final int WIDTH = Display.width + SideMenu.WIDTH;
+    public static final int HEIGHT = 50;
 
     private Graphics2D g2d;
-    private int b_w = 40;
-    private int b_h = 18;
-    private int b_y = height - b_h - 5;
-    private int b_txt_center = b_y + b_h / 2 + 5;
-    private Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
-    private Rectangle resize = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
-    private Rectangle pause = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
-    private Rectangle view = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
-    private Rectangle help = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
-    private List<Button> buttons = new ArrayList<>();
+    private final int b_w = 40;
+    private final int b_h = 18;
+    private final int b_y = HEIGHT - b_h - 5;
+    private final Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
+    private final Rectangle resize = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
+    private final Rectangle pause = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
+    private final Rectangle view = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
+    private final Rectangle help = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
+    private final List<Button> buttons = new ArrayList<>();
     private Point mouse = new Point(0, 0);
 
     public BottomMenu() {
@@ -39,8 +38,8 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         super.paintComponent(g);
         g2d = (Graphics2D) g;
 
-        g2d.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, height, Color.WHITE));
-        g2d.fillRect(0, 0, Display.width * 2 + SideMenu.width, height);
+        g2d.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, HEIGHT, Color.WHITE));
+        g2d.fillRect(0, 0, Display.width * 2 + SideMenu.WIDTH, HEIGHT);
 
         g2d.setColor(new Color(32, 64, 128, 128));
         g2d.fill(clear);
@@ -52,8 +51,9 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         }
         g2d.fill(pause);
         makeButtons();
-        draw_buttons();
+        drawButtons();
         g2d.setColor(Color.WHITE);
+        int b_txt_center = b_y + b_h / 2 + 5;
         g2d.drawString("NEW", clear.x + 5, b_txt_center);
         g2d.drawString("SIZE", resize.x + 5, b_txt_center);
         g2d.fillRect(pause.x + 12, pause.y + 5, 5, pause.height - 9);
@@ -84,7 +84,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             Display.toggle_size();
         }
         if (pause.contains(mouse)) {
-            Display.toggle_pause();
+            Display.togglePause();
         }
         if (view.contains(mouse)) {
             if (Display.view == 0) {
@@ -122,7 +122,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         }
     }
 
-    public void draw_buttons() {
+    public void drawButtons() {
         for (Button b : buttons) {
             Color c = Color.GRAY;
             if (b.getItem() instanceof Element) {

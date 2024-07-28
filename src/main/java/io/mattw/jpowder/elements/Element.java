@@ -30,7 +30,10 @@ public class Element extends Item {
 
     public Conversion[] convs = new Conversion[0];
 
+    @Setter
+    @Getter
     public Color color = new Color(180, 180, 30);
+    @Setter
     public ElementMovement movement;
     public ParticleBehaviour behaviour;
 
@@ -78,18 +81,6 @@ public class Element extends Item {
 
     public boolean lighterThan(Element e) {
         return e.weight < weight;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color c) {
-        color = c;
-    }
-
-    public void setMovement(ElementMovement em) {
-        movement = em;
     }
 
     public void setParticleBehaviour(ParticleBehaviour bh) {

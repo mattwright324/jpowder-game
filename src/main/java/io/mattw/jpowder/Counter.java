@@ -13,7 +13,7 @@ public class Counter extends Thread {
 
     private long count = 0;
     private long fps = 0;
-    private long last_fps = System.currentTimeMillis();
+    private long lastFps = System.currentTimeMillis();
 
     public void add() {
         count++;
@@ -21,12 +21,12 @@ public class Counter extends Thread {
 
     public void run() {
         while (isAlive()) {
-            if (System.currentTimeMillis() - last_fps > 1000) {
-                seconds += (System.currentTimeMillis() - last_fps) / 1000.0;
+            if (System.currentTimeMillis() - lastFps > 1000) {
+                seconds += (System.currentTimeMillis() - lastFps) / 1000.0;
 
                 fps = count;
                 count = 0;
-                last_fps = System.currentTimeMillis();
+                lastFps = System.currentTimeMillis();
 
                 total += fps;
                 avg = total / seconds;

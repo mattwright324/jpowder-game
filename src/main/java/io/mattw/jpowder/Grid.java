@@ -11,8 +11,8 @@ public class Grid {
     private static final int TEMP = 0;
     private static final int TYPE = 1;
     private static final int CTYPE = 2;
-    public static Cell[][] pgrid = new Cell[Display.width][Display.height]; // Particle Grid
-    public static BigCell[][] agrid = new BigCell[Display.width / 4][Display.height / 4]; // Air Grid (Walls, Gravity .. )
+    public static final Cell[][] pgrid = new Cell[Display.width][Display.height]; // Particle Grid
+    public static final BigCell[][] agrid = new BigCell[Display.width / 4][Display.height / 4]; // Air Grid (Walls, Gravity .. )
 
     public static Cell cell(int x, int y) {
         if (x > Display.width - 1) {
@@ -208,10 +208,7 @@ public class Grid {
 
         int err = dx - dy;
 
-        while (true) {
-            if (a.x == b.x && a.y == b.y) {
-                break;
-            }
+        while (a.x != b.x || a.y != b.y) {
             int e2 = 2 * err;
             if (e2 > -dy) {
                 err = err - dy;

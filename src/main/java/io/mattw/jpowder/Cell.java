@@ -26,11 +26,11 @@ public class Cell {
         stack = new Particle[1];
     }
 
-    public int screen_x() {
+    public int screenX() {
         return x * Display.scale;
     }
 
-    public int screen_y() {
+    public int screenY() {
         return y * Display.scale;
     }
 
@@ -63,7 +63,7 @@ public class Cell {
         return s;
     }
 
-    public int null_count() {
+    public int nullCount() {
         return stack.length - count();
     }
 
@@ -124,12 +124,6 @@ public class Cell {
         }
         stack[pos] = null;
     }
-    
-    /*public int findPos(Particle p) {
-    	for(int i=0; i<stack.length; i++)
-    		if(stack[i]!=null && stack[i].same(p)) return i;
-    	return -1;
-    }*/
 
     public void add(Particle p) {
         for (int i = 0; i < stack.length; i++) {
@@ -181,21 +175,17 @@ public class Cell {
         if (stack.length > 0 && empty()) {
             stack = new Particle[0];
         } else {
-            int nulls = 0;
             for (int i = 0; i < stack.length; i++) {
                 if (stack[i] == null) {
                     for (int n = i; n < stack.length; n++) {
                         if (stack[n] != null) {
                             stack[i] = stack[n];
                             stack[n] = null;
-                            nulls++;
                             break;
                         }
                     }
                 }
             }
-            // if (nulls > 0)
-            //     Arrays.copyOf(stack, stack.length - nulls);
         }
     }
 }

@@ -8,9 +8,11 @@ import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTh
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubIJTheme;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import lombok.Getter;
 
 import java.util.concurrent.Callable;
 
+@Getter
 public enum FlatStyle {
     FLATLAF_MACOS_DARK("FlatLaf MacOS Dark", FlatMacDarkLaf::setup),
     FLATLAF_MACOS_LIGHT("FlatLaf MacOS Light", FlatMacLightLaf::setup),
@@ -53,18 +55,6 @@ public enum FlatStyle {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getPrefName() {
-        return prefName;
-    }
-
-    public Callable<Boolean> getLafSetup() {
-        return lafSetup;
     }
 
 }

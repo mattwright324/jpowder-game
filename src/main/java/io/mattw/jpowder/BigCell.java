@@ -36,11 +36,11 @@ public class BigCell {
         }
     }
 
-    public int screen_x() {
+    public int screenX() {
         return x * Display.scale * 4;
     }
 
-    public int screen_y() {
+    public int screenY() {
         return y * Display.scale * 4;
     }
 }

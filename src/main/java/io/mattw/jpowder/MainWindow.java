@@ -46,7 +46,7 @@ public class MainWindow extends JFrame {
 
         var pauseGame = new JCheckBoxMenuItem("Pause Game");
         pauseGame.addActionListener(e -> {
-            Display.toggle_pause();
+            Display.togglePause();
             pauseGame.setSelected(Game.paused);
         });
 
@@ -115,11 +115,11 @@ public class MainWindow extends JFrame {
         add(game, BorderLayout.CENTER);
 
         menu = new SideMenu();
-        menu.setPreferredSize(new Dimension(SideMenu.width, SideMenu.height));
+        menu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
         add(menu, BorderLayout.EAST);
 
         menub = new BottomMenu();
-        menub.setPreferredSize(new Dimension(BottomMenu.width, BottomMenu.height));
+        menub.setPreferredSize(new Dimension(BottomMenu.WIDTH, BottomMenu.HEIGHT));
         add(menub, BorderLayout.SOUTH);
 
         resize();
@@ -133,7 +133,7 @@ public class MainWindow extends JFrame {
     }
 
     public void resize() {
-        getContentPane().setPreferredSize(new Dimension(Display.width * Display.scale + SideMenu.width, Display.height * Display.scale + BottomMenu.height));
+        getContentPane().setPreferredSize(new Dimension(Display.width * Display.scale + SideMenu.WIDTH, Display.height * Display.scale + BottomMenu.HEIGHT));
         pack();
     }
 

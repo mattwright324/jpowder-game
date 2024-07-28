@@ -27,21 +27,18 @@ public class Particle {
     private int x, y, pos = 0;
     private Element el;
     private long update = 50;
-    private long last_update = System.currentTimeMillis();
+    private long lastUpdate = System.currentTimeMillis();
 
     private int ctype = 0;
     private int tmp = 0;
+    // EW
+    @Setter
     private Color deco;
     private double vx = 0, vy = 0;
     private long life = 0;
     private double celcius = 0.0;
+    @Setter
     private boolean remove = false;
-    
-    /*final long cid = r.nextLong();
-    public boolean same(Particle p) {
-    	//System.out.println(x+"."+y+","+cid+" =? "+p.x+"."+p.y+","+p.cid);
-    	return cid==p.cid;
-    }*/
 
     public Particle(Element e, int x, int y) {
         init(e, x, y);
@@ -123,10 +120,6 @@ public class Particle {
         return new Color(c, c, c);
     }
 
-    public void setDeco(Color c) { // EW
-        deco = c;
-    }
-
     public void addSandEffect() {
         Color color = el.getColor();
         int red = (color.getRed() + (random.nextInt(19) - 10));
@@ -135,16 +128,12 @@ public class Particle {
         setDeco(new Color(Math.abs(red) % 256, Math.abs(green) % 256, Math.abs(blue) % 256, color.getAlpha()));
     }
 
-    public void setRemove(boolean b) {
-        remove = b;
-    }
-
     public boolean remove() {
         return remove || (toWall() != null);
     }
 
     public boolean ready() {
-        return System.currentTimeMillis() - last_update > update;
+        return System.currentTimeMillis() - lastUpdate > update;
     }
 
     public void update() {
@@ -223,7 +212,7 @@ public class Particle {
             if (!Grid.valid(x, y, 4)) {
                 setRemove(true);
             }
-            last_update = System.currentTimeMillis();
+            lastUpdate = System.currentTimeMillis();
         }
     }
 
@@ -252,9 +241,6 @@ public class Particle {
     public void morph(Element e, int type, boolean makectype) {
         int id = el.getId();
         switch (type) {
-            case (MORPH_FULL):
-                init(e, x, y);
-                break;
             case (MORPH_KEEP_TEMP):
                 double temp = celcius;
                 init(e, x, y);
@@ -263,6 +249,7 @@ public class Particle {
             case (MORPH_EL_ONLY):
                 el = e;
                 break;
+            case (MORPH_FULL):
             default:
                 init(e, x, y);
                 break;

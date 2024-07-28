@@ -115,7 +115,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         }
     }
 
-    public static void toggle_pause() {
+    public static void togglePause() {
         Game.paused = !Game.paused;
         MainWindow.menub.repaint();
     }
@@ -128,14 +128,14 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
 
         for (int w = 0; w < Grid.agrid.length; w++) {
             for (int h = 0; h < Grid.agrid[0].length; h++) {
-                draw_bigcell(Grid.bigcell(w, h));
+                drawBigCell(Grid.bigcell(w, h));
             }
         }
         csize = 0;
         nsize = 0;
         for (int w = 0; w < width; w++) {
             for (int h = 0; h < height; h++) {
-                draw_cell(Grid.cell(w, h));
+                drawCell(Grid.cell(w, h));
             }
         }
 
@@ -183,7 +183,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
                 w2d.drawString("[ ]      mouse size     " + draw_size, 5, spacing * line++);
                 w2d.drawString("SPACE    toggle pause   " + (Game.paused ? "Paused" : "Playing"), 5, spacing * line++);
                 w2d.drawString("S        window size    " + (small ? "Default" : "Large"), 5, spacing * line++);
-                w2d.drawString("1-3      display type   " + viewName, 5, spacing * line++);
+                w2d.drawString("1-3      display type   " + viewName, 5, spacing * line);
             }
 
 
@@ -208,28 +208,28 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         dfps.add();
     }
 
-    public void draw_cell(Cell c) {
+    public void drawCell(Cell c) {
         Particle p;
         if (!c.empty() && (p = Grid.getStackTop(c.getX(), c.getY())) != null && p.display()) {
             csize += c.count();
             Color col = p.getColor();
             b2d.setColor(col);
-            b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
+            b2d.fillRect(c.screenX(), c.screenY(), scale, scale);
             if (view == 3 && p.getEl().isGlow()) { // "Fancy" Display; not great on fps
                 b2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
                 int s = scale; // Small flicker
-                b2d.fillRect(c.screen_x() - s, c.screen_y() - s, scale + s * 2, scale + s * 2);
+                b2d.fillRect(c.screenX() - s, c.screenY() - s, scale + s * 2, scale + s * 2);
             }
         }
-        nsize += c.null_count();
+        nsize += c.nullCount();
     }
 
-    public void draw_bigcell(BigCell c) {
+    public void drawBigCell(BigCell c) {
         if (c.getWall() == null) {
             return;
         }
         b2d.setColor(c.getWall().getColor());
-        b2d.fillRect(c.screen_x(), c.screen_y(), (scale) * 4, (scale) * 4);
+        b2d.fillRect(c.screenX(), c.screenY(), (scale) * 4, (scale) * 4);
     }
 
     public void place(Item e, Point pt, int size) {
@@ -363,7 +363,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     public void setKeyBindings() {
         addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Display.toggle_pause();
+                Display.togglePause();
                 if (Game.paused) {
                     for (int w = 0; w < width; w++) {
                         for (int h = 0; h < height; h++) {
