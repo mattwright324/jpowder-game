@@ -35,8 +35,8 @@ public class MainWindow extends JFrame {
         setLayout(new BorderLayout());
         setResizable(false);
 
-        var centerX = (Toolkit.getDefaultToolkit().getScreenSize().width - Display.width * 2) / 2;
-        var centerY = (Toolkit.getDefaultToolkit().getScreenSize().height - Display.height * 2) / 2;
+        var centerX = (Toolkit.getDefaultToolkit().getScreenSize().width - (Display.WIDTH * 2 + SideMenu.WIDTH)) / 2;
+        var centerY = (Toolkit.getDefaultToolkit().getScreenSize().height - (Display.HEIGHT * 2 + BottomMenu.HEIGHT)) / 2;
         setLocation(centerX, centerY);
 
         FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#0094FF"));
@@ -133,7 +133,7 @@ public class MainWindow extends JFrame {
     }
 
     public void resize() {
-        getContentPane().setPreferredSize(new Dimension(Display.width * Display.scale + SideMenu.WIDTH, Display.height * Display.scale + BottomMenu.HEIGHT));
+        getContentPane().setPreferredSize(new Dimension(Display.WIDTH * Display.scale + SideMenu.WIDTH, Display.HEIGHT * Display.scale + BottomMenu.HEIGHT));
         pack();
     }
 

@@ -11,15 +11,15 @@ public class Grid {
     private static final int TEMP = 0;
     private static final int TYPE = 1;
     private static final int CTYPE = 2;
-    public static final Cell[][] pgrid = new Cell[Display.width][Display.height]; // Particle Grid
-    public static final BigCell[][] agrid = new BigCell[Display.width / 4][Display.height / 4]; // Air Grid (Walls, Gravity .. )
+    public static final Cell[][] pgrid = new Cell[Display.WIDTH][Display.HEIGHT]; // Particle Grid
+    public static final BigCell[][] agrid = new BigCell[Display.WIDTH / 4][Display.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
 
     public static Cell cell(int x, int y) {
-        if (x > Display.width - 1) {
-            x = Display.width - 1;
+        if (x > Display.WIDTH - 1) {
+            x = Display.WIDTH - 1;
         }
-        if (y > Display.height - 1) {
-            y = Display.height - 1;
+        if (y > Display.HEIGHT - 1) {
+            y = Display.HEIGHT - 1;
         }
         if (x < 0) {
             x = 0;
@@ -31,11 +31,11 @@ public class Grid {
     }
 
     public static BigCell bigcell(int x, int y) {
-        if (x > Display.width / 4) {
-            x = Display.width / 4;
+        if (x > Display.WIDTH / 4) {
+            x = Display.WIDTH / 4;
         }
-        if (y > Display.height / 4) {
-            y = Display.height / 4;
+        if (y > Display.HEIGHT / 4) {
+            y = Display.HEIGHT / 4;
         }
         if (x < 0) {
             x = 0;
@@ -48,13 +48,13 @@ public class Grid {
 
     public static void newGame() {
         Game.paused = true;
-        for (int w = 0; w < Display.width; w++) {
-            for (int h = 0; h < Display.height; h++) {
+        for (int w = 0; w < Display.WIDTH; w++) {
+            for (int h = 0; h < Display.HEIGHT; h++) {
                 cell(w, h).reset();
             }
         }
-        for (int w = 0; w < Display.width / 4; w++) {
-            for (int h = 0; h < Display.height / 4; h++) {
+        for (int w = 0; w < Display.WIDTH / 4; w++) {
+            for (int h = 0; h < Display.HEIGHT / 4; h++) {
                 bigcell(w, h).reset();
             }
         }
@@ -66,11 +66,11 @@ public class Grid {
      * offset=4 for one-layer wall to surround remaining cells
      */
     public static boolean valid(int x, int y, int offset) {
-        return !(x < offset || y < offset || x >= Display.width - offset || y >= Display.height - offset);
+        return !(x < offset || y < offset || x >= Display.WIDTH - offset || y >= Display.HEIGHT - offset);
     }
 
     public static boolean valid_big(int x, int y, int offset) { // Air Grid
-        return !(x < offset || y < offset || x >= Display.width / 4 - offset || y >= Display.height / 4 - offset);
+        return !(x < offset || y < offset || x >= Display.WIDTH / 4 - offset || y >= Display.HEIGHT / 4 - offset);
     }
 
     /**
@@ -155,8 +155,8 @@ public class Grid {
         }
         int changed = 0;
         if (Elements.exists(id)) {
-            for (int w = 0; w < Display.width; w++) {
-                for (int h = 0; h < Display.height; h++) {
+            for (int w = 0; w < Display.WIDTH; w++) {
+                for (int h = 0; h < Display.HEIGHT; h++) {
                     Cell cell = cell(w, h);
                     if (!cell.empty()) {
                         for (int pos = 0; pos < cell.getStack().length; pos++) {

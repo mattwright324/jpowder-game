@@ -10,20 +10,20 @@ import java.awt.image.BufferedImage;
 public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
     public static final int WIDTH = 60;
-    public static final int HEIGHT = Display.height;
-    public static Item[] selected = Elements.solid;
+    public static final int HEIGHT = Display.HEIGHT;
+    public static Item[] selectedCategory = Elements.solid;
 
     private BufferedImage img;
-    private Graphics2D b2d;
+    private Graphics2D graphics;
     private boolean init = true;
     private final int b_h = 40;
     private final int b_w = WIDTH - 10;
-    private final Rectangle sl = new Rectangle(5, 5, b_w, b_h);
-    private final Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
-    private final Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
-    private final Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
-    private final Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
-    private final Rectangle tl = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
+    private final Rectangle solidRect = new Rectangle(5, 5, b_w, b_h);
+    private final Rectangle liquidRect = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
+    private final Rectangle gassesRect = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
+    private final Rectangle powderRect = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
+    private final Rectangle radioRect = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
+    private final Rectangle toolsRect = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
 
     public SideMenu() {
         setFocusable(true);
@@ -34,7 +34,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public void init() {
         init = false;
         img = new BufferedImage(WIDTH, HEIGHT * 2, BufferedImage.TYPE_INT_ARGB);
-        b2d = img.createGraphics();
+        graphics = img.createGraphics();
     }
 
     public void paintComponent(Graphics g) {
@@ -44,41 +44,41 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
             init();
         }
 
-        b2d.setPaint(new GradientPaint(0, 0, Color.BLACK, WIDTH, 0, Color.WHITE));
-        b2d.fillRect(0, 0, WIDTH, HEIGHT * 2);
+        graphics.setPaint(new GradientPaint(0, 0, Color.BLACK, WIDTH, 0, Color.WHITE));
+        graphics.fillRect(0, 0, WIDTH, HEIGHT * 2);
 
-        b2d.setColor(new Color(128, 128, 128, 128));
-        b2d.fill(sl);
-        b2d.fill(ll);
-        b2d.fill(gl);
-        b2d.fill(pl);
-        b2d.fill(ral);
-        b2d.fill(tl);
+        graphics.setColor(new Color(128, 128, 128, 128));
+        graphics.fill(solidRect);
+        graphics.fill(liquidRect);
+        graphics.fill(gassesRect);
+        graphics.fill(powderRect);
+        graphics.fill(radioRect);
+        graphics.fill(toolsRect);
 
         int line = 0;
 
-        b2d.setColor(Color.WHITE);
+        graphics.setColor(Color.WHITE);
         int b_txt = b_h / 2;
-        b2d.drawString("Solid", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString("Solid", 10, b_txt + (b_h + 5) * line);
         int b_txtn = b_h / 2 + 15;
-        b2d.drawString(Elements.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(Elements.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        b2d.drawString("Liquid", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.liquid.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString("Liquid", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString(Elements.liquid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        b2d.drawString("Gass", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.gasses.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString("Gass", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString(Elements.gasses.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        b2d.drawString("Powder", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.powder.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString("Powder", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString(Elements.powder.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        b2d.drawString("Radio", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString("Radio", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString(Elements.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        b2d.drawString("Tools", 10, b_txt + (b_h + 5) * line);
-        b2d.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line);
+        graphics.drawString("Tools", 10, b_txt + (b_h + 5) * line);
+        graphics.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line);
 
-        b2d.setPaintMode();
+        graphics.setPaintMode();
         g2d.drawImage(img, null, 0, 0);
     }
 
@@ -100,23 +100,23 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
-        if (sl.contains(p)) {
-            selected = Elements.solid;
+        if (solidRect.contains(p)) {
+            selectedCategory = Elements.solid;
         }
-        if (ll.contains(p)) {
-            selected = Elements.liquid;
+        if (liquidRect.contains(p)) {
+            selectedCategory = Elements.liquid;
         }
-        if (gl.contains(p)) {
-            selected = Elements.gasses;
+        if (gassesRect.contains(p)) {
+            selectedCategory = Elements.gasses;
         }
-        if (pl.contains(p)) {
-            selected = Elements.powder;
+        if (powderRect.contains(p)) {
+            selectedCategory = Elements.powder;
         }
-        if (ral.contains(p)) {
-            selected = Elements.radio;
+        if (radioRect.contains(p)) {
+            selectedCategory = Elements.radio;
         }
-        if (tl.contains(p)) {
-            selected = Elements.tools;
+        if (toolsRect.contains(p)) {
+            selectedCategory = Elements.tools;
         }
         MainWindow.menub.repaint();
     }

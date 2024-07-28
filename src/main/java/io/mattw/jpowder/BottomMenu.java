@@ -13,18 +13,18 @@ import java.util.List;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    public static final int WIDTH = Display.width + SideMenu.WIDTH;
+    public static final int WIDTH = Display.WIDTH + SideMenu.WIDTH;
     public static final int HEIGHT = 50;
 
-    private Graphics2D g2d;
+    private Graphics2D graphics;
     private final int b_w = 40;
     private final int b_h = 18;
     private final int b_y = HEIGHT - b_h - 5;
-    private final Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
-    private final Rectangle resize = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
-    private final Rectangle pause = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
-    private final Rectangle view = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
-    private final Rectangle help = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
+    private final Rectangle clearRect = new Rectangle(5, b_y, b_w, b_h);
+    private final Rectangle resizeRect = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
+    private final Rectangle pauseRect = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
+    private final Rectangle viewRect = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
+    private final Rectangle helpRect = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
     private final List<Button> buttons = new ArrayList<>();
     private Point mouse = new Point(0, 0);
 
@@ -36,30 +36,30 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g2d = (Graphics2D) g;
+        graphics = (Graphics2D) g;
 
-        g2d.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, HEIGHT, Color.WHITE));
-        g2d.fillRect(0, 0, Display.width * 2 + SideMenu.WIDTH, HEIGHT);
+        graphics.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, HEIGHT, Color.WHITE));
+        graphics.fillRect(0, 0, Display.WIDTH * 2 + SideMenu.WIDTH, HEIGHT);
 
-        g2d.setColor(new Color(32, 64, 128, 128));
-        g2d.fill(clear);
-        g2d.fill(resize);
-        g2d.fill(view);
-        g2d.fill(help);
+        graphics.setColor(new Color(32, 64, 128, 128));
+        graphics.fill(clearRect);
+        graphics.fill(resizeRect);
+        graphics.fill(viewRect);
+        graphics.fill(helpRect);
         if (Game.paused) {
-            g2d.setColor(new Color(255, 64, 128, 128));
+            graphics.setColor(new Color(255, 64, 128, 128));
         }
-        g2d.fill(pause);
+        graphics.fill(pauseRect);
         makeButtons();
         drawButtons();
-        g2d.setColor(Color.WHITE);
+        graphics.setColor(Color.WHITE);
         int b_txt_center = b_y + b_h / 2 + 5;
-        g2d.drawString("NEW", clear.x + 5, b_txt_center);
-        g2d.drawString("SIZE", resize.x + 5, b_txt_center);
-        g2d.fillRect(pause.x + 12, pause.y + 5, 5, pause.height - 9);
-        g2d.fillRect(pause.x + 22, pause.y + 5, 5, pause.height - 9);
-        g2d.drawString("VIEW", view.x + 5, b_txt_center);
-        g2d.drawString("KEYS", help.x + 5, b_txt_center);
+        graphics.drawString("NEW", clearRect.x + 5, b_txt_center);
+        graphics.drawString("SIZE", resizeRect.x + 5, b_txt_center);
+        graphics.fillRect(pauseRect.x + 12, pauseRect.y + 5, 5, pauseRect.height - 9);
+        graphics.fillRect(pauseRect.x + 22, pauseRect.y + 5, 5, pauseRect.height - 9);
+        graphics.drawString("VIEW", viewRect.x + 5, b_txt_center);
+        graphics.drawString("KEYS", helpRect.x + 5, b_txt_center);
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -76,17 +76,17 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 
     public void mousePressed(MouseEvent e) {
         mouse = e.getPoint();
-        if (clear.contains(mouse)) {
+        if (clearRect.contains(mouse)) {
             Game.paused = true;
             Grid.newGame();
         }
-        if (resize.contains(mouse)) {
+        if (resizeRect.contains(mouse)) {
             Display.toggle_size();
         }
-        if (pause.contains(mouse)) {
+        if (pauseRect.contains(mouse)) {
             Display.togglePause();
         }
-        if (view.contains(mouse)) {
+        if (viewRect.contains(mouse)) {
             if (Display.view == 0) {
                 Display.setView(1);
             } else {
@@ -96,14 +96,14 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         for (Button b : buttons) {
             if (b.contains(mouse)) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    Display.left = b.getItem();
+                    Display.leftClickType = b.getItem();
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    Display.right = b.getItem();
+                    Display.rightClickType = b.getItem();
                 }
             }
         }
-        if (help.contains(mouse)) {
+        if (helpRect.contains(mouse)) {
             Display.help = !Display.help;
         }
     }
@@ -111,7 +111,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public void makeButtons() {
         buttons.clear();
         int i = 0;
-        for (Item e : SideMenu.selected) {
+        for (Item e : SideMenu.selectedCategory) {
             int x = MainWindow.mouse.x;
             if (x > MainWindow.window.getWidth() / 2) {
                 x = MainWindow.window.getWidth() / 2;
@@ -131,23 +131,23 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             if (b.getItem() instanceof Wall) {
                 c = b.getItem().getColor();
             }
-            g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
-            g2d.setPaintMode();
-            g2d.fill(b);
+            graphics.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
+            graphics.setPaintMode();
+            graphics.fill(b);
             if (b.contains(mouse)) {
-                g2d.setColor(new Color(255, 0, 0, 128));
-                g2d.drawRect(b.x, b.y, b.width, b.height);
+                graphics.setColor(new Color(255, 0, 0, 128));
+                graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == Display.left) {
-                g2d.setColor(new Color(255, 0, 0));
-                g2d.drawRect(b.x, b.y, b.width, b.height);
+            if (b.getItem() == Display.leftClickType) {
+                graphics.setColor(new Color(255, 0, 0));
+                graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == Display.right) {
-                g2d.setColor(new Color(0, 0, 255));
-                g2d.drawRect(b.x, b.y, b.width, b.height);
+            if (b.getItem() == Display.rightClickType) {
+                graphics.setColor(new Color(0, 0, 255));
+                graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(b.getItem().getName(), b.x + 2, b.y + b_h / 2 + 5);
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(b.getItem().getName(), b.x + 2, b.y + b_h / 2 + 5);
         }
     }
 

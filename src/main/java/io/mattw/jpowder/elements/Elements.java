@@ -43,12 +43,12 @@ public class Elements {
     public static final Element gas, warp, fire, plsm, stm;
     public static final Random random = new Random();
 
-    static final ElementMovement em_phot = p -> {
+    public static final ElementMovement em_phot = p -> {
         int ny = p.getY() + (int) p.getVy();
         int nx = p.getX() + (int) p.getVx();
         p.tryMove(nx, ny);
     };
-    static final ElementMovement em_radioactive = new ElementMovement() {
+    public static final ElementMovement em_radioactive = new ElementMovement() {
         public Particle collide;
 
         public void move(Particle p) {
@@ -73,24 +73,24 @@ public class Elements {
                     (collide.getEl() != Elements.radp || collide.getEl() != Elements.phot);
         }
     };
-    static final ElementMovement em_powder = p -> {
+    public static final ElementMovement em_powder = p -> {
         int y = p.getY() + 1;
         p.tryMove(p.getX(), y);
         int x = p.getX() + (random.nextBoolean() ? -1 : 1);
         p.tryMove(x, y);
     };
-    static final ElementMovement em_gas = p -> {
+    public static final ElementMovement em_gas = p -> {
         int ny = p.getY() + (random.nextInt(3) - 1) + (int) p.getVy();
         int nx = p.getX() + (random.nextInt(3) - 1) + (int) p.getVx();
         p.tryMove(nx, ny);
     };
-    static final ElementMovement em_liquid = p -> {
+    public static final ElementMovement em_liquid = p -> {
         int nx = p.getX() + random.nextInt(5) - 2;
         p.tryMove(nx, p.getY());
         int ny = p.getY() + random.nextInt(2);
         p.tryMove(nx, ny);
     };
-    static final ParticleBehaviour pb_phot = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_phot = new ParticleBehaviour() {
         public void init(Particle p) {
             while (p.getVx() == 0 && p.getVy() == 0) {
                 p.setVx(3 * (random.nextInt(3) - 1));
@@ -101,7 +101,7 @@ public class Elements {
         public void update(Particle p) {
         }
     };
-    static final ParticleBehaviour pb_fire = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_fire = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(p.getLife() + random.nextInt(50));
             p.setCelcius(p.getCelcius() + random.nextInt(20));
@@ -121,7 +121,7 @@ public class Elements {
             p.setDeco(new Color((int) p.getLife(), random.nextInt(20), random.nextInt(20)));
         }
     };
-    static final ParticleBehaviour pb_plut = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_plut = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(random.nextInt(400) + 100);
         }
@@ -134,7 +134,7 @@ public class Elements {
             p.setCelcius(p.getCelcius() + 4500); // Decay should result in a lot of heat + pressure (when added)
         }
     };
-    static final ParticleBehaviour pb_radio = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_radio = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(random.nextInt(50) + 1);
             p.setCelcius(982);
@@ -150,7 +150,7 @@ public class Elements {
             }
         }
     };
-    static final ParticleBehaviour pb_sprk = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_sprk = new ParticleBehaviour() {
         public void init(Particle p) {
         }
 
@@ -182,7 +182,7 @@ public class Elements {
             }
         }
     };
-    static final ParticleBehaviour pb_plsm = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_plsm = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(p.getLife() + random.nextInt(50));
             p.setCelcius(p.getCelcius() + random.nextInt(20));
@@ -200,7 +200,7 @@ public class Elements {
             }
         }
     };
-    static final ParticleBehaviour pb_clne = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_clne = new ParticleBehaviour() {
         public void init(Particle p) {
             // Needs to be set ctype on click
             p.setCtype(none.getId());
@@ -229,7 +229,7 @@ public class Elements {
 
         }
     };
-    static final ParticleBehaviour pb_lava = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_lava = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setCtype(stne.getId());
         }
@@ -237,7 +237,7 @@ public class Elements {
         public void update(Particle p) {
         }
     };
-    static final ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_qrtz = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setTmp(random.nextInt(10));
             p.setDeco(new Color(120, 226, 150 + (int) (105 * (p.getTmp() / 10.0))));
@@ -249,7 +249,7 @@ public class Elements {
             }
         }
     };
-    static final ParticleBehaviour pb_fill = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_fill = new ParticleBehaviour() {
         public void init(Particle p) {
         }
 
@@ -269,7 +269,7 @@ public class Elements {
             }
         }
     };
-    static final ParticleBehaviour pb_ant = new ParticleBehaviour() {
+    public static final ParticleBehaviour pb_ant = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(180);
             p.setTmp(1); // tmp 0 = dead, 1 = right, 2 = left
