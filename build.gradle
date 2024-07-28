@@ -31,11 +31,11 @@ jar {
     }
 }
 
-def buildTime() {
+static def buildTime() {
     return new Date().format('yyyyMMdd.HHmmss')
 }
 
-task packageJar(type: Copy) {
+tasks.register('packageJar', Copy) {
     delete layout.buildDirectory.dir('package')
     dependsOn('shadowJar')
 
@@ -48,7 +48,7 @@ task packageJar(type: Copy) {
     from layout.buildDirectory.file('libs/jpowder-game-all.jar')
     into layout.buildDirectory.dir('package')
 
-    def version = buildTime();
+    def version = buildTime()
     from layout.buildDirectory.file('package/jpowder-game-all.jar')
     rename { String fileName -> fileName.replace('all', version) }
 }

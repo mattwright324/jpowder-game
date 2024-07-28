@@ -15,13 +15,13 @@ TODO:
 * Gravity
 * Improved liquid movement
 
-Control | Action
- ------- | ------
- T | Toggle drawing shape as Circle or Square.
- F | Update by a single frame.
- H | Toggle HUD
- S | Toggle window size.
- SPACE | Pause & Play
- [ ] | Change drawing size +- 1
- 1 to 4 | View type: Default, Temp, Life Gradient, Fancy
+| Control | Action                                         |
+|---------|------------------------------------------------|
+| T       | Toggle drawing shape as Circle or Square.      |
+| F       | Update by a single frame.                      |
+| H       | Toggle HUD                                     |
+| S       | Toggle window size.                            |
+| SPACE   | Pause & Play                                   |
+| [ ]     | Change drawing size +- 1                       |
+| 1 to 4  | View type: Default, Temp, Life Gradient, Fancy |
  

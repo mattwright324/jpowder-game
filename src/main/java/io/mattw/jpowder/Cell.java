@@ -160,8 +160,8 @@ public class Cell {
                     }
                 }
             }
-            if (nulls > 0)
-                Arrays.copyOf(stack, stack.length - nulls);
+            // if (nulls > 0)
+            //     Arrays.copyOf(stack, stack.length - nulls);
         }
     }
 }

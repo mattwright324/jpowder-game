@@ -197,16 +197,14 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     public void draw_cell(Cell c) {
         Particle p;
         if (!c.empty() && (p = Grid.getStackTop(c.x, c.y)) != null && p.display()) {
-            if (p != null) {
-                size += c.count();
-                Color col = p.getColor();
-                b2d.setColor(col);
-                b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
-                if (view == 3 && p.el.glow) { // "Fancy" Display; not great on fps
-                    b2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
-                    int s = scale; // Small flicker
-                    b2d.fillRect(c.screen_x() - s, c.screen_y() - s, scale + s * 2, scale + s * 2);
-                }
+            size += c.count();
+            Color col = p.getColor();
+            b2d.setColor(col);
+            b2d.fillRect(c.screen_x(), c.screen_y(), scale, scale);
+            if (view == 3 && p.el.glow) { // "Fancy" Display; not great on fps
+                b2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
+                int s = scale; // Small flicker
+                b2d.fillRect(c.screen_x() - s, c.screen_y() - s, scale + s * 2, scale + s * 2);
             }
         }
         nsize += c.null_count();
@@ -226,7 +224,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             for (int y = start.y; y <= end.y; y++) {
                 if (mouse_square) placeAt(e, x, y);
                 else {
-                    if (Math.sqrt(Math.pow(x - pt.x, 2) + Math.pow(y - pt.y, 2)) <= size / 2) {
+                    if (Math.sqrt(Math.pow(x - pt.x, 2) + Math.pow(y - pt.y, 2)) <= (double) size / 2) {
                         placeAt(e, x, y);
                     }
                 }

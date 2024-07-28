@@ -21,7 +21,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public int b_txt = b_h / 2;
     public int b_txtn = b_h / 2 + 15;
     public Rectangle sl = new Rectangle(5, 5, b_w, b_h);
-    public Rectangle ll = new Rectangle(5, 5 + (b_h + 5) * 1, b_w, b_h);
+    public Rectangle ll = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
     public Rectangle gl = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
     public Rectangle pl = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
     public Rectangle ral = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);

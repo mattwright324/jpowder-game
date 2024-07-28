@@ -20,7 +20,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public int b_y = height - b_h - 5;
     public int b_txt_center = b_y + b_h / 2 + 5;
     public Rectangle clear = new Rectangle(5, b_y, b_w, b_h);
-    public Rectangle resize = new Rectangle(5 + (b_w + 5) * 1, b_y, b_w, b_h);
+    public Rectangle resize = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
     public Rectangle pause = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
     public Rectangle view = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
     public Rectangle help = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
@@ -112,7 +112,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         for (Button b : buttons) {
             Color c = Color.GRAY;
             if (b.item instanceof Element) c = ((Element) b.item).getColor();
-            if (b.item instanceof Wall) c = ((Wall) b.item).color;
+            if (b.item instanceof Wall) c = b.item.color;
             g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
             g2d.setPaintMode();
             g2d.fill(b);

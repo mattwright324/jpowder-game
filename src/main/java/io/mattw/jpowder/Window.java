@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Window extends JFrame {
 
-    public static BufferedImage heatColorStrip, iconImg;
+    public static BufferedImage heatColorStrip;
     public static Window window = new Window();
     public static Point mouse = new Point(0, 0);
     static Display game;
@@ -20,6 +20,12 @@ public class Window extends JFrame {
         setLayout(new BorderLayout());
         setTitle("JPowder");
         setResizable(false);
+
+        try {
+            BufferedImage iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/jpowder.png"));
+            setIconImage(iconImg);
+        } catch (IOException ignored) {
+        }
 
         game = new Display();
         add(game, BorderLayout.CENTER);
@@ -39,14 +45,10 @@ public class Window extends JFrame {
         window.setVisible(true);
         try {
             // Gradle knows best
-            heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/colorstrip.png"));
+            heatColorStrip = ImageIO.read(ClassLoader.getSystemResourceAsStream("io/mattw/jpowder/colorstrip.png"));
         } catch (IOException ignored) {
         }
-        try {
-            iconImg = ImageIO.read(ClassLoader.getSystemResourceAsStream("main/resources/img/powder/jpowder.png"));
-            window.setIconImage(iconImg);
-        } catch (IOException ignored) {
-        }
+        Display.makeLarge();
     }
 
     public static void updateMouseInFrame(Point p, Component c) {
