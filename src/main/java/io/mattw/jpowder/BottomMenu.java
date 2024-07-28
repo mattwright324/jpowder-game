@@ -1,7 +1,8 @@
 package io.mattw.jpowder;
 
-import io.mattw.jpowder.elements.Element;
-import io.mattw.jpowder.walls.Wall;
+import io.mattw.jpowder.items.Element;
+import io.mattw.jpowder.items.Item;
+import io.mattw.jpowder.items.Wall;
 import lombok.Getter;
 import lombok.Setter;
 

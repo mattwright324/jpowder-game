@@ -1,6 +1,7 @@
 package io.mattw.jpowder;
 
-import io.mattw.jpowder.elements.Elements;
+import io.mattw.jpowder.items.Elements;
+import io.mattw.jpowder.items.Item;
 
 import javax.swing.*;
 import java.awt.*;

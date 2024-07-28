@@ -1,4 +1,4 @@
-package io.mattw.jpowder.walls;
+package io.mattw.jpowder.items;
 
 import java.awt.*;
 

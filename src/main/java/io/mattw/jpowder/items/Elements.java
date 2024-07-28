@@ -1,10 +1,6 @@
-package io.mattw.jpowder.elements;
+package io.mattw.jpowder.items;
 
 import io.mattw.jpowder.Grid;
-import io.mattw.jpowder.Item;
-import io.mattw.jpowder.particles.Particle;
-import io.mattw.jpowder.particles.ParticleBehaviour;
-import io.mattw.jpowder.walls.Walls;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

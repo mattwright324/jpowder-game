@@ -1,7 +1,5 @@
-package io.mattw.jpowder.elements;
+package io.mattw.jpowder.items;
 
-import io.mattw.jpowder.Item;
-import io.mattw.jpowder.particles.ParticleBehaviour;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,10 +1,6 @@
 package io.mattw.jpowder;
 
-import io.mattw.jpowder.elements.Element;
-import io.mattw.jpowder.elements.Elements;
-import io.mattw.jpowder.particles.Particle;
-import io.mattw.jpowder.walls.Wall;
-import io.mattw.jpowder.walls.Walls;
+import io.mattw.jpowder.items.*;
 
 import javax.swing.*;
 import java.awt.*;

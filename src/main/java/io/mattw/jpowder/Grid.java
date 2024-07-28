@@ -1,7 +1,7 @@
 package io.mattw.jpowder;
 
-import io.mattw.jpowder.elements.Elements;
-import io.mattw.jpowder.particles.Particle;
+import io.mattw.jpowder.items.Elements;
+import io.mattw.jpowder.items.Particle;
 
 import java.awt.*;
 import java.util.Arrays;

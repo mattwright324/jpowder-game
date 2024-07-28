@@ -1,13 +1,9 @@
-package io.mattw.jpowder.particles;
+package io.mattw.jpowder.items;
 
 import io.mattw.jpowder.Cell;
 import io.mattw.jpowder.Display;
 import io.mattw.jpowder.Grid;
 import io.mattw.jpowder.MainWindow;
-import io.mattw.jpowder.elements.Conversion;
-import io.mattw.jpowder.elements.Element;
-import io.mattw.jpowder.elements.Elements;
-import io.mattw.jpowder.walls.Wall;
 import lombok.Getter;
 import lombok.Setter;
 

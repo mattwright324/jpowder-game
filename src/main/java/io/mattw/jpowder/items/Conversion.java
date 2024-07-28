@@ -1,6 +1,4 @@
-package io.mattw.jpowder.elements;
-
-import io.mattw.jpowder.particles.Particle;
+package io.mattw.jpowder.items;
 
 public class Conversion {
 

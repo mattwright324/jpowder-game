@@ -1,4 +1,4 @@
-package io.mattw.jpowder.particles;
+package io.mattw.jpowder.items;
 
 public abstract class ParticleBehaviour {
     /**
