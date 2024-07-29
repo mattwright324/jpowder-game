@@ -45,7 +45,8 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
             init();
         }
 
-        graphics.setPaint(new GradientPaint(0, 0, Color.BLACK, WIDTH, 0, Color.WHITE));
+        Color bg = new Color(64, 64, 64);
+        graphics.setPaint(new GradientPaint(0, 0, bg, WIDTH, 0, bg));
         graphics.fillRect(0, 0, WIDTH, HEIGHT * 2);
 
         graphics.setColor(new Color(128, 128, 128, 128));

@@ -6,11 +6,14 @@ import io.mattw.jpowder.items.Wall;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
@@ -41,6 +44,13 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 
         graphics.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, HEIGHT, Color.WHITE));
         graphics.fillRect(0, 0, Display.WIDTH * 2 + SideMenu.WIDTH, HEIGHT);
+
+        try {
+            var bgImg = ImageIO.read(Objects.requireNonNull(getClass().getResource("/bottom-bg.png")));
+            graphics.drawImage(bgImg, 0, 0, getWidth(), getHeight(), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         graphics.setColor(new Color(32, 64, 128, 128));
         graphics.fill(clearRect);

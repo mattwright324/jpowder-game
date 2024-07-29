@@ -18,9 +18,9 @@ public class MainWindow extends JFrame {
     public static BufferedImage heatColorStrip;
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
-    static Display game;
-    static SideMenu sideMenu;
-    static BottomMenu bottomMenu;
+    private static Display game;
+    private static SideMenu sideMenu;
+    public static BottomMenu bottomMenu;
 
     public MainWindow() throws Exception {
         logger.trace("MainWindow()");
