@@ -5,12 +5,16 @@ import io.mattw.jpowder.items.Particle;
 import io.mattw.jpowder.items.Wall;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 
 @Getter
 @Setter
 public class Cell {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private int x, y;
     private Particle[] part;
@@ -150,13 +154,14 @@ public class Cell {
     /**
      * Update the entire stack.
      */
-    public void update() {
+    public void update(String updateId) {
         Particle p;
         for (int i = 0; i < stack.length; i++) {
             if ((p = stack[i]) != null) {
                 if (p.isRemove()) {
                     stack[i] = null;
-                } else {
+                } else if (!updateId.equals(p.getLastUpdateId())) {
+                    p.setLastUpdateId(updateId);
                     p.update();
                 }
             }

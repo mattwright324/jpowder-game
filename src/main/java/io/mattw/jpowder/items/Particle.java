@@ -27,14 +27,12 @@ public class Particle {
 
     private int ctype = 0;
     private int tmp = 0;
-    // EW
-    @Setter
     private Color deco;
     private double vx = 0, vy = 0;
     private long life = 0;
     private double celcius = 0.0;
-    @Setter
     private boolean remove = false;
+    private String lastUpdateId;
 
     public Particle(Element e, int x, int y) {
         init(e, x, y);
@@ -46,13 +44,13 @@ public class Particle {
         this.y = y;
         this.life = el.getLife();
         this.celcius = el.getCelcius();
-        //setRemove(el.remove);
+        // setRemove(el.remove);
         deco = null;
         if (el.isSandEffect()) {
             addSandEffect();
         }
-        if (el.behaviour != null) {
-            el.behaviour.init(this);
+        if (el.getBehaviour() != null) {
+            el.getBehaviour().init(this);
         }
     }
 
@@ -134,11 +132,11 @@ public class Particle {
 
     public void update() {
         if (ready()) {
-            if (el.behaviour != null) {
-                el.behaviour.update(this);
+            if (el.getBehaviour() != null) {
+                el.getBehaviour().update(this);
             }
-            if (el.movement != null) {
-                el.movement.move(this);
+            if (el.getMovement() != null) {
+                el.getMovement().move(this);
             }
 
 
@@ -163,7 +161,7 @@ public class Particle {
                 }
             }
 
-            for (Conversion c : el.convs) {
+            for (Conversion c : el.getConvs()) {
                 if (c != null && c.shouldConvert(this)) {
                     c.doConversion(this);
                 }
@@ -176,8 +174,8 @@ public class Particle {
                 if (life - 1 == 0) {
                     switch (el.getLife_decay_mode()) {
                         case (Elements.DECAY_DIE):
-                            if (el.behaviour != null) {
-                                el.behaviour.destruct(this);
+                            if (el.getBehaviour() != null) {
+                                el.getBehaviour().destruct(this);
                             }
                             setRemove(true);
                             break;
@@ -194,8 +192,8 @@ public class Particle {
                 if (tmp - 1 == 0) {
                     switch (el.getTmp_decay_mode()) {
                         case (Elements.DECAY_DIE):
-                            if (el.behaviour != null) {
-                                el.behaviour.destruct(this);
+                            if (el.getBehaviour() != null) {
+                                el.getBehaviour().destruct(this);
                             }
                             setRemove(true);
                             break;

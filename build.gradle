@@ -50,7 +50,7 @@ tasks.register('packageJar', Copy) {
 
     def version = buildTime()
     from layout.buildDirectory.file('package/jpowder-game-all.jar')
-    rename { String fileName -> fileName.replace('all', version) }
+    rename { String fileName -> fileName.replace('game-all', version) }
 }
 
 // Setup application, dependencies

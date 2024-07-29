@@ -26,14 +26,11 @@ public class Element extends Item {
     private boolean tmp_decay = true;
     private int tmp_decay_mode = Elements.DECAY_NONE;
 
-    public Conversion[] convs = new Conversion[0];
+    private Conversion[] convs = new Conversion[0];
 
-    @Setter
-    @Getter
-    public Color color = new Color(180, 180, 30);
-    @Setter
-    public ElementMovement movement;
-    public ParticleBehaviour behaviour;
+    private Color color = new Color(180, 180, 30);
+    private ElementMovement movement;
+    private ParticleBehaviour behaviour;
 
     public Element(int eid, String name) {
         setId(eid);

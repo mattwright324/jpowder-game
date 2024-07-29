@@ -1,5 +1,7 @@
 package io.mattw.jpowder;
 
+import java.util.UUID;
+
 public class Game extends Thread {
 
     public static final int MAX_AIR = 256;
@@ -9,9 +11,10 @@ public class Game extends Thread {
     public static final Counter gameFps = new Counter();
 
     static void update() {
+        String updateId = UUID.randomUUID().toString();
         for (int w = 0; w < Display.WIDTH; w++) {
             for (int h = 0; h < Display.HEIGHT; h++) {
-                Grid.cell(w, h).update();
+                Grid.cell(w, h).update(updateId);
             }
         }
         gameFps.add();
