@@ -484,30 +484,6 @@ public class ElementType {
         return EL_MAP.get(id);
     }
 
-    public static Element get(String name) {
-        name = name.toUpperCase();
-        if (ID_NAME.containsValue(name)) {
-            for (int key : ID_NAME.keySet()) {
-                if (ID_NAME.get(key).equals(name)) {
-                    return EL_MAP.get(key);
-                }
-            }
-        }
-        return EL_MAP.get(0);
-    }
-
-    public static int getID(String name) {
-        name = name.toUpperCase();
-        if (ID_NAME.containsValue(name)) {
-            for (int key : ID_NAME.keySet()) {
-                if (ID_NAME.get(key).equals(name)) {
-                    return key;
-                }
-            }
-        }
-        return 0;
-    }
-
     public static void add(int id, Element e) {
         ID_NAME.put(id, e.getName().toUpperCase());
         EL_MAP.put(id, e);

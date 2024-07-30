@@ -21,16 +21,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private static Graphics2D hud2d;
     private static BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
     private static Graphics2D game2d = img.createGraphics();
-    private static Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-    private static PerSecondCounter drawFps = new PerSecondCounter();
+    private static final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
+    private static final PerSecondCounter drawFps = new PerSecondCounter();
     private static String viewName = "Default";
     private static boolean hud = true;
 
     public static Item leftClickType = ElementType.DUST; // Hacky as fuck.
     public static Item rightClickType = ElementType.NONE;
 
-    private Timer timer = new Timer(5, this);
-    private GameThread game = new GameThread();
+    private final Timer timer = new Timer(5, this);
+    private final GameThread game = new GameThread();
     private int csize = 0;
     private int nsize = 0;
     private int draw_size = 0;
@@ -39,8 +39,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private Point mouseStart = new Point(0, 0);
     private Point mouseStop = new Point(0, 0);
     private boolean mouseSquare = false;
-    private InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-    private ActionMap am = getActionMap();
+    private final InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    private final ActionMap am = getActionMap();
 
     public GamePanel() {
         for (int w = 0; w < GamePanel.WIDTH; w++) {
@@ -279,10 +279,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public Point mouseToCell(Point p) {
         return new Point(p.x / scale, p.y / scale);
-    }
-
-    public Point mouseToBigCell(Point p) {
-        return new Point(p.x / scale / 4, p.y / scale / 4);
     }
 
     public void updateMouse(Point p) {

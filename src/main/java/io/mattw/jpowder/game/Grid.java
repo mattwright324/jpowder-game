@@ -4,9 +4,6 @@ import io.mattw.jpowder.ui.GamePanel;
 
 public class Grid {
 
-    private static final int TEMP = 0;
-    private static final int TYPE = 1;
-    private static final int CTYPE = 2;
     public static final Cell[][] PART_GRID = new Cell[GamePanel.WIDTH][GamePanel.HEIGHT]; // Particle Grid
     public static final BigCell[][] BIG_GRID = new BigCell[GamePanel.WIDTH / 4][GamePanel.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
 
@@ -87,13 +84,6 @@ public class Grid {
         return cell(x, y).getStack()[0];
     }
 
-    public static Particle[] getStack(int x, int y) {
-        if (!validCell(x, y, 0) && cell(x, y).empty()) {
-            return null;
-        }
-        return cell(x, y).getStack();
-    }
-
     public static void remStackTop(int x, int y) {
         if (!validCell(x, y, 0) && cell(x, y).empty()) {
             return;
@@ -118,10 +108,6 @@ public class Grid {
         cell(x, y).add(p);
     }
 
-    public static boolean empty(int x, int y) {
-        return cell(x, y).empty();
-    }
-
     /**
      * Returns particles surrounding a cell.
      */
@@ -136,58 +122,6 @@ public class Grid {
             }
         }
         return tmp;
-    }
-
-    /**
-     * Change values for all particles. Could be used as set command in a console.
-     *
-     * @param method Method 	TYPE, TEMP, CTYPE
-     * @param id     Particle "all"/ID/name
-     * @param val    Value	double/int, "all"/ID/name
-     */
-    public static String set(int method, int id, double val) { // set(TYPE, 12, 14) set(TEMP, 12, 90000) set(CTYPE, 22, 12)
-        if (method == TYPE && !ElementType.exists((int) val)) {
-            return "Element does not exist.";
-        }
-        int changed = 0;
-        if (ElementType.exists(id)) {
-            for (int w = 0; w < GamePanel.WIDTH; w++) {
-                for (int h = 0; h < GamePanel.HEIGHT; h++) {
-                    Cell cell = cell(w, h);
-                    if (!cell.empty()) {
-                        for (int pos = 0; pos < cell.getStack().length; pos++) {
-                            if (cell.getStack()[pos] != null) {
-                                changed++;
-                                switch (method) {
-                                    case (TEMP):
-                                        cell.getStack()[pos].setCelcius(val);
-                                        break;
-                                    case (TYPE):
-                                        if (val == 0) {
-                                            cell.getStack()[pos] = null;
-                                        } else {
-                                            cell.getStack()[pos].morph(ElementType.get(id), Particle.MORPH_FULL, false);
-                                        }
-                                        break;
-                                    case (CTYPE):
-                                        cell.getStack()[pos].setCtype((int) val);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return changed + " altered";
-    }
-
-    public static String set(int m, String name, double val) { // set(TYPE, "watr", 0)
-        return set(m, ElementType.getID(name), val);
-    }
-
-    public static String set(int m, String name, String val) { // set(TYPE, "watr", "none")
-        return set(m, ElementType.getID(name), ElementType.getID(val));
     }
 
 }

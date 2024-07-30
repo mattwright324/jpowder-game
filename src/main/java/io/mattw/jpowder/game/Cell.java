@@ -39,23 +39,6 @@ public class Cell {
 
     // Stacked Particles
 
-    public void cascadeUpdateParticlePositions() {
-        if (this.part == null) {
-            return;
-        }
-        for (int i = 0; i < 9; i++) {
-            if (this.part[i] == null) {
-                continue;
-            }
-            this.part[i].setX(this.x);
-            this.part[i].setY(this.y);
-        }
-    }
-
-    public Wall toWall() {
-        return Grid.bigcell(x / 4, y / 4).getWall();
-    }
-
     public int count() {
         int s = 0;
         for (var particle : stack) {

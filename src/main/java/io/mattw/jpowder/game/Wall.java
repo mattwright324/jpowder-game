@@ -19,9 +19,4 @@ public class Wall extends Item {
         setColor(color);
     }
 
-    public Wall(String name, String desc, Color color) {
-        setName(name);
-        setDescription(desc);
-        setColor(color);
-    }
 }

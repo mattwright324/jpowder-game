@@ -32,23 +32,6 @@ public class Element extends Item {
     private ElementMovement movement;
     private ParticleBehaviour behaviour;
 
-    public Element(int eid, String name) {
-        setId(eid);
-        setName(name);
-    }
-
-    public Element(int eid, String name, Color c) {
-        setId(eid);
-        setName(name);
-        setColor(c);
-    }
-
-    public Element(int eid, String name, String desc) {
-        setId(eid);
-        setName(name);
-        setDescription(desc);
-    }
-
     public Element(int eid, String name, String desc, Color c) {
         setId(eid);
         setName(name);
@@ -72,10 +55,6 @@ public class Element extends Item {
 
     public boolean heavierThan(Element e) {
         return e.weight > weight;
-    }
-
-    public boolean lighterThan(Element e) {
-        return e.weight < weight;
     }
 
     public void setParticleBehaviour(ParticleBehaviour bh) {

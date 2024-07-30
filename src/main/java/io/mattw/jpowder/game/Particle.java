@@ -67,18 +67,6 @@ public class Particle {
         return Math.random() < el.getFlammibility();
     }
 
-    public boolean warmerThan(Particle p) {
-        return celcius > p.celcius;
-    }
-
-    public boolean heavierThan(Element e) {
-        return el.getWeight() > e.getWeight();
-    }
-
-    public boolean heavierThan(Particle p) {
-        return heavierThan(p.el);
-    }
-
     public double temp() {
         return Math.round(celcius * 10000.0) / 10000.0;
     }

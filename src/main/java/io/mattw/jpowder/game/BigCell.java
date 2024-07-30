@@ -4,8 +4,6 @@ import io.mattw.jpowder.ui.GamePanel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.*;
-
 @Getter
 @Setter
 public class BigCell {
@@ -23,18 +21,6 @@ public class BigCell {
     public void reset() {
         wall = null;
         pressure = 0;
-    }
-
-    public Color getColor() {
-        if (wall != null) {
-            return wall.getColor();
-        }
-        int c = (int) (255 * Math.abs(pressure) / GameThread.MAX_AIR);
-        if (pressure < 0) {
-            return new Color(0, 0, c);
-        } else {
-            return new Color(c, 0, 0);
-        }
     }
 
     public int screenX() {

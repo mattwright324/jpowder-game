@@ -51,7 +51,4 @@ public class PerSecondCounter extends Thread {
         avg = 0;
     }
 
-    public double average() {
-        return Math.round(avg * 100.0) / 100.0;
-    }
 }

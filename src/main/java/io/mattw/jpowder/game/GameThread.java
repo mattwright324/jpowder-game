@@ -7,9 +7,6 @@ import java.util.UUID;
 
 public class GameThread extends Thread {
 
-    public static final int MAX_AIR = 256;
-    private static final int MIN_AIR = -256;
-    private static final int MAX_PARTS = GamePanel.WIDTH * GamePanel.HEIGHT;
     public static boolean paused = false;
     public static final PerSecondCounter gameFps = new PerSecondCounter();
 
