@@ -1,16 +1,19 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.game;
+
+import io.mattw.jpowder.PerSecondCounter;
+import io.mattw.jpowder.ui.Display;
 
 import java.util.UUID;
 
-public class Game extends Thread {
+public class GameThread extends Thread {
 
     public static final int MAX_AIR = 256;
     private static final int MIN_AIR = -256;
     private static final int MAX_PARTS = Display.WIDTH * Display.HEIGHT;
     public static boolean paused = false;
-    public static final Counter gameFps = new Counter();
+    public static final PerSecondCounter gameFps = new PerSecondCounter();
 
-    static void update() {
+    public static void update() {
         String updateId = UUID.randomUUID().toString();
         for (int w = 0; w < Display.WIDTH; w++) {
             for (int h = 0; h < Display.HEIGHT; h++) {

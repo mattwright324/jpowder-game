@@ -1,8 +1,10 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.ui;
 
-import io.mattw.jpowder.items.Element;
-import io.mattw.jpowder.items.Item;
-import io.mattw.jpowder.items.Wall;
+import io.mattw.jpowder.game.GameThread;
+import io.mattw.jpowder.game.Grid;
+import io.mattw.jpowder.game.Element;
+import io.mattw.jpowder.game.Item;
+import io.mattw.jpowder.game.Wall;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,7 +59,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         graphics.fill(resizeRect);
         graphics.fill(viewRect);
         graphics.fill(helpRect);
-        if (Game.paused) {
+        if (GameThread.paused) {
             graphics.setColor(new Color(255, 64, 128, 128));
         }
         graphics.fill(pauseRect);
@@ -88,7 +90,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public void mousePressed(MouseEvent e) {
         mouse = e.getPoint();
         if (clearRect.contains(mouse)) {
-            Game.paused = true;
+            GameThread.paused = true;
             Grid.newGame();
         }
         if (resizeRect.contains(mouse)) {

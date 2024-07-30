@@ -1,6 +1,8 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.ui;
 
 import com.formdev.flatlaf.FlatLaf;
+import io.mattw.jpowder.game.GameThread;
+import io.mattw.jpowder.game.Grid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,7 +49,7 @@ public class MainWindow extends JFrame {
         var pauseGame = new JCheckBoxMenuItem("Pause Game");
         pauseGame.addActionListener(e -> {
             Display.togglePause();
-            pauseGame.setSelected(Game.paused);
+            pauseGame.setSelected(GameThread.paused);
         });
 
         var exitButton = new JMenuItem("Exit");

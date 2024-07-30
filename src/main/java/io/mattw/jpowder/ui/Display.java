@@ -1,6 +1,7 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.ui;
 
-import io.mattw.jpowder.items.*;
+import io.mattw.jpowder.*;
+import io.mattw.jpowder.game.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     private static BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
     private static Graphics2D game2d = img.createGraphics();
     private static Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-    private static Counter drawFps = new Counter();
+    private static PerSecondCounter drawFps = new PerSecondCounter();
     private static String viewName = "Default";
     private static boolean hud = true;
 
@@ -30,7 +31,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     private Timer timer = new Timer(5, this);
     private Point mouse = new Point(0, 0);
     private Point mouse_drag = new Point(0, 0);
-    private Game game = new Game();
+    private GameThread game = new GameThread();
     private int csize = 0, nsize = 0;
     private int draw_size = 0;
     private Point mstart = new Point(0, 0), mstop = new Point(0, 0);
@@ -110,7 +111,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     }
 
     public static void togglePause() {
-        Game.paused = !Game.paused;
+        GameThread.paused = !GameThread.paused;
         MainWindow.bottomMenu.repaint();
     }
 
@@ -164,7 +165,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
             hud2d.setFont(typeface);
             int line = 1;
             int spacing = hud2d.getFontMetrics().getHeight();
-            hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + Game.gameFps.fps(), 5, spacing * line++);
+            hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + GameThread.gameFps.fps(), 5, spacing * line++);
             hud2d.drawString("Parts             " + csize, 5, spacing * line++);
             hud2d.drawString("Null Stack-Cells  " + nsize, 5, spacing * line++); // As in nulls within a Cell's stack[]
             hud2d.drawString(leftClickType.getName() + " || " + rightClickType.getName(), 5, spacing * line++);
@@ -175,7 +176,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
                 hud2d.drawString("F        single frame   ", 5, spacing * line++);
                 hud2d.drawString("H        toggle hud     ", 5, spacing * line++);
                 hud2d.drawString("[ ]      mouse size     " + draw_size, 5, spacing * line++);
-                hud2d.drawString("SPACE    toggle pause   " + (Game.paused ? "Paused" : "Playing"), 5, spacing * line++);
+                hud2d.drawString("SPACE    toggle pause   " + (GameThread.paused ? "Paused" : "Playing"), 5, spacing * line++);
                 hud2d.drawString("S        window size    " + (small ? "Default" : "Large"), 5, spacing * line++);
                 hud2d.drawString("1-3      display type   " + viewName, 5, spacing * line);
             }
@@ -357,7 +358,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Display.togglePause();
-                if (Game.paused) {
+                if (GameThread.paused) {
                     for (int w = 0; w < WIDTH; w++) {
                         for (int h = 0; h < HEIGHT; h++) {
                             Grid.cell(w, h).cleanStack();
@@ -373,8 +374,8 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         });
         addKeyBinding(KeyEvent.VK_F, "frame", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Game.paused = true;
-                Game.update();
+                GameThread.paused = true;
+                GameThread.update();
             }
         });
         addKeyBinding(KeyEvent.VK_OPEN_BRACKET, "mouse_small", new AbstractAction() {

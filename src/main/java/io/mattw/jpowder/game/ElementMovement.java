@@ -1,4 +1,4 @@
-package io.mattw.jpowder.items;
+package io.mattw.jpowder.game;
 
 public interface ElementMovement {
     void move(Particle p);

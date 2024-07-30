@@ -1,6 +1,5 @@
-package io.mattw.jpowder.items;
+package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.Grid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

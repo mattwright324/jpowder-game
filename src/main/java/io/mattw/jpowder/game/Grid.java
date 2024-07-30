@@ -1,7 +1,6 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.items.Elements;
-import io.mattw.jpowder.items.Particle;
+import io.mattw.jpowder.ui.Display;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class Grid {
     }
 
     public static void newGame() {
-        Game.paused = true;
+        GameThread.paused = true;
         for (int w = 0; w < Display.WIDTH; w++) {
             for (int h = 0; h < Display.HEIGHT; h++) {
                 cell(w, h).reset();
@@ -58,7 +57,7 @@ public class Grid {
                 bigcell(w, h).reset();
             }
         }
-        Game.paused = false;
+        GameThread.paused = false;
     }
 
     /**

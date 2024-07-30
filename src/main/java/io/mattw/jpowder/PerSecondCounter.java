@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Counter extends Thread {
+public class PerSecondCounter extends Thread {
 
     private double seconds = 0;
     private long total = 0;

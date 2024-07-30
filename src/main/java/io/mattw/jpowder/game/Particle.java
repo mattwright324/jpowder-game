@@ -1,9 +1,7 @@
-package io.mattw.jpowder.items;
+package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.Cell;
-import io.mattw.jpowder.Display;
-import io.mattw.jpowder.Grid;
-import io.mattw.jpowder.MainWindow;
+import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.MainWindow;
 import lombok.Getter;
 import lombok.Setter;
 

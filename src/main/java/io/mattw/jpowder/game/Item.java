@@ -1,4 +1,4 @@
-package io.mattw.jpowder.items;
+package io.mattw.jpowder.game;
 
 import lombok.Getter;
 import lombok.Setter;

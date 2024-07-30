@@ -1,6 +1,6 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.items.Wall;
+import io.mattw.jpowder.ui.Display;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +28,7 @@ public class BigCell {
         if (wall != null) {
             return wall.getColor();
         }
-        int c = (int) (255 * Math.abs(pressure) / Game.MAX_AIR);
+        int c = (int) (255 * Math.abs(pressure) / GameThread.MAX_AIR);
         if (pressure < 0) {
             return new Color(0, 0, c);
         } else {

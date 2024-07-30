@@ -1,8 +1,6 @@
-package io.mattw.jpowder;
+package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.items.Element;
-import io.mattw.jpowder.items.Particle;
-import io.mattw.jpowder.items.Wall;
+import io.mattw.jpowder.ui.Display;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;

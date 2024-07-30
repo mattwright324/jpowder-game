@@ -1,5 +1,7 @@
 package io.mattw.jpowder;
 
+import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
