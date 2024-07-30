@@ -18,7 +18,9 @@ public class Particle {
     public static final int MORPH_KEEP_TEMP = 1;
     public static final int MORPH_EL_ONLY = 2;
 
-    private int x, y, pos = 0;
+    private int x;
+    private int y;
+    private int pos = 0;
     private Element el;
     private long update = 50;
     private long lastUpdate = System.currentTimeMillis();
@@ -26,7 +28,8 @@ public class Particle {
     private int ctype = 0;
     private int tmp = 0;
     private Color deco;
-    private double vx = 0, vy = 0;
+    private double vx = 0;
+    private double vy = 0;
     private long life = 0;
     private double celcius = 0.0;
     private boolean remove = false;

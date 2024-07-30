@@ -10,7 +10,8 @@ import java.awt.*;
 @Setter
 public class BigCell {
 
-    private int x, y;
+    private int x;
+    private int y;
     private Wall wall;
     private double pressure = 0;
 

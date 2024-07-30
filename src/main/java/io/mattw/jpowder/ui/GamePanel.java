@@ -30,12 +30,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public static Item rightClickType = ElementType.NONE;
 
     private Timer timer = new Timer(5, this);
-    private Point mouse = new Point(0, 0);
-    private Point mouse_drag = new Point(0, 0);
     private GameThread game = new GameThread();
-    private int csize = 0, nsize = 0;
+    private int csize = 0;
+    private int nsize = 0;
     private int draw_size = 0;
-    private Point mstart = new Point(0, 0), mstop = new Point(0, 0);
+    private Point mouse = new Point(0, 0);
+    private Point mouseDrag = new Point(0, 0);
+    private Point mouseStart = new Point(0, 0);
+    private Point mouseStop = new Point(0, 0);
     private boolean mouseSquare = false;
     private InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     private ActionMap am = getActionMap();
@@ -136,10 +138,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         }
 
         game2d.setColor(Color.LIGHT_GRAY);
-        int sx = mstart.x * scale;
-        int w = (mstop.x - mstart.x) * scale;
-        int sy = mstart.y * scale;
-        int h = (mstop.y - mstart.y) * scale;
+        int sx = mouseStart.x * scale;
+        int w = (mouseStop.x - mouseStart.x) * scale;
+        int sy = mouseStart.y * scale;
+        int h = (mouseStop.y - mouseStart.y) * scale;
         if (mouseSquare) {
             game2d.drawRect(sx, sy, w, h); // Size
             game2d.setColor(new Color(244, 244, 244, 32));
@@ -285,8 +287,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public void updateMouse(Point p) {
         mouse = p;
-        mstart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
-        mstop = new Point(mstart.x + draw_size, mstart.y + draw_size);
+        mouseStart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
+        mouseStop = new Point(mouseStart.x + draw_size, mouseStart.y + draw_size);
     }
 
     /**
@@ -317,16 +319,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     public void mouseDragged(MouseEvent e) {
-        mouse_drag = mouse;
+        mouseDrag = mouse;
         MainWindow.updateMouseInFrame(e.getPoint(), this);
         updateMouse(mouseToCell(e.getPoint()));
         if (SwingUtilities.isLeftMouseButton(e)) {
-            for (Point p : line(mouse_drag, mouse)) {
+            for (Point p : line(mouseDrag, mouse)) {
                 place(leftClickType, p, draw_size);
             }
         }
         if (SwingUtilities.isRightMouseButton(e)) {
-            for (Point p : line(mouse_drag, mouse)) {
+            for (Point p : line(mouseDrag, mouse)) {
                 place(rightClickType, p, draw_size);
             }
         }
@@ -465,8 +467,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         if (draw_size < 0) {
             draw_size = 0;
         }
-        mstart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
-        mstop = new Point(mstart.x + draw_size, mstart.y + draw_size);
+        mouseStart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
+        mouseStop = new Point(mouseStart.x + draw_size, mouseStart.y + draw_size);
     }
 
     public void actionPerformed(ActionEvent e) {

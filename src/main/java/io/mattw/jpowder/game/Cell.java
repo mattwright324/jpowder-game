@@ -14,7 +14,8 @@ public class Cell {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private int x, y;
+    private int x;
+    private int y;
     private Particle[] part;
     private Particle[] stack = new Particle[0];
 
