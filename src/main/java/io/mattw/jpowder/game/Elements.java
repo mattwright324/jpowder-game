@@ -345,7 +345,7 @@ public class Elements {
         metl.setConducts(true);
 
         qrtz = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
-        qrtz.setTmp_decay(false);
+        qrtz.setTmpDecay(false);
         qrtz.setParticleBehaviour(pb_qrtz);
 
         dmnd = create(7, "DMND", "Diamond", new Color(32, 248, 228), WEIGHT_DMND);
@@ -364,7 +364,7 @@ public class Elements {
 
         sprk = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
         sprk.setParticleBehaviour(pb_sprk);
-        sprk.setLife_decay_mode(DECAY_CTYPE);
+        sprk.setLifeDecayMode(DECAY_CTYPE);
         sprk.setLife(4);
 
         watr = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
@@ -409,20 +409,20 @@ public class Elements {
         warp = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND - 1);
         warp.setMovement(em_gas);
         warp.setLife(500);
-        warp.setLife_decay_mode(DECAY_DIE);
+        warp.setLifeDecayMode(DECAY_DIE);
 
         fire = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
         fire.setMovement(em_gas);
         fire.setParticleBehaviour(pb_fire);
         fire.setCelcius(450);
-        fire.setLife_decay_mode(DECAY_DIE);
+        fire.setLifeDecayMode(DECAY_DIE);
         fire.setLife(120);
         fire.setGlow(true);
 
         plsm = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
         plsm.setParticleBehaviour(pb_plsm);
         plsm.setCelcius(MAX_TEMP);
-        plsm.setLife_decay_mode(DECAY_DIE);
+        plsm.setLifeDecayMode(DECAY_DIE);
         plsm.setLife(120);
         plsm.setGlow(true);
 
@@ -437,13 +437,13 @@ public class Elements {
         ice.setCelcius(-25);
 
         fill = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
-        fill.setTmp_decay(false);
+        fill.setTmpDecay(false);
         fill.setHeatTransfer(0.5);
         fill.setParticleBehaviour(pb_fill);
 
         ant = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
-        ant.setTmp_decay(false);
-        ant.setLife_decay(false);
+        ant.setTmpDecay(false);
+        ant.setLifeDecay(false);
         ant.setParticleBehaviour(pb_ant);
 
         void_ = create(27, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);

@@ -21,10 +21,10 @@ public class Element extends Item {
     private boolean sandEffect = false;
     private boolean glow = false;
     private long life = 0;
-    private boolean life_decay = true;
-    private int life_decay_mode = Elements.DECAY_DIE;
-    private boolean tmp_decay = true;
-    private int tmp_decay_mode = Elements.DECAY_NONE;
+    private boolean lifeDecay = true;
+    private int lifeDecayMode = Elements.DECAY_DIE;
+    private boolean tmpDecay = true;
+    private int tmpDecayMode = Elements.DECAY_NONE;
 
     private Conversion[] convs = new Conversion[0];
 

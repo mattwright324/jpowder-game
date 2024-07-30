@@ -165,12 +165,12 @@ public class Particle {
                 }
             }
 
-            if (el.isLife_decay()) {
+            if (el.isLifeDecay()) {
                 if (life > 0) {
                     life--;
                 }
                 if (life - 1 == 0) {
-                    switch (el.getLife_decay_mode()) {
+                    switch (el.getLifeDecayMode()) {
                         case (Elements.DECAY_DIE):
                             if (el.getBehaviour() != null) {
                                 el.getBehaviour().destruct(this);
@@ -183,12 +183,12 @@ public class Particle {
                     }
                 }
             }
-            if (el.isTmp_decay()) {
+            if (el.isTmpDecay()) {
                 if (tmp > 0) {
                     tmp--;
                 }
                 if (tmp - 1 == 0) {
-                    switch (el.getTmp_decay_mode()) {
+                    switch (el.getTmpDecayMode()) {
                         case (Elements.DECAY_DIE):
                             if (el.getBehaviour() != null) {
                                 el.getBehaviour().destruct(this);
