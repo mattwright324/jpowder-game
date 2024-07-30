@@ -40,7 +40,7 @@ public class Particle {
     }
 
     public void init(Element e, int x, int y) {
-        el = e;
+        this.el = e;
         this.x = x;
         this.y = y;
         this.life = el.getLife();
@@ -83,31 +83,31 @@ public class Particle {
     }
 
     public Color getTempColor() { // Colorized temperature with no affect on performance!
-        int w = MainWindow.heatColorStrip.getWidth();
-        int x = (int) (w * (celcius + Math.abs(ElementType.MIN_TEMP)) / (Math.abs(ElementType.MAX_TEMP) + Math.abs(ElementType.MIN_TEMP)));
+        var w = MainWindow.heatColorStrip.getWidth();
+        var x = (int) (w * (celcius + Math.abs(ElementType.MIN_TEMP)) / (Math.abs(ElementType.MAX_TEMP) + Math.abs(ElementType.MIN_TEMP)));
         if (w <= x) {
             x = w - 1;
         }
         if (x < 0) {
             x = 0;
         }
-        int color = MainWindow.heatColorStrip.getRGB(x, 0);
-        int red = (color & 0x00ff0000) >> 16;
-        int green = (color & 0x0000ff00) >> 8;
-        int blue = color & 0x000000ff;
+        var color = MainWindow.heatColorStrip.getRGB(x, 0);
+        var red = (color & 0x00ff0000) >> 16;
+        var green = (color & 0x0000ff00) >> 8;
+        var blue = color & 0x000000ff;
         return new Color(red, green, blue);
     }
 
     public Color getLifeGradient() {
-        int c = (int) (life % 200 + 55);
+        var c = (int) (life % 200 + 55);
         return new Color(c, c, c);
     }
 
     public void addSandEffect() {
-        Color color = el.getColor();
-        int red = (color.getRed() + (random.nextInt(19) - 10));
-        int green = (color.getGreen() + (random.nextInt(19) - 10));
-        int blue = (color.getBlue() + (random.nextInt(19) - 10));
+        var color = el.getColor();
+        var red = (color.getRed() + (random.nextInt(19) - 10));
+        var green = (color.getGreen() + (random.nextInt(19) - 10));
+        var blue = (color.getBlue() + (random.nextInt(19) - 10));
         setDeco(new Color(Math.abs(red) % 256, Math.abs(green) % 256, Math.abs(blue) % 256, color.getAlpha()));
     }
 
@@ -127,7 +127,6 @@ public class Particle {
             if (el.getMovement() != null) {
                 el.getMovement().move(this);
             }
-
 
             for (int w = -1; w < 2; w++) {
                 for (int h = -1; h < 2; h++) {
@@ -200,24 +199,26 @@ public class Particle {
     }
 
     public void tryMove(int nx, int ny) {
-        if (Grid.validCell(nx, ny, 0)) {
-            Cell cell = Grid.cell(x, y);
-            Cell cell2 = Grid.cell(nx, ny);
-            if (cell2.contains(ElementType.VOID)) {
-                cell.rem(pos);
-                return;
-            }
-            Particle o;
-            if (!(toWall() != null && !toWall().isParts()) && (cell2.addable(this) || cell2.displaceable(this))) {
-                cell.rem(pos);
-                for (int i = 0; i < cell2.getStack().length; i++) {
-                    if ((o = cell2.part(i)) != null) {
-                        cell.add(o);
-                        cell2.rem(i);
-                    }
+        if (!Grid.validCell(nx, ny, 0)) {
+            return;
+        }
+        var cell = Grid.cell(x, y);
+        var cell2 = Grid.cell(nx, ny);
+        if (cell2.contains(ElementType.VOID)) {
+            cell.rem(pos);
+            return;
+        }
+
+        if (!(toWall() != null && !toWall().isParts()) && (cell2.addable(this) || cell2.displaceable(this))) {
+            cell.rem(pos);
+            for (int i = 0; i < cell2.getStack().length; i++) {
+                var part = cell2.part(i);
+                if (part!= null) {
+                    cell.add(part);
+                    cell2.rem(i);
                 }
-                cell2.add(this);
             }
+            cell2.add(this);
         }
     }
 
