@@ -1,6 +1,6 @@
 package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.GamePanel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -29,11 +29,11 @@ public class Cell {
     }
 
     public int screenX() {
-        return x * Display.scale;
+        return x * GamePanel.scale;
     }
 
     public int screenY() {
-        return y * Display.scale;
+        return y * GamePanel.scale;
     }
 
     // Stacked Particles

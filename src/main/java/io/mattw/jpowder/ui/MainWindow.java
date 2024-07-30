@@ -20,7 +20,7 @@ public class MainWindow extends JFrame {
     public static BufferedImage heatColorStrip;
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
-    private static Display game;
+    private static GamePanel game;
     private static SideMenu sideMenu;
     public static BottomMenu bottomMenu;
 
@@ -37,8 +37,8 @@ public class MainWindow extends JFrame {
         setLayout(new BorderLayout());
         setResizable(false);
 
-        var centerX = (Toolkit.getDefaultToolkit().getScreenSize().width - (Display.WIDTH * 2 + SideMenu.WIDTH)) / 2;
-        var centerY = (Toolkit.getDefaultToolkit().getScreenSize().height - (Display.HEIGHT * 2 + BottomMenu.HEIGHT)) / 2;
+        var centerX = (Toolkit.getDefaultToolkit().getScreenSize().width - (GamePanel.WIDTH * 2 + SideMenu.WIDTH)) / 2;
+        var centerY = (Toolkit.getDefaultToolkit().getScreenSize().height - (GamePanel.HEIGHT * 2 + BottomMenu.HEIGHT)) / 2;
         setLocation(centerX, centerY);
 
         FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#0094FF"));
@@ -48,7 +48,7 @@ public class MainWindow extends JFrame {
 
         var pauseGame = new JCheckBoxMenuItem("Pause Game");
         pauseGame.addActionListener(e -> {
-            Display.togglePause();
+            GamePanel.togglePause();
             pauseGame.setSelected(GameThread.paused);
         });
 
@@ -63,16 +63,16 @@ public class MainWindow extends JFrame {
 
         var keybindHelp = new JCheckBoxMenuItem("Show Keybind Help");
         keybindHelp.addActionListener(e -> {
-            Display.help = !Display.help;
-            SwingUtilities.invokeLater(() -> keybindHelp.setSelected(Display.help));
+            GamePanel.help = !GamePanel.help;
+            SwingUtilities.invokeLater(() -> keybindHelp.setSelected(GamePanel.help));
         });
 
         var largeView = new JRadioButtonMenuItem("Large Window (2x)");
         largeView.setSelected(true);
-        largeView.addActionListener(e -> Display.makeLarge());
+        largeView.addActionListener(e -> GamePanel.makeLarge());
 
         var smallView = new JRadioButtonMenuItem("Small Window (1x)");
-        smallView.addActionListener(e -> Display.makeSmall());
+        smallView.addActionListener(e -> GamePanel.makeSmall());
 
         var group1 = new ButtonGroup();
         group1.add(largeView);
@@ -80,16 +80,16 @@ public class MainWindow extends JFrame {
 
         var defaultView = new JRadioButtonMenuItem("Default View");
         defaultView.setSelected(true);
-        defaultView.addActionListener(e -> Display.setView(0));
+        defaultView.addActionListener(e -> GamePanel.setView(0));
 
         var tempView = new JRadioButtonMenuItem("Temp View");
-        tempView.addActionListener(e -> Display.setView(1));
+        tempView.addActionListener(e -> GamePanel.setView(1));
 
         var lifeGradientView = new JRadioButtonMenuItem("Life Gradient View");
-        lifeGradientView.addActionListener(e -> Display.setView(2));
+        lifeGradientView.addActionListener(e -> GamePanel.setView(2));
 
         var fancyView = new JRadioButtonMenuItem("Fancy View");
-        fancyView.addActionListener(e -> Display.setView(3));
+        fancyView.addActionListener(e -> GamePanel.setView(3));
 
         var group2 = new ButtonGroup();
         group2.add(defaultView);
@@ -113,7 +113,7 @@ public class MainWindow extends JFrame {
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
 
-        game = new Display();
+        game = new GamePanel();
         add(game, BorderLayout.CENTER);
 
         sideMenu = new SideMenu();
@@ -135,7 +135,7 @@ public class MainWindow extends JFrame {
     }
 
     public void resize() {
-        getContentPane().setPreferredSize(new Dimension(Display.WIDTH * Display.scale + SideMenu.WIDTH, Display.HEIGHT * Display.scale + BottomMenu.HEIGHT));
+        getContentPane().setPreferredSize(new Dimension(GamePanel.WIDTH * GamePanel.scale + SideMenu.WIDTH, GamePanel.HEIGHT * GamePanel.scale + BottomMenu.HEIGHT));
         pack();
     }
 

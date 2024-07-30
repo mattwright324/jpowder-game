@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
-public class Display extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     public final static int WIDTH = 612; // 612
     public final static int HEIGHT = 384; // 384
@@ -39,14 +39,14 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     private InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     private ActionMap am = getActionMap();
 
-    public Display() {
-        for (int w = 0; w < Display.WIDTH; w++) {
-            for (int h = 0; h < Display.HEIGHT; h++) {
+    public GamePanel() {
+        for (int w = 0; w < GamePanel.WIDTH; w++) {
+            for (int h = 0; h < GamePanel.HEIGHT; h++) {
                 Grid.PART_GRID[w][h] = new Cell(w, h);
             }
         }
-        for (int w = 0; w < Display.WIDTH / 4; w++) {
-            for (int h = 0; h < Display.HEIGHT / 4; h++) {
+        for (int w = 0; w < GamePanel.WIDTH / 4; w++) {
+            for (int h = 0; h < GamePanel.HEIGHT / 4; h++) {
                 Grid.BIG_GRID[w][h] = new BigCell(w, h);
             }
         }
@@ -357,7 +357,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
     public void setKeyBindings() {
         addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Display.togglePause();
+                GamePanel.togglePause();
                 if (GameThread.paused) {
                     for (int w = 0; w < WIDTH; w++) {
                         for (int h = 0; h < HEIGHT; h++) {
@@ -369,7 +369,7 @@ public class Display extends JPanel implements ActionListener, KeyListener, Mous
         });
         addKeyBinding(KeyEvent.VK_S, "resize", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Display.toggle_size();
+                GamePanel.toggle_size();
             }
         });
         addKeyBinding(KeyEvent.VK_F, "frame", new AbstractAction() {

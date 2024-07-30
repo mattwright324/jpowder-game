@@ -1,6 +1,6 @@
 package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.GamePanel;
 import io.mattw.jpowder.ui.MainWindow;
 import lombok.Getter;
 import lombok.Setter;
@@ -81,7 +81,7 @@ public class Particle {
     }
 
     public Color getColor() { // EW
-        switch (Display.view) {
+        switch (GamePanel.view) {
             case (1):
                 return getTempColor();
             case (2):

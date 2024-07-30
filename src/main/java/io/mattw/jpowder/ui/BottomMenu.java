@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    public static final int WIDTH = Display.WIDTH + SideMenu.WIDTH;
+    public static final int WIDTH = GamePanel.WIDTH + SideMenu.WIDTH;
     public static final int HEIGHT = 50;
 
     private Graphics2D graphics;
@@ -45,7 +45,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         graphics = (Graphics2D) g;
 
         graphics.setPaint(new GradientPaint(0, 0, Color.BLACK, 0, HEIGHT, Color.WHITE));
-        graphics.fillRect(0, 0, Display.WIDTH * 2 + SideMenu.WIDTH, HEIGHT);
+        graphics.fillRect(0, 0, GamePanel.WIDTH * 2 + SideMenu.WIDTH, HEIGHT);
 
         try {
             var bgImg = ImageIO.read(Objects.requireNonNull(getClass().getResource("/bottom-bg.png")));
@@ -94,30 +94,30 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             Grid.newGame();
         }
         if (resizeRect.contains(mouse)) {
-            Display.toggle_size();
+            GamePanel.toggle_size();
         }
         if (pauseRect.contains(mouse)) {
-            Display.togglePause();
+            GamePanel.togglePause();
         }
         if (viewRect.contains(mouse)) {
-            if (Display.view == 0) {
-                Display.setView(1);
+            if (GamePanel.view == 0) {
+                GamePanel.setView(1);
             } else {
-                Display.setView(0);
+                GamePanel.setView(0);
             }
         }
         for (Button b : buttons) {
             if (b.contains(mouse)) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    Display.leftClickType = b.getItem();
+                    GamePanel.leftClickType = b.getItem();
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    Display.rightClickType = b.getItem();
+                    GamePanel.rightClickType = b.getItem();
                 }
             }
         }
         if (helpRect.contains(mouse)) {
-            Display.help = !Display.help;
+            GamePanel.help = !GamePanel.help;
         }
     }
 
@@ -151,11 +151,11 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
                 graphics.setColor(new Color(255, 0, 0, 128));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == Display.leftClickType) {
+            if (b.getItem() == GamePanel.leftClickType) {
                 graphics.setColor(new Color(255, 0, 0));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == Display.rightClickType) {
+            if (b.getItem() == GamePanel.rightClickType) {
                 graphics.setColor(new Color(0, 0, 255));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }

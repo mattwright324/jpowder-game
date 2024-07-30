@@ -1,6 +1,6 @@
 package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.GamePanel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,10 +37,10 @@ public class BigCell {
     }
 
     public int screenX() {
-        return x * Display.scale * 4;
+        return x * GamePanel.scale * 4;
     }
 
     public int screenY() {
-        return y * Display.scale * 4;
+        return y * GamePanel.scale * 4;
     }
 }

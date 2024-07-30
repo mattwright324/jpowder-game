@@ -1,6 +1,6 @@
 package io.mattw.jpowder;
 
-import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.GamePanel;
 import io.mattw.jpowder.ui.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +25,7 @@ public class Application {
             final var window = new MainWindow();
             window.setVisible(true);
 
-            Display.makeLarge();
+            GamePanel.makeLarge();
         } catch (Exception e) {
             logger.error(e);
         }

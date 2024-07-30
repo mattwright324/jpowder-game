@@ -1,6 +1,6 @@
 package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.ui.Display;
+import io.mattw.jpowder.ui.GamePanel;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -10,15 +10,15 @@ public class Grid {
     private static final int TEMP = 0;
     private static final int TYPE = 1;
     private static final int CTYPE = 2;
-    public static final Cell[][] PART_GRID = new Cell[Display.WIDTH][Display.HEIGHT]; // Particle Grid
-    public static final BigCell[][] BIG_GRID = new BigCell[Display.WIDTH / 4][Display.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
+    public static final Cell[][] PART_GRID = new Cell[GamePanel.WIDTH][GamePanel.HEIGHT]; // Particle Grid
+    public static final BigCell[][] BIG_GRID = new BigCell[GamePanel.WIDTH / 4][GamePanel.HEIGHT / 4]; // Air Grid (Walls, Gravity .. )
 
     public static Cell cell(int x, int y) {
-        if (x > Display.WIDTH - 1) {
-            x = Display.WIDTH - 1;
+        if (x > GamePanel.WIDTH - 1) {
+            x = GamePanel.WIDTH - 1;
         }
-        if (y > Display.HEIGHT - 1) {
-            y = Display.HEIGHT - 1;
+        if (y > GamePanel.HEIGHT - 1) {
+            y = GamePanel.HEIGHT - 1;
         }
         if (x < 0) {
             x = 0;
@@ -30,11 +30,11 @@ public class Grid {
     }
 
     public static BigCell bigcell(int x, int y) {
-        if (x > Display.WIDTH / 4) {
-            x = Display.WIDTH / 4;
+        if (x > GamePanel.WIDTH / 4) {
+            x = GamePanel.WIDTH / 4;
         }
-        if (y > Display.HEIGHT / 4) {
-            y = Display.HEIGHT / 4;
+        if (y > GamePanel.HEIGHT / 4) {
+            y = GamePanel.HEIGHT / 4;
         }
         if (x < 0) {
             x = 0;
@@ -47,13 +47,13 @@ public class Grid {
 
     public static void newGame() {
         GameThread.paused = true;
-        for (int w = 0; w < Display.WIDTH; w++) {
-            for (int h = 0; h < Display.HEIGHT; h++) {
+        for (int w = 0; w < GamePanel.WIDTH; w++) {
+            for (int h = 0; h < GamePanel.HEIGHT; h++) {
                 cell(w, h).reset();
             }
         }
-        for (int w = 0; w < Display.WIDTH / 4; w++) {
-            for (int h = 0; h < Display.HEIGHT / 4; h++) {
+        for (int w = 0; w < GamePanel.WIDTH / 4; w++) {
+            for (int h = 0; h < GamePanel.HEIGHT / 4; h++) {
                 bigcell(w, h).reset();
             }
         }
@@ -65,11 +65,11 @@ public class Grid {
      * offset=4 for one-layer wall to surround remaining cells
      */
     public static boolean validCell(int x, int y, int offset) {
-        return !(x < offset || y < offset || x >= Display.WIDTH - offset || y >= Display.HEIGHT - offset);
+        return !(x < offset || y < offset || x >= GamePanel.WIDTH - offset || y >= GamePanel.HEIGHT - offset);
     }
 
     public static boolean validBigCell(int x, int y, int offset) { // Air Grid
-        return !(x < offset || y < offset || x >= Display.WIDTH / 4 - offset || y >= Display.HEIGHT / 4 - offset);
+        return !(x < offset || y < offset || x >= GamePanel.WIDTH / 4 - offset || y >= GamePanel.HEIGHT / 4 - offset);
     }
 
     /**
@@ -154,8 +154,8 @@ public class Grid {
         }
         int changed = 0;
         if (Elements.exists(id)) {
-            for (int w = 0; w < Display.WIDTH; w++) {
-                for (int h = 0; h < Display.HEIGHT; h++) {
+            for (int w = 0; w < GamePanel.WIDTH; w++) {
+                for (int h = 0; h < GamePanel.HEIGHT; h++) {
                     Cell cell = cell(w, h);
                     if (!cell.empty()) {
                         for (int pos = 0; pos < cell.getStack().length; pos++) {

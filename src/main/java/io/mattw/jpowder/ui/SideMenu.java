@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
     public static final int WIDTH = 60;
-    public static final int HEIGHT = Display.HEIGHT;
+    public static final int HEIGHT = GamePanel.HEIGHT;
     public static Item[] selectedCategory = Elements.solid;
 
     private BufferedImage img;
@@ -40,7 +40,6 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
         if (init) {
             init();
         }
@@ -81,7 +80,8 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         graphics.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line);
 
         graphics.setPaintMode();
-        g2d.drawImage(img, null, 0, 0);
+
+        ((Graphics2D) g).drawImage(img, null, 0, 0);
     }
 
     public void actionPerformed(ActionEvent e) {
