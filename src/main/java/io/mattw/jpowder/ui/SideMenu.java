@@ -1,6 +1,6 @@
 package io.mattw.jpowder.ui;
 
-import io.mattw.jpowder.game.Elements;
+import io.mattw.jpowder.game.ElementType;
 import io.mattw.jpowder.game.Item;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
 
     public static final int WIDTH = 60;
     public static final int HEIGHT = GamePanel.HEIGHT;
-    public static Item[] selectedCategory = Elements.solid;
+    public static Item[] selectedCategory = ElementType.solid;
 
     private BufferedImage img;
     private Graphics2D graphics;
@@ -62,22 +62,22 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         int b_txt = b_h / 2;
         graphics.drawString("Solid", 10, b_txt + (b_h + 5) * line);
         int b_txtn = b_h / 2 + 15;
-        graphics.drawString(Elements.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(ElementType.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         graphics.drawString("Liquid", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(Elements.liquid.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(ElementType.liquid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         graphics.drawString("Gass", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(Elements.gasses.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(ElementType.gasses.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         graphics.drawString("Powder", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(Elements.powder.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(ElementType.powder.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         graphics.drawString("Radio", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(Elements.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
+        graphics.drawString(ElementType.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
 
         graphics.drawString("Tools", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(Elements.tools.length + "", 10, b_txtn + (b_h + 5) * line);
+        graphics.drawString(ElementType.tools.length + "", 10, b_txtn + (b_h + 5) * line);
 
         graphics.setPaintMode();
 
@@ -103,22 +103,22 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         if (solidRect.contains(p)) {
-            selectedCategory = Elements.solid;
+            selectedCategory = ElementType.solid;
         }
         if (liquidRect.contains(p)) {
-            selectedCategory = Elements.liquid;
+            selectedCategory = ElementType.liquid;
         }
         if (gassesRect.contains(p)) {
-            selectedCategory = Elements.gasses;
+            selectedCategory = ElementType.gasses;
         }
         if (powderRect.contains(p)) {
-            selectedCategory = Elements.powder;
+            selectedCategory = ElementType.powder;
         }
         if (radioRect.contains(p)) {
-            selectedCategory = Elements.radio;
+            selectedCategory = ElementType.radio;
         }
         if (toolsRect.contains(p)) {
-            selectedCategory = Elements.tools;
+            selectedCategory = ElementType.tools;
         }
         MainWindow.bottomMenu.repaint();
     }

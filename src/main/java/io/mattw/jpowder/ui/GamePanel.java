@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -25,8 +26,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private static String viewName = "Default";
     private static boolean hud = true;
 
-    public static Item leftClickType = Elements.dust; // Hacky as fuck.
-    public static Item rightClickType = Elements.none;
+    public static Item leftClickType = ElementType.DUST; // Hacky as fuck.
+    public static Item rightClickType = ElementType.NONE;
 
     private Timer timer = new Timer(5, this);
     private Point mouse = new Point(0, 0);
@@ -187,8 +188,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             if ((particle = Grid.getStackTop(mouse.x, mouse.y)) != null) {
                 if (particle.getEl() != null) {
                     info = particle.getEl().getName();
-                    if (!(particle.getCtype() == 0) && Elements.exists(particle.getCtype())) {
-                        info += "(" + Elements.get(particle.getCtype()) + ")";
+                    if (!(particle.getCtype() == 0) && ElementType.exists(particle.getCtype())) {
+                        info += "(" + ElementType.get(particle.getCtype()) + ")";
                     }
                     info += ", Temp:" + particle.temp();
                     info += ", Life:" + particle.getLife();
@@ -211,8 +212,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             game2d.fillRect(cell.screenX(), cell.screenY(), scale, scale);
             if (view == 3 && particle.getEl().isGlow()) { // "Fancy" Display; not great on fps
                 game2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
-                int s = scale; // Small flicker
-                game2d.fillRect(cell.screenX() - s, cell.screenY() - s, scale + s * 2, scale + s * 2);
+                game2d.fillRect(cell.screenX() - scale, cell.screenY() - scale, scale + scale * 2, scale + scale * 2);
             }
         }
         nsize += cell.nullCount();
@@ -250,14 +250,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             Element el = (Element) element;
             Cell cell = Grid.cell(x, y);
             Particle particle = Grid.getStackTop(x, y);
-            if (el == Elements.none) {
+            if (el == ElementType.NONE) {
                 Grid.remStackTop(x, y);
-            } else if (element == Elements.sprk) {
+            } else if (element == ElementType.SPRK) {
                 if (particle != null && particle.getEl().isConducts()) {
                     particle.setCtype(particle.getEl().getId());
-                    particle.morph(Elements.sprk, Particle.MORPH_KEEP_TEMP, true);
+                    particle.morph(ElementType.SPRK, Particle.MORPH_KEEP_TEMP, true);
                 }
-            } else if (particle != null && el != Elements.clne && particle.getEl() == Elements.clne) {
+            } else if (particle != null && el != ElementType.CLNE && particle.getEl() == ElementType.CLNE) {
                 particle.setCtype(el.getId());
             } else if (cell.addable(el)) {
                 Grid.cell(x, y).add(el);
@@ -267,7 +267,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             Wall wall = (Wall) element;
             BigCell bigCell = Grid.bigcell(x / 4, y / 4);
 
-            if (wall == Walls.none) {
+            if (wall == WallType.NONE) {
                 bigCell.setWall(null);
             } else {
                 bigCell.setWall(wall);
@@ -289,17 +289,44 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         mstop = new Point(mstart.x + draw_size, mstart.y + draw_size);
     }
 
+    /**
+     * Bresenham's Line Algorithm
+     * Used to fill spacing between mouse drags.
+     */
+    public Point[] line(Point a, Point b) {
+        var pts = new Point[0];
+        var dx = Math.abs(b.x - a.x);
+        var dy = Math.abs(b.y - a.y);
+        var sx = a.x < b.x ? 1 : -1;
+        var sy = a.y < b.y ? 1 : -1;
+        var err = dx - dy;
+        while (a.x != b.x || a.y != b.y) {
+            var e2 = 2 * err;
+            if (e2 > -dy) {
+                err = err - dy;
+                a.x = a.x + sx;
+            }
+            if (e2 < dx) {
+                err = err + dx;
+                a.y = a.y + sy;
+            }
+            pts = Arrays.copyOf(pts, pts.length + 1);
+            pts[pts.length - 1] = new Point(a.x, a.y);
+        }
+        return pts;
+    }
+
     public void mouseDragged(MouseEvent e) {
         mouse_drag = mouse;
         MainWindow.updateMouseInFrame(e.getPoint(), this);
         updateMouse(mouseToCell(e.getPoint()));
         if (SwingUtilities.isLeftMouseButton(e)) {
-            for (Point p : Grid.line(mouse_drag, mouse)) {
+            for (Point p : line(mouse_drag, mouse)) {
                 place(leftClickType, p, draw_size);
             }
         }
         if (SwingUtilities.isRightMouseButton(e)) {
-            for (Point p : Grid.line(mouse_drag, mouse)) {
+            for (Point p : line(mouse_drag, mouse)) {
                 place(rightClickType, p, draw_size);
             }
         }

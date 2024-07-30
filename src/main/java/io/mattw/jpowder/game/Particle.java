@@ -93,7 +93,7 @@ public class Particle {
 
     public Color getTempColor() { // Colorized temperature with no affect on performance!
         int w = MainWindow.heatColorStrip.getWidth();
-        int x = (int) (w * (celcius + Math.abs(Elements.MIN_TEMP)) / (Math.abs(Elements.MAX_TEMP) + Math.abs(Elements.MIN_TEMP)));
+        int x = (int) (w * (celcius + Math.abs(ElementType.MIN_TEMP)) / (Math.abs(ElementType.MAX_TEMP) + Math.abs(ElementType.MIN_TEMP)));
         if (w <= x) {
             x = w - 1;
         }
@@ -149,11 +149,11 @@ public class Particle {
                         double trans = p.el.getHeatTransfer();
                         p.celcius += (diff * trans);
                         celcius = celcius - (diff * trans);
-                        if (celcius < Elements.MIN_TEMP) {
-                            celcius = Elements.MIN_TEMP;
+                        if (celcius < ElementType.MIN_TEMP) {
+                            celcius = ElementType.MIN_TEMP;
                         }
-                        if (celcius > Elements.MAX_TEMP) {
-                            celcius = Elements.MAX_TEMP;
+                        if (celcius > ElementType.MAX_TEMP) {
+                            celcius = ElementType.MAX_TEMP;
                         }
                     }
                 }
@@ -171,14 +171,14 @@ public class Particle {
                 }
                 if (life - 1 == 0) {
                     switch (el.getLifeDecayMode()) {
-                        case (Elements.DECAY_DIE):
+                        case (ElementType.DECAY_DIE):
                             if (el.getBehaviour() != null) {
                                 el.getBehaviour().destruct(this);
                             }
                             setRemove(true);
                             break;
-                        case (Elements.DECAY_CTYPE):
-                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                        case (ElementType.DECAY_CTYPE):
+                            morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
                             break;
                     }
                 }
@@ -189,14 +189,14 @@ public class Particle {
                 }
                 if (tmp - 1 == 0) {
                     switch (el.getTmpDecayMode()) {
-                        case (Elements.DECAY_DIE):
+                        case (ElementType.DECAY_DIE):
                             if (el.getBehaviour() != null) {
                                 el.getBehaviour().destruct(this);
                             }
                             setRemove(true);
                             break;
-                        case (Elements.DECAY_CTYPE):
-                            morph(Elements.get(ctype), MORPH_KEEP_TEMP, true);
+                        case (ElementType.DECAY_CTYPE):
+                            morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
                             break;
                     }
                 }
@@ -212,7 +212,7 @@ public class Particle {
         if (Grid.validCell(nx, ny, 0)) {
             Cell cell = Grid.cell(x, y);
             Cell cell2 = Grid.cell(nx, ny);
-            if (cell2.contains(Elements.void_)) {
+            if (cell2.contains(ElementType.VOID)) {
                 cell.rem(pos);
                 return;
             }

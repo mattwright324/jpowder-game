@@ -10,8 +10,8 @@ import java.util.Arrays;
 @Setter
 public class Element extends Item {
 
-    private int weight = Elements.WEIGHT_POWDER;
-    private double celcius = Elements.DEFAULT_TEMP;
+    private int weight = ElementType.WEIGHT_POWDER;
+    private double celcius = ElementType.DEFAULT_TEMP;
     private boolean remove = false;
     private double flammibility = 0;
     private boolean conducts = false;
@@ -22,9 +22,9 @@ public class Element extends Item {
     private boolean glow = false;
     private long life = 0;
     private boolean lifeDecay = true;
-    private int lifeDecayMode = Elements.DECAY_DIE;
+    private int lifeDecayMode = ElementType.DECAY_DIE;
     private boolean tmpDecay = true;
-    private int tmpDecayMode = Elements.DECAY_NONE;
+    private int tmpDecayMode = ElementType.DECAY_NONE;
 
     private Conversion[] convs = new Conversion[0];
 

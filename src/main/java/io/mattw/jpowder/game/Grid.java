@@ -2,9 +2,6 @@ package io.mattw.jpowder.game;
 
 import io.mattw.jpowder.ui.GamePanel;
 
-import java.awt.*;
-import java.util.Arrays;
-
 public class Grid {
 
     private static final int TEMP = 0;
@@ -149,11 +146,11 @@ public class Grid {
      * @param val    Value	double/int, "all"/ID/name
      */
     public static String set(int method, int id, double val) { // set(TYPE, 12, 14) set(TEMP, 12, 90000) set(CTYPE, 22, 12)
-        if (method == TYPE && !Elements.exists((int) val)) {
+        if (method == TYPE && !ElementType.exists((int) val)) {
             return "Element does not exist.";
         }
         int changed = 0;
-        if (Elements.exists(id)) {
+        if (ElementType.exists(id)) {
             for (int w = 0; w < GamePanel.WIDTH; w++) {
                 for (int h = 0; h < GamePanel.HEIGHT; h++) {
                     Cell cell = cell(w, h);
@@ -169,7 +166,7 @@ public class Grid {
                                         if (val == 0) {
                                             cell.getStack()[pos] = null;
                                         } else {
-                                            cell.getStack()[pos].morph(Elements.get(id), Particle.MORPH_FULL, false);
+                                            cell.getStack()[pos].morph(ElementType.get(id), Particle.MORPH_FULL, false);
                                         }
                                         break;
                                     case (CTYPE):
@@ -186,40 +183,11 @@ public class Grid {
     }
 
     public static String set(int m, String name, double val) { // set(TYPE, "watr", 0)
-        return set(m, Elements.getID(name), val);
+        return set(m, ElementType.getID(name), val);
     }
 
     public static String set(int m, String name, String val) { // set(TYPE, "watr", "none")
-        return set(m, Elements.getID(name), Elements.getID(val));
+        return set(m, ElementType.getID(name), ElementType.getID(val));
     }
 
-    /**
-     * Bresenham's Line Algorithm
-     * Used to fill spacing between mouse drags.
-     */
-    public static Point[] line(Point a, Point b) {
-        Point[] pts = new Point[0];
-        int dx = Math.abs(b.x - a.x);
-        int dy = Math.abs(b.y - a.y);
-
-        int sx = (a.x < b.x) ? 1 : -1;
-        int sy = (a.y < b.y) ? 1 : -1;
-
-        int err = dx - dy;
-
-        while (a.x != b.x || a.y != b.y) {
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err = err - dy;
-                a.x = a.x + sx;
-            }
-            if (e2 < dx) {
-                err = err + dx;
-                a.y = a.y + sy;
-            }
-            pts = Arrays.copyOf(pts, pts.length + 1);
-            pts[pts.length - 1] = new Point(a.x, a.y);
-        }
-        return pts;
-    }
 }

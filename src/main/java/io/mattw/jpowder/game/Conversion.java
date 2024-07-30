@@ -19,11 +19,11 @@ public class Conversion {
 
     public boolean shouldConvert(Particle p) {
         switch (sign) {
-            case (Elements.CS_EQ):
+            case (ElementType.CS_EQ):
                 return (int) value == (int) p.getCelcius();
-            case (Elements.CS_LSS):
+            case (ElementType.CS_LSS):
                 return value > p.getCelcius();
-            case (Elements.CS_GTR):
+            case (ElementType.CS_GTR):
             default:
                 return value < p.getCelcius();
         }
@@ -35,7 +35,7 @@ public class Conversion {
                 p.morph(el, Particle.MORPH_KEEP_TEMP, true);
                 break;
             case (CM_CTYPE):
-                p.morph(Elements.get(p.getCtype()), Particle.MORPH_KEEP_TEMP, true);
+                p.morph(ElementType.get(p.getCtype()), Particle.MORPH_KEEP_TEMP, true);
                 break;
         }
     }
