@@ -37,8 +37,6 @@ public class Cell {
         return y * GamePanel.scale;
     }
 
-    // Stacked Particles
-
     public int count() {
         int s = 0;
         for (var particle : stack) {
@@ -104,7 +102,7 @@ public class Cell {
         return stack[pos];
     }
 
-    public void rem(int pos) { // Remove
+    public void rem(int pos) {
         if (stack.length <= pos) {
             return;
         }

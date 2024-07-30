@@ -17,7 +17,7 @@ public class MainWindow extends JFrame {
 
     private static final Logger logger = LogManager.getLogger();
 
-    public static BufferedImage heatColorStrip;
+    public static BufferedImage HEAT_COLOR_STRIP;
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
     private static GamePanel game;
@@ -28,7 +28,7 @@ public class MainWindow extends JFrame {
         logger.trace("MainWindow()");
 
         var icon = ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon.png")));
-        heatColorStrip = ImageIO.read(Objects.requireNonNull(getClass().getResource("/heat-color-strip.png")));
+        HEAT_COLOR_STRIP = ImageIO.read(Objects.requireNonNull(getClass().getResource("/heat-color-strip.png")));
 
         window = this;
         setIconImage(icon);

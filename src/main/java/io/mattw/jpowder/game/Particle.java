@@ -45,8 +45,7 @@ public class Particle {
         this.y = y;
         this.life = el.getLife();
         this.celcius = el.getCelcius();
-        // setRemove(el.remove);
-        deco = null;
+        this.deco = null;
         if (el.isSandEffect()) {
             addSandEffect();
         }
@@ -71,7 +70,7 @@ public class Particle {
         return Math.round(celcius * 10000.0) / 10000.0;
     }
 
-    public Color getColor() { // EW
+    public Color getColor() {
         switch (GamePanel.view) {
             case (1):
                 return getTempColor();
@@ -82,8 +81,8 @@ public class Particle {
         }
     }
 
-    public Color getTempColor() { // Colorized temperature with no affect on performance!
-        var w = MainWindow.heatColorStrip.getWidth();
+    public Color getTempColor() {
+        var w = MainWindow.HEAT_COLOR_STRIP.getWidth();
         var x = (int) (w * (celcius + Math.abs(ElementType.MIN_TEMP)) / (Math.abs(ElementType.MAX_TEMP) + Math.abs(ElementType.MIN_TEMP)));
         if (w <= x) {
             x = w - 1;
@@ -91,7 +90,7 @@ public class Particle {
         if (x < 0) {
             x = 0;
         }
-        var color = MainWindow.heatColorStrip.getRGB(x, 0);
+        var color = MainWindow.HEAT_COLOR_STRIP.getRGB(x, 0);
         var red = (color & 0x00ff0000) >> 16;
         var green = (color & 0x0000ff00) >> 8;
         var blue = color & 0x000000ff;
@@ -115,87 +114,85 @@ public class Particle {
         return remove || (toWall() != null);
     }
 
-    public boolean ready() {
-        return System.currentTimeMillis() - lastUpdate > update;
-    }
-
     public void update() {
-        if (ready()) {
-            if (el.getBehaviour() != null) {
-                el.getBehaviour().update(this);
-            }
-            if (el.getMovement() != null) {
-                el.getMovement().move(this);
-            }
-
-            for (int w = -1; w < 2; w++) {
-                for (int h = -1; h < 2; h++) {
-                    if (Grid.validCell(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
-                        Particle p = Grid.getStackTop(x + w, y + h);
-                        if (p == null) {
-                            continue; // What? Why the hell is this NullPointering?!?!
-                        }
-                        double diff = (celcius - p.celcius);
-                        double trans = p.el.getHeatTransfer();
-                        p.celcius += (diff * trans);
-                        celcius = celcius - (diff * trans);
-                        if (celcius < ElementType.MIN_TEMP) {
-                            celcius = ElementType.MIN_TEMP;
-                        }
-                        if (celcius > ElementType.MAX_TEMP) {
-                            celcius = ElementType.MAX_TEMP;
-                        }
-                    }
-                }
-            }
-
-            for (Conversion c : el.getConvs()) {
-                if (c != null && c.shouldConvert(this)) {
-                    c.doConversion(this);
-                }
-            }
-
-            if (el.isLifeDecay()) {
-                if (life > 0) {
-                    life--;
-                }
-                if (life - 1 == 0) {
-                    switch (el.getLifeDecayMode()) {
-                        case (ElementType.DECAY_DIE):
-                            if (el.getBehaviour() != null) {
-                                el.getBehaviour().destruct(this);
-                            }
-                            setRemove(true);
-                            break;
-                        case (ElementType.DECAY_CTYPE):
-                            morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
-                            break;
-                    }
-                }
-            }
-            if (el.isTmpDecay()) {
-                if (tmp > 0) {
-                    tmp--;
-                }
-                if (tmp - 1 == 0) {
-                    switch (el.getTmpDecayMode()) {
-                        case (ElementType.DECAY_DIE):
-                            if (el.getBehaviour() != null) {
-                                el.getBehaviour().destruct(this);
-                            }
-                            setRemove(true);
-                            break;
-                        case (ElementType.DECAY_CTYPE):
-                            morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
-                            break;
-                    }
-                }
-            }
-            if (!Grid.validCell(x, y, 4)) {
-                setRemove(true);
-            }
-            lastUpdate = System.currentTimeMillis();
+        if (!(System.currentTimeMillis() - lastUpdate > update)) {
+            return;
         }
+
+        if (el.getBehaviour() != null) {
+            el.getBehaviour().update(this);
+        }
+        if (el.getMovement() != null) {
+            el.getMovement().move(this);
+        }
+
+        for (int w = -1; w < 2; w++) {
+            for (int h = -1; h < 2; h++) {
+                if (Grid.validCell(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
+                    Particle p = Grid.getStackTop(x + w, y + h);
+                    if (p == null) {
+                        continue;
+                    }
+                    double diff = (celcius - p.celcius);
+                    double trans = p.el.getHeatTransfer();
+                    p.celcius += (diff * trans);
+                    celcius = celcius - (diff * trans);
+                    if (celcius < ElementType.MIN_TEMP) {
+                        celcius = ElementType.MIN_TEMP;
+                    }
+                    if (celcius > ElementType.MAX_TEMP) {
+                        celcius = ElementType.MAX_TEMP;
+                    }
+                }
+            }
+        }
+
+        for (Conversion c : el.getConvs()) {
+            if (c != null && c.shouldConvert(this)) {
+                c.doConversion(this);
+            }
+        }
+
+        if (el.isLifeDecay()) {
+            if (life > 0) {
+                life--;
+            }
+            if (life - 1 == 0) {
+                switch (el.getLifeDecayMode()) {
+                    case (ElementType.DECAY_DIE):
+                        if (el.getBehaviour() != null) {
+                            el.getBehaviour().destruct(this);
+                        }
+                        setRemove(true);
+                        break;
+                    case (ElementType.DECAY_CTYPE):
+                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
+                        break;
+                }
+            }
+        }
+        if (el.isTmpDecay()) {
+            if (tmp > 0) {
+                tmp--;
+            }
+            if (tmp - 1 == 0) {
+                switch (el.getTmpDecayMode()) {
+                    case (ElementType.DECAY_DIE):
+                        if (el.getBehaviour() != null) {
+                            el.getBehaviour().destruct(this);
+                        }
+                        setRemove(true);
+                        break;
+                    case (ElementType.DECAY_CTYPE):
+                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
+                        break;
+                }
+            }
+        }
+        if (!Grid.validCell(x, y, 4)) {
+            setRemove(true);
+        }
+        lastUpdate = System.currentTimeMillis();
     }
 
     public void tryMove(int nx, int ny) {
