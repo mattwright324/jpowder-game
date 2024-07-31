@@ -16,7 +16,6 @@ public class Cell {
 
     private int x;
     private int y;
-    private Particle[] part;
     private Particle[] stack = new Particle[0];
 
     public Cell(int x, int y) {
@@ -25,7 +24,6 @@ public class Cell {
     }
 
     public void reset() {
-        part = null;
         stack = new Particle[1];
     }
 

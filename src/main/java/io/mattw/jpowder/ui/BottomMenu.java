@@ -1,10 +1,6 @@
 package io.mattw.jpowder.ui;
 
-import io.mattw.jpowder.game.GameThread;
-import io.mattw.jpowder.game.Grid;
-import io.mattw.jpowder.game.Element;
-import io.mattw.jpowder.game.Item;
-import io.mattw.jpowder.game.Wall;
+import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -101,9 +97,9 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         }
         if (viewRect.contains(mouse)) {
             if (GamePanel.view == 0) {
-                GamePanel.setView(1);
+                GamePanel.setView(ViewType.TEMP);
             } else {
-                GamePanel.setView(0);
+                GamePanel.setView(ViewType.DEFAULT);
             }
         }
         for (Button b : buttons) {

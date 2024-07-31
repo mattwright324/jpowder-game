@@ -20,10 +20,6 @@ public class GameThread extends Thread {
         gameFps.add();
     }
 
-    public void startUpdateThread() {
-        start();
-    }
-
     public void run() {
         gameFps.start();
         while (isAlive()) {

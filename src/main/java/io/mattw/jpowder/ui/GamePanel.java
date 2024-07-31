@@ -53,7 +53,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 Grid.BIG_GRID[w][h] = new BigCell(w, h);
             }
         }
-        game.startUpdateThread();
+        game.start();
         timer.start();
         drawFps.start();
 
@@ -86,23 +86,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         MainWindow.window.resize();
     }
 
-    public static void setView(int i) {
-        if (i == 0) {
-            view = 0;
-            viewName = "Default";
+    public static void setView(ViewType viewType) {
+        if (viewType == null) {
+            viewType = ViewType.DEFAULT;
         }
-        if (i == 1) {
-            view = 1;
-            viewName = "Temperature";
-        }
-        if (i == 2) {
-            view = 2;
-            viewName = "Life Gradient";
-        }
-        if (i == 3) {
-            view = 3;
-            viewName = "Fancy";
-        }
+
+        view = viewType.ordinal();
+        viewName = viewType.getDisplayName();
     }
 
     public static void toggle_size() {
@@ -164,7 +154,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         hud2d.drawImage(img, null, 0, 0);
         if (hud) {
             hud2d.setColor(Color.WHITE);
-            hud2d.setXORMode(Color.BLACK);
+            hud2d.setXORMode(Color.GRAY);
             hud2d.setFont(typeface);
             int line = 1;
             int spacing = hud2d.getFontMetrics().getHeight();
@@ -428,22 +418,22 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         });
         addKeyBinding(KeyEvent.VK_1, "view1", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(0);
+                setView(ViewType.DEFAULT);
             }
         });
         addKeyBinding(KeyEvent.VK_2, "view2", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(1);
+                setView(ViewType.TEMP);
             }
         });
         addKeyBinding(KeyEvent.VK_3, "view3", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(2);
+                setView(ViewType.LIFE);
             }
         });
         addKeyBinding(KeyEvent.VK_4, "view4", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(3);
+                setView(ViewType.FANCY);
             }
         });
         addKeyBinding(KeyEvent.VK_T, "mouse_shape", new AbstractAction() {

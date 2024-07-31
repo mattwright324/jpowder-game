@@ -3,6 +3,7 @@ package io.mattw.jpowder.ui;
 import com.formdev.flatlaf.FlatLaf;
 import io.mattw.jpowder.game.GameThread;
 import io.mattw.jpowder.game.Grid;
+import io.mattw.jpowder.game.ViewType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,16 +81,16 @@ public class MainWindow extends JFrame {
 
         var defaultView = new JRadioButtonMenuItem("Default View");
         defaultView.setSelected(true);
-        defaultView.addActionListener(e -> GamePanel.setView(0));
+        defaultView.addActionListener(e -> GamePanel.setView(ViewType.DEFAULT));
 
         var tempView = new JRadioButtonMenuItem("Temp View");
-        tempView.addActionListener(e -> GamePanel.setView(1));
+        tempView.addActionListener(e -> GamePanel.setView(ViewType.TEMP));
 
         var lifeGradientView = new JRadioButtonMenuItem("Life Gradient View");
-        lifeGradientView.addActionListener(e -> GamePanel.setView(2));
+        lifeGradientView.addActionListener(e -> GamePanel.setView(ViewType.LIFE));
 
         var fancyView = new JRadioButtonMenuItem("Fancy View");
-        fancyView.addActionListener(e -> GamePanel.setView(3));
+        fancyView.addActionListener(e -> GamePanel.setView(ViewType.FANCY));
 
         var group2 = new ButtonGroup();
         group2.add(defaultView);

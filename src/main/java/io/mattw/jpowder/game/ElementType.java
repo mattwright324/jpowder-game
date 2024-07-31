@@ -307,7 +307,7 @@ public class ElementType {
                 if (angle == 270) {
                     ny += 1;
                 }
-                logger.info("life: {}, angle: {}, x.y: {}.{} -> nx.ny: {}.{}", p.getLife(), angle, x, y, nx, ny);
+                // logger.info("life: {}, angle: {}, x.y: {}.{} -> nx.ny: {}.{}", p.getLife(), angle, x, y, nx, ny);
                 Particle o = Grid.getStackTop(nx, ny);
                 if (o == null) {
                     p.setTmp(1);
