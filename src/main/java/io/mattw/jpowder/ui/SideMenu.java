@@ -2,6 +2,7 @@ package io.mattw.jpowder.ui;
 
 import io.mattw.jpowder.game.ElementType;
 import io.mattw.jpowder.game.Item;
+import org.greenrobot.eventbus.EventBus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +28,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     private final Rectangle toolsRect = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
 
     public SideMenu() {
+        // EventBus.getDefault().register(this);
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);

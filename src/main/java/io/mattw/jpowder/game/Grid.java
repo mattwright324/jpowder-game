@@ -40,18 +40,16 @@ public class Grid {
     }
 
     public static void newGame() {
-        GameThread.paused = true;
         for (int w = 0; w < GamePanel.WIDTH; w++) {
             for (int h = 0; h < GamePanel.HEIGHT; h++) {
-                cell(w, h).reset();
+                PART_GRID[w][h] = new Cell(w, h);
             }
         }
         for (int w = 0; w < GamePanel.WIDTH / 4; w++) {
             for (int h = 0; h < GamePanel.HEIGHT / 4; h++) {
-                bigcell(w, h).reset();
+                BIG_GRID[w][h] = new BigCell(w, h);
             }
         }
-        GameThread.paused = false;
     }
 
     /**

@@ -1,8 +1,15 @@
 package io.mattw.jpowder.ui;
 
+import io.mattw.jpowder.event.NewGameEvent;
+import io.mattw.jpowder.event.PauseChangeEvent;
+import io.mattw.jpowder.event.ScaleChangeEvent;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +21,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+
+    private static final Logger logger = LogManager.getLogger();
 
     public static final int WIDTH = GamePanel.WIDTH + SideMenu.WIDTH;
     public static final int HEIGHT = 50;
@@ -29,8 +38,12 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     private final Rectangle helpRect = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
     private final List<Button> buttons = new ArrayList<>();
     private Point mouse = new Point(0, 0);
+    private GamePanel game;
 
-    public BottomMenu() {
+    public BottomMenu(GamePanel game) {
+        EventBus.getDefault().register(this);
+
+        this.game = game;
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -55,7 +68,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         graphics.fill(resizeRect);
         graphics.fill(viewRect);
         graphics.fill(helpRect);
-        if (GameThread.paused) {
+        if (game.getGameUpdateThread().isPaused()) {
             graphics.setColor(new Color(255, 64, 128, 128));
         }
         graphics.fill(pauseRect);
@@ -86,14 +99,15 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public void mousePressed(MouseEvent e) {
         mouse = e.getPoint();
         if (clearRect.contains(mouse)) {
-            GameThread.paused = true;
-            Grid.newGame();
+            EventBus.getDefault().post(new NewGameEvent());
         }
         if (resizeRect.contains(mouse)) {
-            GamePanel.toggle_size();
+            EventBus.getDefault().post(new ScaleChangeEvent(Scale.TOGGLE));
         }
         if (pauseRect.contains(mouse)) {
-            GamePanel.togglePause();
+            boolean paused = game.getGameUpdateThread().isPaused();
+
+            EventBus.getDefault().post(new PauseChangeEvent(!paused));
         }
         if (viewRect.contains(mouse)) {
             if (GamePanel.view == 0) {
@@ -177,6 +191,11 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public void mouseMoved(MouseEvent e) {
         mouse = e.getPoint();
         MainWindow.updateMouseInFrame(e.getPoint(), this);
+    }
+
+    @Subscribe
+    public void onPauseChangeEvent(PauseChangeEvent e) {
+        repaint();
     }
     
     @Getter

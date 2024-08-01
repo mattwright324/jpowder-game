@@ -1,7 +1,13 @@
 package io.mattw.jpowder.ui;
 
 import io.mattw.jpowder.*;
+import io.mattw.jpowder.event.NextFrameEvent;
+import io.mattw.jpowder.event.PauseChangeEvent;
+import io.mattw.jpowder.event.ScaleChangeEvent;
 import io.mattw.jpowder.game.*;
+import lombok.Getter;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +15,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
+@Getter
 public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     public final static int WIDTH = 612; // 612
@@ -30,10 +37,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public static Item rightClickType = ElementType.NONE;
 
     private final Timer timer = new Timer(5, this);
-    private final GameThread game = new GameThread();
+    private final GameUpdateThread gameUpdateThread = new GameUpdateThread();
     private int csize = 0;
     private int nsize = 0;
-    private int draw_size = 0;
+    private int drawSize = 0;
     private Point mouse = new Point(0, 0);
     private Point mouseDrag = new Point(0, 0);
     private Point mouseStart = new Point(0, 0);
@@ -43,19 +50,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private final ActionMap am = getActionMap();
 
     public GamePanel() {
-        for (int w = 0; w < GamePanel.WIDTH; w++) {
-            for (int h = 0; h < GamePanel.HEIGHT; h++) {
-                Grid.PART_GRID[w][h] = new Cell(w, h);
-            }
-        }
-        for (int w = 0; w < GamePanel.WIDTH / 4; w++) {
-            for (int h = 0; h < GamePanel.HEIGHT / 4; h++) {
-                Grid.BIG_GRID[w][h] = new BigCell(w, h);
-            }
-        }
-        game.start();
+        EventBus.getDefault().register(this);
+
+        Grid.newGame();
+        gameUpdateThread.start();
         timer.start();
         drawFps.start();
+        scaleSetLarge();
 
         setFocusable(true);
         addKeyListener(this);
@@ -70,20 +71,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         setKeyBindings();
     }
 
-    public static void makeSmall() {
+    private void scaleSetSmall() {
         scale = 1;
         img = new BufferedImage(WIDTH * scale, HEIGHT * scale, BufferedImage.TYPE_4BYTE_ABGR);
         game2d = img.createGraphics();
         small = true;
-        MainWindow.window.resize();
     }
 
-    public static void makeLarge() {
+    private void scaleSetLarge() {
         scale = 2;
         img = new BufferedImage(WIDTH * scale, HEIGHT * scale, BufferedImage.TYPE_4BYTE_ABGR);
         game2d = img.createGraphics();
         small = false;
-        MainWindow.window.resize();
     }
 
     public static void setView(ViewType viewType) {
@@ -95,17 +94,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         viewName = viewType.getDisplayName();
     }
 
-    public static void toggle_size() {
-        if (small) {
-            makeLarge();
-        } else {
-            makeSmall();
-        }
-    }
+    public void togglePause() {
+        boolean paused = gameUpdateThread.isPaused();
 
-    public static void togglePause() {
-        GameThread.paused = !GameThread.paused;
-        MainWindow.bottomMenu.repaint();
+        EventBus.getDefault().post(new PauseChangeEvent(!paused));
     }
 
     public void paintComponent(Graphics g) {
@@ -158,7 +150,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             hud2d.setFont(typeface);
             int line = 1;
             int spacing = hud2d.getFontMetrics().getHeight();
-            hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + GameThread.gameFps.fps(), 5, spacing * line++);
+            hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + gameUpdateThread.getGameFps().fps(), 5, spacing * line++);
             hud2d.drawString("Parts             " + csize, 5, spacing * line++);
             hud2d.drawString("Null Stack-Cells  " + nsize, 5, spacing * line++); // As in nulls within a Cell's stack[]
             hud2d.drawString(leftClickType.getName() + " || " + rightClickType.getName(), 5, spacing * line++);
@@ -168,8 +160,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 hud2d.drawString("T        mouse type     " + (mouseSquare ? "Square" : "Circle"), 5, spacing * line++);
                 hud2d.drawString("F        single frame   ", 5, spacing * line++);
                 hud2d.drawString("H        toggle hud     ", 5, spacing * line++);
-                hud2d.drawString("[ ]      mouse size     " + draw_size, 5, spacing * line++);
-                hud2d.drawString("SPACE    toggle pause   " + (GameThread.paused ? "Paused" : "Playing"), 5, spacing * line++);
+                hud2d.drawString("[ ]      mouse size     " + drawSize, 5, spacing * line++);
+                hud2d.drawString("SPACE    toggle pause   " + (gameUpdateThread.isPaused() ? "Paused" : "Playing"), 5, spacing * line++);
                 hud2d.drawString("S        window size    " + (small ? "Default" : "Large"), 5, spacing * line++);
                 hud2d.drawString("1-3      display type   " + viewName, 5, spacing * line);
             }
@@ -273,8 +265,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public void updateMouse(Point p) {
         mouse = p;
-        mouseStart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
-        mouseStop = new Point(mouseStart.x + draw_size, mouseStart.y + draw_size);
+        mouseStart = new Point(mouse.x - drawSize / 2, mouse.y - drawSize / 2);
+        mouseStop = new Point(mouseStart.x + drawSize, mouseStart.y + drawSize);
     }
 
     /**
@@ -310,12 +302,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         updateMouse(mouseToCell(e.getPoint()));
         if (SwingUtilities.isLeftMouseButton(e)) {
             for (Point p : line(mouseDrag, mouse)) {
-                place(leftClickType, p, draw_size);
+                place(leftClickType, p, drawSize);
             }
         }
         if (SwingUtilities.isRightMouseButton(e)) {
             for (Point p : line(mouseDrag, mouse)) {
-                place(rightClickType, p, draw_size);
+                place(rightClickType, p, drawSize);
             }
         }
     }
@@ -327,10 +319,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e)) {
-            place(leftClickType, mouse, draw_size);
+            place(leftClickType, mouse, drawSize);
         }
         if (SwingUtilities.isRightMouseButton(e)) {
-            place(rightClickType, mouse, draw_size);
+            place(rightClickType, mouse, drawSize);
         }
         if (SwingUtilities.isMiddleMouseButton(e)) {
             Particle m = Grid.getStackTop(mouse.x, mouse.y);
@@ -372,8 +364,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public void setKeyBindings() {
         addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GamePanel.togglePause();
-                if (GameThread.paused) {
+                togglePause();
+                if (gameUpdateThread.isPaused()) {
                     for (int w = 0; w < WIDTH; w++) {
                         for (int h = 0; h < HEIGHT; h++) {
                             Grid.cell(w, h).cleanStack();
@@ -384,30 +376,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         });
         addKeyBinding(KeyEvent.VK_S, "resize", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GamePanel.toggle_size();
+                EventBus.getDefault().post(new ScaleChangeEvent(Scale.TOGGLE));
             }
         });
         addKeyBinding(KeyEvent.VK_F, "frame", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GameThread.paused = true;
-                GameThread.update();
+                if (!gameUpdateThread.isPaused()) {
+                    EventBus.getDefault().post(new PauseChangeEvent(true));
+                }
+                EventBus.getDefault().post(new NextFrameEvent());
             }
         });
         addKeyBinding(KeyEvent.VK_OPEN_BRACKET, "mouse_small", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                draw_size -= 2;
+                drawSize -= 2;
                 updateMouse(mouse);
-                if (draw_size < 0) {
-                    draw_size = 0;
+                if (drawSize < 0) {
+                    drawSize = 0;
                 }
             }
         });
         addKeyBinding(KeyEvent.VK_CLOSE_BRACKET, "mouse_big", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                draw_size += 2;
+                drawSize += 2;
                 updateMouse(mouse);
-                if (draw_size < 0) {
-                    draw_size = 0;
+                if (drawSize < 0) {
+                    drawSize = 0;
                 }
             }
         });
@@ -449,15 +443,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
-        draw_size -= e.getWheelRotation();
-        if (draw_size < 0) {
-            draw_size = 0;
+        drawSize -= e.getWheelRotation();
+        if (drawSize < 0) {
+            drawSize = 0;
         }
-        mouseStart = new Point(mouse.x - draw_size / 2, mouse.y - draw_size / 2);
-        mouseStop = new Point(mouseStart.x + draw_size, mouseStart.y + draw_size);
+        mouseStart = new Point(mouse.x - drawSize / 2, mouse.y - drawSize / 2);
+        mouseStop = new Point(mouseStart.x + drawSize, mouseStart.y + drawSize);
     }
 
     public void actionPerformed(ActionEvent e) {
         repaint();
     }
+
+    @Subscribe
+    public void onScaleChangeEvent(ScaleChangeEvent e) {
+        var value = e.getScale();
+        if (value == Scale.SMALL) {
+            scaleSetSmall();
+        } else if (value == Scale.LARGE) {
+            scaleSetLarge();
+        } else if (value == Scale.TOGGLE) {
+            if (scale == 1) {
+                scaleSetLarge();
+            } else {
+                scaleSetSmall();
+            }
+        }
+    }
+
 }

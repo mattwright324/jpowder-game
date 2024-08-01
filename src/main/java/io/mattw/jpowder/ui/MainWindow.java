@@ -1,11 +1,16 @@
 package io.mattw.jpowder.ui;
 
 import com.formdev.flatlaf.FlatLaf;
-import io.mattw.jpowder.game.GameThread;
+import io.mattw.jpowder.event.NewGameEvent;
+import io.mattw.jpowder.event.PauseChangeEvent;
+import io.mattw.jpowder.event.ScaleChangeEvent;
 import io.mattw.jpowder.game.Grid;
 import io.mattw.jpowder.game.ViewType;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Objects;
 
+@Getter
 public class MainWindow extends JFrame {
 
     private static final Logger logger = LogManager.getLogger();
@@ -21,12 +27,17 @@ public class MainWindow extends JFrame {
     public static BufferedImage HEAT_COLOR_STRIP;
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
-    private static GamePanel game;
-    private static SideMenu sideMenu;
+
+    private final GamePanel game;
+    private final SideMenu sideMenu;
     public static BottomMenu bottomMenu;
+
+    private final JCheckBoxMenuItem pauseGame;
 
     public MainWindow() throws Exception {
         logger.trace("MainWindow()");
+
+        EventBus.getDefault().register(this);
 
         var icon = ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon.png")));
         HEAT_COLOR_STRIP = ImageIO.read(Objects.requireNonNull(getClass().getResource("/heat-color-strip.png")));
@@ -45,13 +56,9 @@ public class MainWindow extends JFrame {
         FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#0094FF"));
 
         var newGame = new JMenuItem("New Game");
-        newGame.addActionListener(e -> Grid.newGame());
+        newGame.addActionListener(e -> EventBus.getDefault().post(new NewGameEvent()));
 
-        var pauseGame = new JCheckBoxMenuItem("Pause Game");
-        pauseGame.addActionListener(e -> {
-            GamePanel.togglePause();
-            pauseGame.setSelected(GameThread.paused);
-        });
+        pauseGame = new JCheckBoxMenuItem("Pause Game");
 
         var exitButton = new JMenuItem("Exit");
         exitButton.addActionListener(e -> System.exit(0));
@@ -70,10 +77,10 @@ public class MainWindow extends JFrame {
 
         var largeView = new JRadioButtonMenuItem("Large Window (2x)");
         largeView.setSelected(true);
-        largeView.addActionListener(e -> GamePanel.makeLarge());
+        largeView.addActionListener(e -> EventBus.getDefault().post(new ScaleChangeEvent(Scale.LARGE)));
 
         var smallView = new JRadioButtonMenuItem("Small Window (1x)");
-        smallView.addActionListener(e -> GamePanel.makeSmall());
+        smallView.addActionListener(e -> EventBus.getDefault().post(new ScaleChangeEvent(Scale.SMALL)));
 
         var group1 = new ButtonGroup();
         group1.add(largeView);
@@ -117,11 +124,16 @@ public class MainWindow extends JFrame {
         game = new GamePanel();
         add(game, BorderLayout.CENTER);
 
+        pauseGame.addActionListener(e -> {
+            boolean paused = game.getGameUpdateThread().isPaused();
+            EventBus.getDefault().post(new PauseChangeEvent(!paused));
+        });
+
         sideMenu = new SideMenu();
         sideMenu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
         add(sideMenu, BorderLayout.EAST);
 
-        bottomMenu = new BottomMenu();
+        bottomMenu = new BottomMenu(game);
         bottomMenu.setPreferredSize(new Dimension(BottomMenu.WIDTH, BottomMenu.HEIGHT));
         add(bottomMenu, BorderLayout.SOUTH);
 
@@ -136,8 +148,32 @@ public class MainWindow extends JFrame {
     }
 
     public void resize() {
-        getContentPane().setPreferredSize(new Dimension(GamePanel.WIDTH * GamePanel.scale + SideMenu.WIDTH, GamePanel.HEIGHT * GamePanel.scale + BottomMenu.HEIGHT));
-        pack();
+        var scaledWidth = GamePanel.WIDTH * GamePanel.scale + SideMenu.WIDTH;
+        var scaledHeight = GamePanel.HEIGHT * GamePanel.scale + BottomMenu.HEIGHT;
+        var size = new Dimension(scaledWidth, scaledHeight);
+
+        this.getContentPane().setPreferredSize(size);
+        this.pack();
+    }
+
+    @Subscribe
+    public void onEvent(Object e) {
+        logger.trace("Received {}: {}", e.getClass().getSimpleName(), e);
+    }
+
+    @Subscribe
+    public void onPauseChangeEvent(PauseChangeEvent e) {
+        pauseGame.setSelected(e.isPaused());
+    }
+
+    @Subscribe
+    public void onNewGameEvent(NewGameEvent e) {
+        Grid.newGame();
+    }
+
+    @Subscribe
+    public void onScaleChangeEvent(ScaleChangeEvent e) {
+        SwingUtilities.invokeLater(this::resize);
     }
 
 }

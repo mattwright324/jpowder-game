@@ -24,8 +24,6 @@ public class Application {
 
             final var window = new MainWindow();
             window.setVisible(true);
-
-            GamePanel.makeLarge();
         } catch (Exception e) {
             logger.error(e);
         }

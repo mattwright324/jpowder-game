@@ -24,7 +24,7 @@ public class Cell {
     }
 
     public void reset() {
-        stack = new Particle[1];
+        stack = new Particle[0];
     }
 
     public int screenX() {
