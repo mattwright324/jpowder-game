@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatLaf;
 import io.mattw.jpowder.event.NewGameEvent;
 import io.mattw.jpowder.event.PauseChangeEvent;
 import io.mattw.jpowder.event.ScaleChangeEvent;
+import io.mattw.jpowder.event.ViewChangeEvent;
 import io.mattw.jpowder.game.Grid;
 import io.mattw.jpowder.game.ViewType;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 public class MainWindow extends JFrame {
@@ -28,9 +30,14 @@ public class MainWindow extends JFrame {
     public static MainWindow window;
     public static Point mouse = new Point(0, 0);
 
-    private final GamePanel game;
+    private final GamePanel gamePanel;
     private final SideMenu sideMenu;
     public static BottomMenu bottomMenu;
+
+    private final JRadioButtonMenuItem defaultView;
+    private final JRadioButtonMenuItem tempView;
+    private final JRadioButtonMenuItem lifeGradientView;
+    private final JRadioButtonMenuItem fancyView;
 
     private final JCheckBoxMenuItem pauseGame;
 
@@ -86,18 +93,18 @@ public class MainWindow extends JFrame {
         group1.add(largeView);
         group1.add(smallView);
 
-        var defaultView = new JRadioButtonMenuItem("Default View");
+        defaultView = new JRadioButtonMenuItem("Default View");
         defaultView.setSelected(true);
-        defaultView.addActionListener(e -> GamePanel.setView(ViewType.DEFAULT));
+        defaultView.addActionListener(e -> EventBus.getDefault().post(new ViewChangeEvent(ViewType.DEFAULT)));
 
-        var tempView = new JRadioButtonMenuItem("Temp View");
-        tempView.addActionListener(e -> GamePanel.setView(ViewType.TEMP));
+        tempView = new JRadioButtonMenuItem("Temp View");
+        tempView.addActionListener(e -> EventBus.getDefault().post(new ViewChangeEvent(ViewType.TEMP)));
 
-        var lifeGradientView = new JRadioButtonMenuItem("Life Gradient View");
-        lifeGradientView.addActionListener(e -> GamePanel.setView(ViewType.LIFE));
+        lifeGradientView = new JRadioButtonMenuItem("Life Gradient View");
+        lifeGradientView.addActionListener(e -> EventBus.getDefault().post(new ViewChangeEvent(ViewType.LIFE)));
 
-        var fancyView = new JRadioButtonMenuItem("Fancy View");
-        fancyView.addActionListener(e -> GamePanel.setView(ViewType.FANCY));
+        fancyView = new JRadioButtonMenuItem("Fancy View");
+        fancyView.addActionListener(e -> EventBus.getDefault().post(new ViewChangeEvent(ViewType.FANCY)));
 
         var group2 = new ButtonGroup();
         group2.add(defaultView);
@@ -121,11 +128,11 @@ public class MainWindow extends JFrame {
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
 
-        game = new GamePanel();
-        add(game, BorderLayout.CENTER);
+        gamePanel = new GamePanel();
+        add(gamePanel, BorderLayout.CENTER);
 
         pauseGame.addActionListener(e -> {
-            boolean paused = game.getGameUpdateThread().isPaused();
+            boolean paused = gamePanel.getGameUpdateThread().isPaused();
             EventBus.getDefault().post(new PauseChangeEvent(!paused));
         });
 
@@ -133,7 +140,7 @@ public class MainWindow extends JFrame {
         sideMenu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
         add(sideMenu, BorderLayout.EAST);
 
-        bottomMenu = new BottomMenu(game);
+        bottomMenu = new BottomMenu(gamePanel);
         bottomMenu.setPreferredSize(new Dimension(BottomMenu.WIDTH, BottomMenu.HEIGHT));
         add(bottomMenu, BorderLayout.SOUTH);
 
@@ -148,8 +155,8 @@ public class MainWindow extends JFrame {
     }
 
     public void resize() {
-        var scaledWidth = GamePanel.WIDTH * GamePanel.scale + SideMenu.WIDTH;
-        var scaledHeight = GamePanel.HEIGHT * GamePanel.scale + BottomMenu.HEIGHT;
+        var scaledWidth = GamePanel.WIDTH * GamePanel.windowScale + SideMenu.WIDTH;
+        var scaledHeight = GamePanel.HEIGHT * GamePanel.windowScale + BottomMenu.HEIGHT;
         var size = new Dimension(scaledWidth, scaledHeight);
 
         this.getContentPane().setPreferredSize(size);
@@ -174,6 +181,23 @@ public class MainWindow extends JFrame {
     @Subscribe
     public void onScaleChangeEvent(ScaleChangeEvent e) {
         SwingUtilities.invokeLater(this::resize);
+    }
+
+    @Subscribe
+    public void onViewChangeEvent(ViewChangeEvent e) {
+        var view = Optional.of(e).map(ViewChangeEvent::getViewType).orElse(ViewType.DEFAULT);
+
+        SwingUtilities.invokeLater(() -> {
+            if (view == ViewType.TEMP) {
+                tempView.setSelected(true);
+            } else if (view == ViewType.LIFE) {
+                lifeGradientView.setSelected(true);
+            } else if (view == ViewType.FANCY) {
+                fancyView.setSelected(true);
+            } else {
+                defaultView.setSelected(true);
+            }
+        });
     }
 
 }

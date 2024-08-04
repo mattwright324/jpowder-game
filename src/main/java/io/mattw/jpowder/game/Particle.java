@@ -70,11 +70,11 @@ public class Particle {
         return Math.round(celcius * 10000.0) / 10000.0;
     }
 
-    public Color getColor() {
-        switch (GamePanel.view) {
-            case (1):
+    public Color getColor(ViewType view) {
+        switch (view) {
+            case TEMP:
                 return getTempColor();
-            case (2):
+            case LIFE:
                 return getLifeGradient();
             default:
                 return deco != null ? deco : el.getColor();

@@ -15,4 +15,8 @@ public enum ViewType {
         this.displayName = displayName;
     }
 
+    public ViewType next() {
+        return ViewType.values()[(ordinal() + 1) % ViewType.values().length];
+    }
+
 }

@@ -2,7 +2,9 @@ package io.mattw.jpowder.event;
 
 import io.mattw.jpowder.ui.Scale;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class ScaleChangeEvent {
 

@@ -24,10 +24,10 @@ public class BigCell {
     }
 
     public int screenX() {
-        return x * GamePanel.scale * 4;
+        return x * GamePanel.windowScale * 4;
     }
 
     public int screenY() {
-        return y * GamePanel.scale * 4;
+        return y * GamePanel.windowScale * 4;
     }
 }

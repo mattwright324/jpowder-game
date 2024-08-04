@@ -4,8 +4,11 @@ import io.mattw.jpowder.*;
 import io.mattw.jpowder.event.NextFrameEvent;
 import io.mattw.jpowder.event.PauseChangeEvent;
 import io.mattw.jpowder.event.ScaleChangeEvent;
+import io.mattw.jpowder.event.ViewChangeEvent;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -14,14 +17,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Getter
 public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
+    private static final Logger logger = LogManager.getLogger();
+
     public final static int WIDTH = 612; // 612
     public final static int HEIGHT = 384; // 384
-    public static int view = 0;
-    public static int scale = 1; // fillRect vs drawRect
+    public static int windowScale = 1; // fillRect vs drawRect
     public static boolean help = false;
 
     private static boolean small = true;
@@ -30,12 +35,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private static Graphics2D game2d = img.createGraphics();
     private static final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
     private static final PerSecondCounter drawFps = new PerSecondCounter();
-    private static String viewName = "Default";
     private static boolean hud = true;
 
     public static Item leftClickType = ElementType.DUST; // Hacky as fuck.
     public static Item rightClickType = ElementType.NONE;
 
+    public ViewType view = ViewType.DEFAULT;
     private final Timer timer = new Timer(5, this);
     private final GameUpdateThread gameUpdateThread = new GameUpdateThread();
     private int csize = 0;
@@ -72,26 +77,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     private void scaleSetSmall() {
-        scale = 1;
-        img = new BufferedImage(WIDTH * scale, HEIGHT * scale, BufferedImage.TYPE_4BYTE_ABGR);
+        windowScale = 1;
+        img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
         game2d = img.createGraphics();
         small = true;
     }
 
     private void scaleSetLarge() {
-        scale = 2;
-        img = new BufferedImage(WIDTH * scale, HEIGHT * scale, BufferedImage.TYPE_4BYTE_ABGR);
+        windowScale = 2;
+        img = new BufferedImage(WIDTH * windowScale, HEIGHT * windowScale, BufferedImage.TYPE_4BYTE_ABGR);
         game2d = img.createGraphics();
         small = false;
-    }
-
-    public static void setView(ViewType viewType) {
-        if (viewType == null) {
-            viewType = ViewType.DEFAULT;
-        }
-
-        view = viewType.ordinal();
-        viewName = viewType.getDisplayName();
     }
 
     public void togglePause() {
@@ -103,6 +99,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         hud2d = (Graphics2D) g;
+
         game2d.setColor(Color.BLACK);
         game2d.fillRect(0, 0, getWidth(), getHeight());
 
@@ -120,10 +117,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         }
 
         game2d.setColor(Color.LIGHT_GRAY);
-        int sx = mouseStart.x * scale;
-        int w = (mouseStop.x - mouseStart.x) * scale;
-        int sy = mouseStart.y * scale;
-        int h = (mouseStop.y - mouseStart.y) * scale;
+        int sx = mouseStart.x * windowScale;
+        int w = (mouseStop.x - mouseStart.x) * windowScale;
+        int sy = mouseStart.y * windowScale;
+        int h = (mouseStop.y - mouseStart.y) * windowScale;
         if (mouseSquare) {
             game2d.drawRect(sx, sy, w, h); // Size
             game2d.setColor(new Color(244, 244, 244, 32));
@@ -135,7 +132,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         }
         int mx = sx + w / 2;
         int my = sy + h / 2;
-        game2d.drawRect(mx, my, scale - 1, scale - 1); // Center Dot
+        game2d.drawRect(mx, my, windowScale - 1, windowScale - 1); // Center Dot
 
         // Edge-lines to find mouse location.
         game2d.drawLine(mx, 0, mx, 4);
@@ -152,7 +149,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             int spacing = hud2d.getFontMetrics().getHeight();
             hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + gameUpdateThread.getGameFps().fps(), 5, spacing * line++);
             hud2d.drawString("Parts             " + csize, 5, spacing * line++);
-            hud2d.drawString("Null Stack-Cells  " + nsize, 5, spacing * line++); // As in nulls within a Cell's stack[]
+            hud2d.drawString("GamePanel         " + getWidth() + "x" + getHeight(), 5, spacing * line++); // As in nulls within a Cell's stack[]
             hud2d.drawString(leftClickType.getName() + " || " + rightClickType.getName(), 5, spacing * line++);
             if (help) {
                 hud2d.drawString("", 5, spacing * line++);
@@ -163,7 +160,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 hud2d.drawString("[ ]      mouse size     " + drawSize, 5, spacing * line++);
                 hud2d.drawString("SPACE    toggle pause   " + (gameUpdateThread.isPaused() ? "Paused" : "Playing"), 5, spacing * line++);
                 hud2d.drawString("S        window size    " + (small ? "Default" : "Large"), 5, spacing * line++);
-                hud2d.drawString("1-3      display type   " + viewName, 5, spacing * line);
+                hud2d.drawString("1-3      display type   " + view.getDisplayName(), 5, spacing * line);
             }
 
             hud2d.drawString("X:" + mouse.x + " Y:" + mouse.y, 5, getHeight() - 25);
@@ -191,12 +188,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         Particle particle;
         if (!cell.empty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
             csize += cell.count();
-            Color col = particle.getColor();
-            game2d.setColor(col);
-            game2d.fillRect(cell.screenX(), cell.screenY(), scale, scale);
-            if (view == 3 && particle.getEl().isGlow()) { // "Fancy" Display; not great on fps
-                game2d.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 64));
-                game2d.fillRect(cell.screenX() - scale, cell.screenY() - scale, scale + scale * 2, scale + scale * 2);
+
+            final var color = particle.getColor(view);
+            game2d.setColor(color);
+            game2d.fillRect(cell.screenX(), cell.screenY(), windowScale, windowScale);
+
+            if (view == ViewType.FANCY && particle.getEl().isGlow()) { // "Fancy" Display; not great on fps
+                game2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64).brighter());
+                var x = cell.screenX() - windowScale;
+                var y = cell.screenY() - windowScale;
+                var cellWidth = windowScale + windowScale * 2;
+                var cellHeight = windowScale + windowScale * 2;
+                game2d.fillRect(x, y, cellWidth, cellHeight);
             }
         }
         nsize += cell.nullCount();
@@ -207,7 +210,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             return;
         }
         game2d.setColor(bigCell.getWall().getColor());
-        game2d.fillRect(bigCell.screenX(), bigCell.screenY(), (scale) * 4, (scale) * 4);
+        game2d.fillRect(bigCell.screenX(), bigCell.screenY(), (windowScale) * 4, (windowScale) * 4);
     }
 
     public void place(Item element, Point point, int size) {
@@ -260,7 +263,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     }
 
     public Point mouseToCell(Point p) {
-        return new Point(p.x / scale, p.y / scale);
+        return new Point(p.x / windowScale, p.y / windowScale);
     }
 
     public void updateMouse(Point p) {
@@ -412,22 +415,22 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         });
         addKeyBinding(KeyEvent.VK_1, "view1", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(ViewType.DEFAULT);
+                EventBus.getDefault().post(new ViewChangeEvent(ViewType.DEFAULT));
             }
         });
         addKeyBinding(KeyEvent.VK_2, "view2", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(ViewType.TEMP);
+                EventBus.getDefault().post(new ViewChangeEvent(ViewType.TEMP));
             }
         });
         addKeyBinding(KeyEvent.VK_3, "view3", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(ViewType.LIFE);
+                EventBus.getDefault().post(new ViewChangeEvent(ViewType.LIFE));
             }
         });
         addKeyBinding(KeyEvent.VK_4, "view4", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setView(ViewType.FANCY);
+                EventBus.getDefault().post(new ViewChangeEvent(ViewType.FANCY));
             }
         });
         addKeyBinding(KeyEvent.VK_T, "mouse_shape", new AbstractAction() {
@@ -463,12 +466,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         } else if (value == Scale.LARGE) {
             scaleSetLarge();
         } else if (value == Scale.TOGGLE) {
-            if (scale == 1) {
+            if (windowScale == 1) {
                 scaleSetLarge();
             } else {
                 scaleSetSmall();
             }
         }
+    }
+
+    @Subscribe
+    public void onViewChangeEvent(ViewChangeEvent e) {
+        view = Optional.of(e).map(ViewChangeEvent::getViewType).orElse(ViewType.DEFAULT);
     }
 
 }

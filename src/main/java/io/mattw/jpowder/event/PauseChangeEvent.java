@@ -1,7 +1,9 @@
 package io.mattw.jpowder.event;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class PauseChangeEvent {
 

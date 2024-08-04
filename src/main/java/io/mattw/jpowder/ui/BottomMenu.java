@@ -3,6 +3,7 @@ package io.mattw.jpowder.ui;
 import io.mattw.jpowder.event.NewGameEvent;
 import io.mattw.jpowder.event.PauseChangeEvent;
 import io.mattw.jpowder.event.ScaleChangeEvent;
+import io.mattw.jpowder.event.ViewChangeEvent;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -106,15 +107,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         }
         if (pauseRect.contains(mouse)) {
             boolean paused = game.getGameUpdateThread().isPaused();
-
             EventBus.getDefault().post(new PauseChangeEvent(!paused));
         }
         if (viewRect.contains(mouse)) {
-            if (GamePanel.view == 0) {
-                GamePanel.setView(ViewType.TEMP);
-            } else {
-                GamePanel.setView(ViewType.DEFAULT);
-            }
+            EventBus.getDefault().post(new ViewChangeEvent(game.getView().next()));
         }
         for (Button b : buttons) {
             if (b.contains(mouse)) {

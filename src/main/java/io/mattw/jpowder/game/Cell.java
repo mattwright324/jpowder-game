@@ -28,11 +28,11 @@ public class Cell {
     }
 
     public int screenX() {
-        return x * GamePanel.scale;
+        return x * GamePanel.windowScale;
     }
 
     public int screenY() {
-        return y * GamePanel.scale;
+        return y * GamePanel.windowScale;
     }
 
     public int count() {
