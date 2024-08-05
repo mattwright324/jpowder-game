@@ -2,12 +2,13 @@ package io.mattw.jpowder.ui;
 
 import io.mattw.jpowder.game.ElementType;
 import io.mattw.jpowder.game.Item;
-import org.greenrobot.eventbus.EventBus;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SideMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
@@ -18,20 +19,28 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     private BufferedImage img;
     private Graphics2D graphics;
     private boolean init = true;
-    private final int b_h = 40;
-    private final int b_w = WIDTH - 10;
-    private final Rectangle solidRect = new Rectangle(5, 5, b_w, b_h);
-    private final Rectangle liquidRect = new Rectangle(5, 5 + (b_h + 5), b_w, b_h);
-    private final Rectangle gassesRect = new Rectangle(5, 5 + (b_h + 5) * 2, b_w, b_h);
-    private final Rectangle powderRect = new Rectangle(5, 5 + (b_h + 5) * 3, b_w, b_h);
-    private final Rectangle radioRect = new Rectangle(5, 5 + (b_h + 5) * 4, b_w, b_h);
-    private final Rectangle toolsRect = new Rectangle(5, 5 + (b_h + 5) * 5, b_w, b_h);
+    private final int btnHeight = 40;
+    private final int btnWidth = WIDTH - 10;
+    private final Rectangle solidRect = new Rectangle(5, 5, btnWidth, btnHeight);
+    private final Rectangle liquidRect = new Rectangle(5, 5 + (btnHeight + 5), btnWidth, btnHeight);
+    private final Rectangle gassesRect = new Rectangle(5, 5 + (btnHeight + 5) * 2, btnWidth, btnHeight);
+    private final Rectangle powderRect = new Rectangle(5, 5 + (btnHeight + 5) * 3, btnWidth, btnHeight);
+    private final Rectangle radioRect = new Rectangle(5, 5 + (btnHeight + 5) * 4, btnWidth, btnHeight);
+    private final Rectangle toolsRect = new Rectangle(5, 5 + (btnHeight + 5) * 5, btnWidth, btnHeight);
+    private final Map<String, Item[]> categories = new LinkedHashMap<>();
 
     public SideMenu() {
         // EventBus.getDefault().register(this);
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
+
+        categories.put("Solid", ElementType.solid);
+        categories.put("Liquid", ElementType.liquid);
+        categories.put("Gas", ElementType.gasses);
+        categories.put("Powder", ElementType.powder);
+        categories.put("Radio", ElementType.radio);
+        categories.put("Tools", ElementType.tools);
     }
 
     public void init() {
@@ -58,28 +67,17 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         graphics.fill(radioRect);
         graphics.fill(toolsRect);
 
-        int line = 0;
+
 
         graphics.setColor(Color.WHITE);
-        int b_txt = b_h / 2;
-        graphics.drawString("Solid", 10, b_txt + (b_h + 5) * line);
-        int b_txtn = b_h / 2 + 15;
-        graphics.drawString(ElementType.solid.length + "", 10, b_txtn + (b_h + 5) * line++);
 
-        graphics.drawString("Liquid", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(ElementType.liquid.length + "", 10, b_txtn + (b_h + 5) * line++);
-
-        graphics.drawString("Gass", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(ElementType.gasses.length + "", 10, b_txtn + (b_h + 5) * line++);
-
-        graphics.drawString("Powder", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(ElementType.powder.length + "", 10, b_txtn + (b_h + 5) * line++);
-
-        graphics.drawString("Radio", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(ElementType.radio.length + "", 10, b_txtn + (b_h + 5) * line++);
-
-        graphics.drawString("Tools", 10, b_txt + (b_h + 5) * line);
-        graphics.drawString(ElementType.tools.length + "", 10, b_txtn + (b_h + 5) * line);
+        int btnTxtLine1 = btnHeight / 2;
+        int btnTxtLine2 = btnHeight / 2 + 15;
+        int line = 0;
+        for (String category : categories.keySet()) {
+            graphics.drawString(category, 10, btnTxtLine1 + (btnHeight + 5) * line);
+            graphics.drawString(categories.get(category).length + "", 10, btnTxtLine2 + (btnHeight + 5) * line++);
+        }
 
         graphics.setPaintMode();
 

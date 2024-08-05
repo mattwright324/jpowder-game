@@ -1,10 +1,7 @@
 package io.mattw.jpowder.ui;
 
 import io.mattw.jpowder.*;
-import io.mattw.jpowder.event.NextFrameEvent;
-import io.mattw.jpowder.event.PauseChangeEvent;
-import io.mattw.jpowder.event.ScaleChangeEvent;
-import io.mattw.jpowder.event.ViewChangeEvent;
+import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
@@ -37,8 +34,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private static final PerSecondCounter drawFps = new PerSecondCounter();
     private static boolean hud = true;
 
-    public static Item leftClickType = ElementType.DUST; // Hacky as fuck.
-    public static Item rightClickType = ElementType.NONE;
+    private Item leftClickType = ElementType.DUST;
+    private Item rightClickType = ElementType.NONE;
 
     public ViewType view = ViewType.DEFAULT;
     private final Timer timer = new Timer(5, this);
@@ -477,6 +474,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     @Subscribe
     public void onViewChangeEvent(ViewChangeEvent e) {
         view = Optional.of(e).map(ViewChangeEvent::getViewType).orElse(ViewType.DEFAULT);
+    }
+
+    @Subscribe
+    public void onToolSelectionEvent(ToolSelectionEvent e) {
+        if (e.getMouseButton() == MouseEvent.BUTTON1) {
+            leftClickType = e.getSelectedItem();
+        } else if (e.getMouseButton() == MouseEvent.BUTTON2) {
+            rightClickType = e.getSelectedItem();
+        }
     }
 
 }

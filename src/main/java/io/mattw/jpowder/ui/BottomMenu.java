@@ -1,9 +1,6 @@
 package io.mattw.jpowder.ui;
 
-import io.mattw.jpowder.event.NewGameEvent;
-import io.mattw.jpowder.event.PauseChangeEvent;
-import io.mattw.jpowder.event.ScaleChangeEvent;
-import io.mattw.jpowder.event.ViewChangeEvent;
+import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -115,10 +112,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         for (Button b : buttons) {
             if (b.contains(mouse)) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    GamePanel.leftClickType = b.getItem();
+                    EventBus.getDefault().post(new ToolSelectionEvent(b.getItem(), MouseEvent.BUTTON1));
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    GamePanel.rightClickType = b.getItem();
+                    EventBus.getDefault().post(new ToolSelectionEvent(b.getItem(), MouseEvent.BUTTON2));
                 }
             }
         }
@@ -157,11 +154,11 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
                 graphics.setColor(new Color(255, 0, 0, 128));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == GamePanel.leftClickType) {
+            if (b.getItem() == game.getLeftClickType()) {
                 graphics.setColor(new Color(255, 0, 0));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
-            if (b.getItem() == GamePanel.rightClickType) {
+            if (b.getItem() == game.getRightClickType()) {
                 graphics.setColor(new Color(0, 0, 255));
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
@@ -191,6 +188,11 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
 
     @Subscribe
     public void onPauseChangeEvent(PauseChangeEvent e) {
+        repaint();
+    }
+
+    @Subscribe(priority = 1)
+    public void onToolSelectionEvent(ToolSelectionEvent e) {
         repaint();
     }
     

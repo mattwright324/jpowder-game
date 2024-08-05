@@ -19,4 +19,8 @@ public class Wall extends Item {
         setColor(color);
     }
 
+    public String toString() {
+        return getName();
+    }
+
 }
