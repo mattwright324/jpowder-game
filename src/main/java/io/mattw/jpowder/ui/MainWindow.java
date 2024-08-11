@@ -1,10 +1,7 @@
 package io.mattw.jpowder.ui;
 
 import com.formdev.flatlaf.FlatLaf;
-import io.mattw.jpowder.event.NewGameEvent;
-import io.mattw.jpowder.event.PauseChangeEvent;
-import io.mattw.jpowder.event.ScaleChangeEvent;
-import io.mattw.jpowder.event.ViewChangeEvent;
+import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.Grid;
 import io.mattw.jpowder.game.ViewType;
 import lombok.Getter;
@@ -34,6 +31,7 @@ public class MainWindow extends JFrame {
     private final SideMenu sideMenu;
     public static BottomMenu bottomMenu;
 
+    private final JCheckBoxMenuItem keybindHelp;
     private final JRadioButtonMenuItem defaultView;
     private final JRadioButtonMenuItem tempView;
     private final JRadioButtonMenuItem lifeGradientView;
@@ -76,11 +74,7 @@ public class MainWindow extends JFrame {
         gameMenu.add(new JSeparator());
         gameMenu.add(exitButton);
 
-        var keybindHelp = new JCheckBoxMenuItem("Show Keybind Help");
-        keybindHelp.addActionListener(e -> {
-            GamePanel.help = !GamePanel.help;
-            SwingUtilities.invokeLater(() -> keybindHelp.setSelected(GamePanel.help));
-        });
+        keybindHelp = new JCheckBoxMenuItem("Show Keybind Help");
 
         var largeView = new JRadioButtonMenuItem("Large Window (2x)");
         largeView.setSelected(true);
@@ -135,6 +129,8 @@ public class MainWindow extends JFrame {
             boolean paused = gamePanel.getGameUpdateThread().isPaused();
             EventBus.getDefault().post(new PauseChangeEvent(!paused));
         });
+
+        keybindHelp.addActionListener(e -> EventBus.getDefault().post(new HelpChangeEvent(!gamePanel.isShowHudHelp())));
 
         sideMenu = new SideMenu();
         sideMenu.setPreferredSize(new Dimension(SideMenu.WIDTH, SideMenu.HEIGHT));
@@ -198,6 +194,11 @@ public class MainWindow extends JFrame {
                 defaultView.setSelected(true);
             }
         });
+    }
+
+    @Subscribe
+    public void onHelpChangeEvent(HelpChangeEvent e) {
+        keybindHelp.setSelected(e.isDisplay());
     }
 
 }

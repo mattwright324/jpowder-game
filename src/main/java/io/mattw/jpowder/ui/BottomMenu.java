@@ -26,14 +26,14 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     public static final int HEIGHT = 50;
 
     private Graphics2D graphics;
-    private final int b_w = 40;
-    private final int b_h = 18;
-    private final int b_y = HEIGHT - b_h - 5;
-    private final Rectangle clearRect = new Rectangle(5, b_y, b_w, b_h);
-    private final Rectangle resizeRect = new Rectangle(5 + (b_w + 5), b_y, b_w, b_h);
-    private final Rectangle pauseRect = new Rectangle(5 + (b_w + 5) * 2, b_y, b_w, b_h);
-    private final Rectangle viewRect = new Rectangle(5 + (b_w + 5) * 3, b_y, b_w, b_h);
-    private final Rectangle helpRect = new Rectangle(5 + (b_w + 5) * 4, b_y, b_w, b_h);
+    private final int btnWidth = 40;
+    private final int btnHeight = 18;
+    private final int btnPosY = HEIGHT - btnHeight - 5;
+    private final Rectangle clearRect = new Rectangle(5, btnPosY, btnWidth, btnHeight);
+    private final Rectangle resizeRect = new Rectangle(5 + (btnWidth + 5), btnPosY, btnWidth, btnHeight);
+    private final Rectangle pauseRect = new Rectangle(5 + (btnWidth + 5) * 2, btnPosY, btnWidth, btnHeight);
+    private final Rectangle viewRect = new Rectangle(5 + (btnWidth + 5) * 3, btnPosY, btnWidth, btnHeight);
+    private final Rectangle helpRect = new Rectangle(5 + (btnWidth + 5) * 4, btnPosY, btnWidth, btnHeight);
     private final List<Button> buttons = new ArrayList<>();
     private Point mouse = new Point(0, 0);
     private GamePanel game;
@@ -73,7 +73,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         makeButtons();
         drawButtons();
         graphics.setColor(Color.WHITE);
-        int b_txt_center = b_y + b_h / 2 + 5;
+        int b_txt_center = btnPosY + btnHeight / 2 + 5;
         graphics.drawString("NEW", clearRect.x + 5, b_txt_center);
         graphics.drawString("SIZE", resizeRect.x + 5, b_txt_center);
         graphics.fillRect(pauseRect.x + 12, pauseRect.y + 5, 5, pauseRect.height - 9);
@@ -120,7 +120,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             }
         }
         if (helpRect.contains(mouse)) {
-            GamePanel.help = !GamePanel.help;
+            EventBus.getDefault().post(new HelpChangeEvent(!game.isShowHudHelp()));
         }
     }
 
@@ -132,7 +132,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             if (x > MainWindow.window.getWidth() / 2) {
                 x = MainWindow.window.getWidth() / 2;
             }
-            Button b = new Button(getWidth() - b_w - (5 + (b_w + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, b_w, b_h);
+            Button b = new Button(getWidth() - btnWidth - (5 + (btnWidth + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, btnWidth, btnHeight);
             b.setItem(e);
             buttons.add(b);
         }
@@ -163,7 +163,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
                 graphics.drawRect(b.x, b.y, b.width, b.height);
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString(b.getItem().getName(), b.x + 2, b.y + b_h / 2 + 5);
+            graphics.drawString(b.getItem().getName(), b.x + 2, b.y + btnHeight / 2 + 5);
         }
     }
 

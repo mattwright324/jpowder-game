@@ -24,19 +24,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public final static int WIDTH = 612; // 612
     public final static int HEIGHT = 384; // 384
     public static int windowScale = 1; // fillRect vs drawRect
-    public static boolean help = false;
 
-    private static boolean small = true;
-    private static Graphics2D hud2d;
-    private static BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
-    private static Graphics2D game2d = img.createGraphics();
-    private static final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-    private static final PerSecondCounter drawFps = new PerSecondCounter();
-    private static boolean hud = true;
-
+    private boolean showHudHelp = false;
+    private boolean small = true;
+    private Graphics2D hud2d;
+    private BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
+    private Graphics2D game2d = img.createGraphics();
+    private final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
+    private final PerSecondCounter drawFps = new PerSecondCounter();
+    private boolean hud = true;
     private Item leftClickType = ElementType.DUST;
     private Item rightClickType = ElementType.NONE;
-
     public ViewType view = ViewType.DEFAULT;
     private final Timer timer = new Timer(5, this);
     private final GameUpdateThread gameUpdateThread = new GameUpdateThread();
@@ -148,7 +146,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             hud2d.drawString("Parts             " + csize, 5, spacing * line++);
             hud2d.drawString("GamePanel         " + getWidth() + "x" + getHeight(), 5, spacing * line++); // As in nulls within a Cell's stack[]
             hud2d.drawString(leftClickType.getName() + " || " + rightClickType.getName(), 5, spacing * line++);
-            if (help) {
+            if (showHudHelp) {
                 hud2d.drawString("", 5, spacing * line++);
                 hud2d.drawString("KEY      ACTION         STATE", 5, spacing * line++);
                 hud2d.drawString("T        mouse type     " + (mouseSquare ? "Square" : "Circle"), 5, spacing * line++);
@@ -483,6 +481,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         } else if (e.getMouseButton() == MouseEvent.BUTTON2) {
             rightClickType = e.getSelectedItem();
         }
+    }
+
+    @Subscribe
+    public void onHelpChangeEvent(HelpChangeEvent e) {
+        showHudHelp = e.isDisplay();
     }
 
 }
