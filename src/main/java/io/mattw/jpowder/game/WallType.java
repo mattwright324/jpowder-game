@@ -8,12 +8,13 @@ public class WallType {
 
     static {
         NONE = new Wall("WNone", Color.BLACK);
-        NONE.setRemove(true);
+        // NONE.setRemove(true);
 
         WALL = new Wall("Wall", Color.LIGHT_GRAY);
 
         AIR = new Wall("WAir", new Color(128, 128, 255, 64));
-        AIR.setAir(true);
+        AIR.setAllowParts(true);
+        // AIR.setAir(true);
 
         WVOID = new Wall("WVoid", new Color(255, 128, 128, 64));
     }

@@ -4,8 +4,7 @@ import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -18,14 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Log4j2
 public class BottomMenu extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
-
-    private static final Logger logger = LogManager.getLogger();
 
     public static final int WIDTH = GamePanel.WIDTH + SideMenu.WIDTH;
     public static final int HEIGHT = 50;
 
-    private Graphics2D graphics;
     private final int btnWidth = 40;
     private final int btnHeight = 18;
     private final int btnPosY = HEIGHT - btnHeight - 5;
@@ -35,8 +32,10 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     private final Rectangle viewRect = new Rectangle(5 + (btnWidth + 5) * 3, btnPosY, btnWidth, btnHeight);
     private final Rectangle helpRect = new Rectangle(5 + (btnWidth + 5) * 4, btnPosY, btnWidth, btnHeight);
     private final List<Button> buttons = new ArrayList<>();
+    private final GamePanel game;
+
+    private Graphics2D graphics;
     private Point mouse = new Point(0, 0);
-    private GamePanel game;
 
     public BottomMenu(GamePanel game) {
         EventBus.getDefault().register(this);
@@ -70,7 +69,7 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
             graphics.setColor(new Color(255, 64, 128, 128));
         }
         graphics.fill(pauseRect);
-        makeButtons();
+        createButtons();
         drawButtons();
         graphics.setColor(Color.WHITE);
         int b_txt_center = btnPosY + btnHeight / 2 + 5;
@@ -124,17 +123,17 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
         }
     }
 
-    public void makeButtons() {
+    public void createButtons() {
         buttons.clear();
         int i = 0;
-        for (Item e : SideMenu.selectedCategory) {
+        for (Item item : SideMenu.selectedCategory.getItems()) {
             int x = MainWindow.mouse.x;
             if (x > MainWindow.window.getWidth() / 2) {
                 x = MainWindow.window.getWidth() / 2;
             }
-            Button b = new Button(getWidth() - btnWidth - (5 + (btnWidth + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, btnWidth, btnHeight);
-            b.setItem(e);
-            buttons.add(b);
+            Button button = new Button(getWidth() - btnWidth - (5 + (btnWidth + 5) * i++) + (getWidth() - x - (getWidth() / 2)), 5, btnWidth, btnHeight);
+            button.setItem(item);
+            buttons.add(button);
         }
     }
 
@@ -172,30 +171,40 @@ public class BottomMenu extends JPanel implements ActionListener, MouseListener,
     }
 
     public void actionPerformed(ActionEvent e) {
-        repaint();
+        repaintLater();
     }
 
     public void mouseDragged(MouseEvent e) {
         mouse = e.getPoint();
         MainWindow.updateMouseInFrame(e.getPoint(), this);
-        repaint();
+        repaintLater();
     }
 
     public void mouseMoved(MouseEvent e) {
         mouse = e.getPoint();
         MainWindow.updateMouseInFrame(e.getPoint(), this);
+        repaintLater();
     }
 
     @Subscribe
     public void onPauseChangeEvent(PauseChangeEvent e) {
-        repaint();
+        repaintLater();
     }
 
     @Subscribe(priority = 1)
     public void onToolSelectionEvent(ToolSelectionEvent e) {
-        repaint();
+        repaintLater();
     }
-    
+
+    @Subscribe
+    public void onCategorySelectEvent(CategorySelectEvent e) {
+        repaintLater();
+    }
+
+    public void repaintLater() {
+        SwingUtilities.invokeLater(this::repaint);
+    }
+
     @Getter
     @Setter
     public static class Button extends Rectangle {

@@ -5,8 +5,7 @@ import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.Grid;
 import io.mattw.jpowder.game.ViewType;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -18,10 +17,9 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
+@Log4j2
 @Getter
 public class MainWindow extends JFrame {
-
-    private static final Logger logger = LogManager.getLogger();
 
     public static BufferedImage HEAT_COLOR_STRIP;
     public static MainWindow window;
@@ -29,7 +27,7 @@ public class MainWindow extends JFrame {
 
     private final GamePanel gamePanel;
     private final SideMenu sideMenu;
-    public static BottomMenu bottomMenu;
+    private final BottomMenu bottomMenu;
 
     private final JCheckBoxMenuItem keybindHelp;
     private final JRadioButtonMenuItem defaultView;
@@ -40,7 +38,7 @@ public class MainWindow extends JFrame {
     private final JCheckBoxMenuItem pauseGame;
 
     public MainWindow() throws Exception {
-        logger.trace("MainWindow()");
+        log.trace("MainWindow()");
 
         EventBus.getDefault().register(this);
 
@@ -144,10 +142,12 @@ public class MainWindow extends JFrame {
     }
 
     public static void updateMouseInFrame(Point p, Component c) {
+        // log.trace("updateMouseInFrame({})", p);
         SwingUtilities.convertPointToScreen(p, c);
         SwingUtilities.convertPointFromScreen(p, window);
         mouse = p;
-        bottomMenu.repaint();
+        SwingUtilities.invokeLater(window.getBottomMenu()::repaint);
+        // window.getBottomMenu().repaint();
     }
 
     public void resize() {
@@ -161,7 +161,7 @@ public class MainWindow extends JFrame {
 
     @Subscribe
     public void onEvent(Object e) {
-        logger.trace("Received {}: {}", e.getClass().getSimpleName(), e);
+        log.trace("Received Event: {}", e);
     }
 
     @Subscribe

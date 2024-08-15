@@ -6,7 +6,8 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
@@ -14,9 +15,9 @@ public class Cell {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private int x;
-    private int y;
-    private Particle[] stack = new Particle[0];
+    private final int x;
+    private final int y;
+    private final List<Particle> parts = new CopyOnWriteArrayList<>();
 
     public Cell(int x, int y) {
         this.x = x;
@@ -24,7 +25,8 @@ public class Cell {
     }
 
     public void reset() {
-        stack = new Particle[0];
+        parts.forEach(part -> part.setRemove(true));
+        parts.clear();
     }
 
     public int screenX() {
@@ -36,139 +38,62 @@ public class Cell {
     }
 
     public int count() {
-        int s = 0;
-        for (var particle : stack) {
-            if (particle != null) {
-                s++;
-            }
-        }
-        return s;
+        return parts.size();
     }
 
-    public int nullCount() {
-        return stack.length - count();
+    public boolean isStackEmpty() {
+        return parts.isEmpty();
     }
 
-    public boolean empty() {
-        for (var particle : stack) {
-            if (particle != null) {
+    public boolean canMoveHere(Particle particle) {
+        return canMoveHere(particle.getEl());
+    }
+
+    public boolean canMoveHere(Element element) {
+        for (var particle : parts) {
+            if (particle != null && !element.isStackable()) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean addable(Particle p) {
-        return addable(p.getEl());
-    }
-
-    public boolean addable(Element e) {
-        for (var particle : stack) {
-            if (particle != null && !particle.getEl().isStackable()) {
+    public boolean canDisplace(Particle p) {
+        var el = p.getEl();
+        for (Particle particle : parts) {
+            if (particle != null && el.heavierThan(particle.getEl())) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean displaceable(Particle p) {
-        return displaceable(p.getEl());
-    }
-
-    public boolean displaceable(Element e) {
-        for (Particle particle : stack) {
-            if (particle != null && e.heavierThan(particle.getEl())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean contains(Element e) {
-        for (Particle particle : stack) {
-            if (particle != null && particle.getEl() == e) {
+    public boolean hasElement(Element element) {
+        for (Particle particle : parts) {
+            if (particle != null && particle.getEl() == element) {
                 return true;
             }
         }
         return false;
     }
 
-    public Particle part(int pos) {
-        if (empty()) {
-            return null;
-        }
-        return stack[pos];
-    }
-
-    public void rem(int pos) {
-        if (stack.length <= pos) {
+    public void removeParticle(Particle pos) {
+        if (parts.isEmpty()) {
             return;
         }
-        stack[pos] = null;
+        parts.remove(pos);
     }
 
-    public void add(Particle p) {
-        for (int i = 0; i < stack.length; i++) {
-            if (stack[i] == null) {
-                p.setX(x);
-                p.setY(y);
-                p.setPos(i);
-                stack[i] = p;
-                return;
-            }
-        }
-
-        stack = Arrays.copyOf(stack, stack.length + 1);
-        stack[stack.length - 1] = p;
-        p.setPos(stack.length - 1);
-        p.setX(x);
-        p.setY(y);
+    public Particle addNewHere(Element element) {
+        var part = new Particle(element, x, y);
+        moveHere(part);
+        return part;
     }
 
-    public void add(Element e) {
-        add(new Particle(e, x, y));
+    public void moveHere(Particle particle) {
+        particle.setX(x);
+        particle.setY(y);
+        parts.add(particle);
     }
 
-    /**
-     * Update the entire stack.
-     */
-    public void update(String updateId) {
-        Particle p;
-        for (int i = 0; i < stack.length; i++) {
-            if ((p = stack[i]) != null) {
-                if (p.isRemove()) {
-                    stack[i] = null;
-                } else if (!updateId.equals(p.getLastUpdateId())) {
-                    p.setLastUpdateId(updateId);
-                    p.update();
-                }
-            }
-            if (stack.length > 0 && empty()) {
-                stack = new Particle[1];
-            }
-        }
-    }
-
-    /**
-     * Moves all particles up and nulls down then cuts off the nulls at the bottom.
-     * Check for affect on performance.
-     * Should not be used often, preferred on pause.
-     */
-    public void cleanStack() {
-        if (stack.length > 0 && empty()) {
-            stack = new Particle[0];
-        } else {
-            for (int i = 0; i < stack.length; i++) {
-                if (stack[i] == null) {
-                    for (int n = i; n < stack.length; n++) {
-                        if (stack[n] != null) {
-                            stack[i] = stack[n];
-                            stack[n] = null;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

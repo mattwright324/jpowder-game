@@ -10,9 +10,9 @@ import java.awt.*;
 public class Wall extends Item {
 
     // Pass-through flags.
-    private boolean air = false;
-    private boolean parts = false;
-    private boolean remove = false;
+    // private boolean air = false;
+    private boolean allowParts = false;
+    // private boolean remove = false;
 
     public Wall(String name, Color color) {
         setName(name);

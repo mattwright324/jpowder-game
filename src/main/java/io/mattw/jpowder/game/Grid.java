@@ -1,7 +1,11 @@
 package io.mattw.jpowder.game;
 
 import io.mattw.jpowder.ui.GamePanel;
+import lombok.extern.log4j.Log4j2;
 
+import java.util.ConcurrentModificationException;
+
+@Log4j2
 public class Grid {
 
     public static final Cell[][] PART_GRID = new Cell[GamePanel.WIDTH][GamePanel.HEIGHT]; // Particle Grid
@@ -68,42 +72,56 @@ public class Grid {
      * Returns uppermost particle in stack.
      */
     public static Particle getStackTop(int x, int y) {
-        if (!validCell(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0)) {
             return null;
         }
-        for (int i = 0; i < cell(x, y).getStack().length; i++) {
-            if (cell(x, y).getStack()[i] != null) {
-                return cell(x, y).getStack()[i];
+        var cell = cell(x, y);
+
+        try {
+            var parts = cell.getParts();
+            synchronized (parts) {
+                var it = parts.iterator();
+                if (it.hasNext()) {
+                    return it.next();
+                }
             }
+        } catch (ConcurrentModificationException e) {
+            log.warn(e);
         }
-        if (cell(x, y).getStack().length == 0) {
-            return null;
-        }
-        return cell(x, y).getStack()[0];
+        return null;
+//        if (cell.isStackEmpty()) {
+//            return null;
+//        }
+//        return cell.getParts().get(0);
     }
 
     public static void remStackTop(int x, int y) {
-        if (!validCell(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0)) {
             return;
         }
-        for (int i = 0; i < cell(x, y).getStack().length; i++) {
-            if (cell(x, y).getStack()[i] != null) {
-                cell(x, y).getStack()[i] = null;
-                return;
-            }
+        var cell = cell(x, y);
+        if (cell.isStackEmpty()) {
+            return;
         }
+
+        cell.getParts().get(0).setRemove(true);
+        cell.getParts().remove(0);
     }
 
     public static void remStack(int x, int y) {
-        if (!validCell(x, y, 0) && cell(x, y).empty()) {
+        if (!validCell(x, y, 0)) {
             return;
         }
-        cell(x, y).reset();
+        var cell = cell(x, y);
+        if (cell.isStackEmpty()) {
+            return;
+        }
+        cell.reset();
     }
 
     public static void setStack(int x, int y, Particle p) {
         remStack(x, y);
-        cell(x, y).add(p);
+        cell(x, y).moveHere(p);
     }
 
     /**

@@ -22,7 +22,7 @@ public class Element extends Item {
     private boolean glow = false;
     private long life = 0;
     private boolean lifeDecay = true;
-    private int lifeDecayMode = ElementType.DECAY_DIE;
+    private int lifeDecayMode = ElementType.DECAY_NONE;
     private boolean tmpDecay = true;
     private int tmpDecayMode = ElementType.DECAY_NONE;
 

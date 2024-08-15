@@ -1,13 +1,14 @@
 package io.mattw.jpowder.game;
 
-import io.mattw.jpowder.ui.GamePanel;
 import io.mattw.jpowder.ui.MainWindow;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 import java.awt.*;
 import java.util.Random;
 
+@Log4j2
 @Getter
 @Setter
 public class Particle {
@@ -22,7 +23,7 @@ public class Particle {
     private int y;
     private int pos = 0;
     private Element el;
-    private long update = 50;
+    // private long update = 50;
     private long lastUpdate = System.currentTimeMillis();
 
     private int ctype = 0;
@@ -37,6 +38,11 @@ public class Particle {
 
     public Particle(Element e, int x, int y) {
         init(e, x, y);
+
+        MainWindow.window.getGamePanel()
+                .getGameUpdateThread()
+                .getPartsToAdd()
+                .add(this);
     }
 
     public void init(Element e, int x, int y) {
@@ -114,21 +120,31 @@ public class Particle {
         return remove || (toWall() != null);
     }
 
-    public void update() {
-        if (!(System.currentTimeMillis() - lastUpdate > update)) {
+    public void update(String updateId) {
+        this.lastUpdateId = updateId;
+
+        var wall = toWall();
+        if (wall != null && !wall.isAllowParts()) {
+            log.debug("in wall");
+        }
+
+        if (remove() || wall != null && !wall.isAllowParts()) {
+            Grid.cell(x, y).removeParticle(this);
+            lastUpdate = System.currentTimeMillis();
             return;
         }
 
         if (el.getBehaviour() != null) {
-            el.getBehaviour().update(this);
+            el.getBehaviour().update(this, updateId);
         }
+
         if (el.getMovement() != null) {
             el.getMovement().move(this);
         }
 
         for (int w = -1; w < 2; w++) {
             for (int h = -1; h < 2; h++) {
-                if (Grid.validCell(x + w, y + h, 0) && !Grid.cell(x + w, y + h).empty() && !(w == 0 && h == 0)) {
+                if (Grid.validCell(x + w, y + h, 0) && !Grid.cell(x + w, y + h).isStackEmpty() && !(w == 0 && h == 0)) {
                     Particle p = Grid.getStackTop(x + w, y + h);
                     if (p == null) {
                         continue;
@@ -166,7 +182,7 @@ public class Particle {
                         setRemove(true);
                         break;
                     case (ElementType.DECAY_CTYPE):
-                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
+                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true, "Particle life decay ctype");
                         break;
                 }
             }
@@ -184,7 +200,7 @@ public class Particle {
                         setRemove(true);
                         break;
                     case (ElementType.DECAY_CTYPE):
-                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true);
+                        morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true, "Particle tmp decay ctype");
                         break;
                 }
             }
@@ -192,31 +208,51 @@ public class Particle {
         if (!Grid.validCell(x, y, 4)) {
             setRemove(true);
         }
+        if (remove()) {
+            Grid.cell(x, y).removeParticle(this);
+        }
         lastUpdate = System.currentTimeMillis();
     }
 
-    public void tryMove(int nx, int ny) {
+    public boolean tryMove(int nx, int ny) {
+        if (x == nx && y == ny) {
+            return false;
+        }
         if (!Grid.validCell(nx, ny, 0)) {
-            return;
+            return false;
         }
-        var cell = Grid.cell(x, y);
-        var cell2 = Grid.cell(nx, ny);
-        if (cell2.contains(ElementType.VOID)) {
-            cell.rem(pos);
-            return;
+        var wall = toWall();
+        if (wall != null && !wall.isAllowParts()) {
+            return false;
         }
+        var fromCell = Grid.cell(x, y);
+        var toCell = Grid.cell(nx, ny);
+        if (toCell.hasElement(ElementType.VOID)) {
+            fromCell.removeParticle(this);
+            this.setRemove(true);
+            return false;
+        }
+        var addable = toCell.canMoveHere(this);
+        if (addable) {
+            fromCell.removeParticle(this);
+            toCell.moveHere(this);
+            return true;
+        }
+        var displaceable = toCell.canDisplace(this);
+        if (!toCell.isStackEmpty() && displaceable) {
+            var swapPart = toCell.getParts().get(0);
+            fromCell.removeParticle(this);
+            toCell.removeParticle(swapPart);
+            toCell.moveHere(this);
+            fromCell.moveHere(swapPart);
+            return true;
+        }
+        return false;
+    }
 
-        if (!(toWall() != null && !toWall().isParts()) && (cell2.addable(this) || cell2.displaceable(this))) {
-            cell.rem(pos);
-            for (int i = 0; i < cell2.getStack().length; i++) {
-                var part = cell2.part(i);
-                if (part!= null) {
-                    cell.add(part);
-                    cell2.rem(i);
-                }
-            }
-            cell2.add(this);
-        }
+    public void morph(Element e, int type, boolean makectype, String msg) {
+        // log.trace("morph({}, {}, {}) {}", e, type, makectype, msg);
+        morph(e, type, makectype);
     }
 
     public void morph(Element e, int type, boolean makectype) {

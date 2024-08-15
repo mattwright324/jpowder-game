@@ -13,7 +13,7 @@ public abstract class ParticleBehaviour {
      *
      * @param p The particle that is being updated.
      */
-    public abstract void update(Particle p);
+    public abstract void update(Particle p, String updateId);
 
     /**
      * Called when the particle decays.

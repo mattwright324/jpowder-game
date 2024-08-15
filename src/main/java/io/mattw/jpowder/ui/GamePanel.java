@@ -4,8 +4,7 @@ import io.mattw.jpowder.*;
 import io.mattw.jpowder.event.*;
 import io.mattw.jpowder.game.*;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -16,38 +15,37 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Log4j2
 @Getter
 public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
-
-    private static final Logger logger = LogManager.getLogger();
 
     public final static int WIDTH = 612; // 612
     public final static int HEIGHT = 384; // 384
     public static int windowScale = 1; // fillRect vs drawRect
 
+    private final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
+    private final PerSecondCounter drawFps = new PerSecondCounter();
+    private final Timer timer = new Timer(5, this);
+    private final GameUpdateThread gameUpdateThread = new GameUpdateThread();
+    private final InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    private final ActionMap am = getActionMap();
+
+    public ViewType view = ViewType.DEFAULT;
     private boolean showHudHelp = false;
     private boolean small = true;
     private Graphics2D hud2d;
     private BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
     private Graphics2D game2d = img.createGraphics();
-    private final Font typeface = new Font("Monospaced", Font.PLAIN, 11);
-    private final PerSecondCounter drawFps = new PerSecondCounter();
     private boolean hud = true;
     private Item leftClickType = ElementType.DUST;
     private Item rightClickType = ElementType.NONE;
-    public ViewType view = ViewType.DEFAULT;
-    private final Timer timer = new Timer(5, this);
-    private final GameUpdateThread gameUpdateThread = new GameUpdateThread();
     private int csize = 0;
-    private int nsize = 0;
-    private int drawSize = 0;
+    private int drawSize = 15;
     private Point mouse = new Point(0, 0);
     private Point mouseDrag = new Point(0, 0);
     private Point mouseStart = new Point(0, 0);
     private Point mouseStop = new Point(0, 0);
     private boolean mouseSquare = false;
-    private final InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-    private final ActionMap am = getActionMap();
 
     public GamePanel() {
         EventBus.getDefault().register(this);
@@ -85,12 +83,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         small = false;
     }
 
-    public void togglePause() {
-        boolean paused = gameUpdateThread.isPaused();
-
-        EventBus.getDefault().post(new PauseChangeEvent(!paused));
-    }
-
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         hud2d = (Graphics2D) g;
@@ -104,7 +96,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             }
         }
         csize = 0;
-        nsize = 0;
         for (int w = 0; w < WIDTH; w++) {
             for (int h = 0; h < HEIGHT; h++) {
                 drawCell(Grid.cell(w, h));
@@ -121,9 +112,31 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             game2d.setColor(new Color(244, 244, 244, 32));
             game2d.fillRect(sx, sy, w, h); // Size overlay
         } else {
-            game2d.drawOval(sx, sy, w, h); // Size
-            game2d.setColor(new Color(244, 244, 244, 32));
-            game2d.fillOval(sx, sy, w, h); // Size overlay
+            var cellWidth = windowScale;
+            var cellHeight = windowScale;
+
+            game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.13f));
+            game2d.setColor(new Color(244, 244, 244));
+
+            for (int x = mouseStart.x; x <= mouseStop.x; x++) {
+                for (int y = mouseStart.y; y <= mouseStop.y; y++) {
+                    var inCircle = isWithinDrawCircle(mouse, x, y);
+                    var edgeOfCircle = !isWithinDrawCircle(mouse, x + 1, y) || !isWithinDrawCircle(mouse, x, y + 1) ||
+                            !isWithinDrawCircle(mouse, x - 1, y) || !isWithinDrawCircle(mouse, x, y - 1);
+                    if (edgeOfCircle) {
+                        game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F));
+                        game2d.setColor(Color.LIGHT_GRAY);
+                    } else {
+                        game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.13f));
+                        game2d.setColor(new Color(244, 244, 244));
+                    }
+                    if (inCircle) {
+                        game2d.fillRect(x * windowScale, y * windowScale, cellWidth, cellHeight);
+                    }
+                }
+            }
+            game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            game2d.setColor(Color.LIGHT_GRAY);
         }
         int mx = sx + w / 2;
         int my = sy + h / 2;
@@ -179,9 +192,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         drawFps.add();
     }
 
+    public boolean isWithinDrawCircle(Point centerPoint, int x, int y) {
+        return Math.sqrt(Math.pow(x - centerPoint.x, 2) + Math.pow(y - centerPoint.y, 2)) <= (double) drawSize / 2;
+    }
+
     public void drawCell(Cell cell) {
         Particle particle;
-        if (!cell.empty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
+        if (!cell.isStackEmpty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
             csize += cell.count();
 
             final var color = particle.getColor(view);
@@ -197,7 +214,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 game2d.fillRect(x, y, cellWidth, cellHeight);
             }
         }
-        nsize += cell.nullCount();
     }
 
     public void drawBigCell(BigCell bigCell) {
@@ -227,26 +243,28 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         }
     }
 
-    public void placeAt(Item element, int x, int y) {
-        if (element instanceof Element && Grid.validCell(x, y, 0)) {
-            Element el = (Element) element;
+    public void placeAt(Item mouseClickType, int x, int y) {
+        if (mouseClickType instanceof Element && Grid.validCell(x, y, 0)) {
+            Element el = (Element) mouseClickType;
             Cell cell = Grid.cell(x, y);
             Particle particle = Grid.getStackTop(x, y);
+
             if (el == ElementType.NONE) {
                 Grid.remStackTop(x, y);
-            } else if (element == ElementType.SPRK) {
+            } else if (mouseClickType == ElementType.SPRK) {
                 if (particle != null && particle.getEl().isConducts()) {
                     particle.setCtype(particle.getEl().getId());
-                    particle.morph(ElementType.SPRK, Particle.MORPH_KEEP_TEMP, true);
+                    particle.morph(ElementType.SPRK, Particle.MORPH_KEEP_TEMP, true, "MOUSE_CLICK");
                 }
             } else if (particle != null && el != ElementType.CLNE && particle.getEl() == ElementType.CLNE) {
                 particle.setCtype(el.getId());
-            } else if (cell.addable(el)) {
-                Grid.cell(x, y).add(el);
+            } else if (cell.canMoveHere(el)) {
+                var part = Grid.cell(x, y).addNewHere(el);
+                // gameUpdateThread.getPartsToAdd().add(part);
             }
         }
-        if (element instanceof Wall && Grid.validBigCell(x / 4, y / 4, 0)) {
-            Wall wall = (Wall) element;
+        if (mouseClickType instanceof Wall && Grid.validBigCell(x / 4, y / 4, 0)) {
+            Wall wall = (Wall) mouseClickType;
             BigCell bigCell = Grid.bigcell(x / 4, y / 4);
 
             if (wall == WallType.NONE) {
@@ -362,14 +380,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public void setKeyBindings() {
         addKeyBinding(KeyEvent.VK_SPACE, "pause", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                togglePause();
-                if (gameUpdateThread.isPaused()) {
-                    for (int w = 0; w < WIDTH; w++) {
-                        for (int h = 0; h < HEIGHT; h++) {
-                            Grid.cell(w, h).cleanStack();
-                        }
-                    }
-                }
+                EventBus.getDefault().post(new PauseChangeEvent(!gameUpdateThread.isPaused()));
             }
         });
         addKeyBinding(KeyEvent.VK_S, "resize", new AbstractAction() {
@@ -442,15 +453,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public void mouseWheelMoved(MouseWheelEvent e) {
         drawSize -= e.getWheelRotation();
-        if (drawSize < 0) {
-            drawSize = 0;
+        if (drawSize < 1) {
+            drawSize = 1;
         }
         mouseStart = new Point(mouse.x - drawSize / 2, mouse.y - drawSize / 2);
         mouseStop = new Point(mouseStart.x + drawSize, mouseStart.y + drawSize);
     }
 
     public void actionPerformed(ActionEvent e) {
-        repaint();
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     @Subscribe

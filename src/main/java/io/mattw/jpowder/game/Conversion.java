@@ -32,10 +32,10 @@ public class Conversion {
     public void doConversion(Particle p) {
         switch (method) {
             case (CM_TYPE):
-                p.morph(el, Particle.MORPH_KEEP_TEMP, true);
+                p.morph(el, Particle.MORPH_KEEP_TEMP, true, "CM_TYPE");
                 break;
             case (CM_CTYPE):
-                p.morph(ElementType.get(p.getCtype()), Particle.MORPH_KEEP_TEMP, true);
+                p.morph(ElementType.get(p.getCtype()), Particle.MORPH_KEEP_TEMP, true, "CM_CTYPE");
                 break;
         }
     }
