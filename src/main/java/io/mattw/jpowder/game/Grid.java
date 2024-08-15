@@ -89,10 +89,6 @@ public class Grid {
             log.warn(e);
         }
         return null;
-//        if (cell.isStackEmpty()) {
-//            return null;
-//        }
-//        return cell.getParts().get(0);
     }
 
     public static void remStackTop(int x, int y) {

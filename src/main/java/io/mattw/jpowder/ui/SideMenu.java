@@ -20,7 +20,6 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
     public static ItemCategory selectedCategory = ItemCategory.POWDER;
 
     private final int btnHeight = 40;
-    private final int btnWidth = WIDTH - 10;
     private final Map<ItemCategory, Rectangle> categoryRects = new LinkedHashMap<>();
 
     private BufferedImage img;
@@ -36,6 +35,7 @@ public class SideMenu extends JPanel implements ActionListener, MouseListener, M
         int i = 0;
         for (ItemCategory category : ItemCategory.values()) {
             var yOffset = 5 + (btnHeight + 5) * i++;
+            int btnWidth = WIDTH - 10;
             categoryRects.put(category, new Rectangle(5, yOffset, btnWidth, btnHeight));
         }
     }
