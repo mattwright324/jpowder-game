@@ -1,19 +1,10 @@
-# JPowder 
+# JPowder
+
 A java cellular automata based on The Powder Toy.
 
 Thread located at [powdertoy.co.uk](http://powdertoy.co.uk/Discussions/Thread/View.html?Thread=19989&PageNum=0)
 
-TODO:
-* Walls - nearly done
-* Pressure
-* Display Options:
-  - Temp (color) - done
-  - Life Gradient - done
-  - Fancy-like - done
-  - Other effects - ?
-* Particle Stacking - working on
-* Gravity
-* Improved liquid movement
+![Preview](./README_preview.png)
 
 | Control | Action                                         |
 |---------|------------------------------------------------|
@@ -25,3 +16,19 @@ TODO:
 | [ ]     | Change drawing size +- 1                       |
 | 1 to 4  | View type: Default, Temp, Life Gradient, Fancy |
  
+### Build & Run
+
+Use the clean build commands to test a build. Use the run command to build and run.
+
+```sh
+$ ./gradlew clean build
+$ ./gradlew run
+```
+
+### Package
+
+Run the package command then zip up the `build/package` folder contents for a release.
+
+```sh
+$ ./gradlew packageJar
+```

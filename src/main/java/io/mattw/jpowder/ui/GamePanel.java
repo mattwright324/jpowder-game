@@ -168,7 +168,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 hud2d.drawString("[ ]      mouse size     " + drawSize, 5, spacing * line++);
                 hud2d.drawString("SPACE    toggle pause   " + (gameUpdateThread.isPaused() ? "Paused" : "Playing"), 5, spacing * line++);
                 hud2d.drawString("S        window size    " + (small ? "Default" : "Large"), 5, spacing * line++);
-                hud2d.drawString("1-3      display type   " + view.getDisplayName(), 5, spacing * line);
+                hud2d.drawString("1-4      display type   " + view.getDisplayName(), 5, spacing * line);
             }
 
             hud2d.drawString("X:" + mouse.x + " Y:" + mouse.y, 5, getHeight() - 25);
