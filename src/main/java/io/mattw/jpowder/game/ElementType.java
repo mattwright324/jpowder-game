@@ -1,5 +1,6 @@
 package io.mattw.jpowder.game;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,9 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+@Log4j2
 public class ElementType {
-
-    private static final Logger logger = LogManager.getLogger();
 
     public static final Map<Integer, String> ID_NAME = new HashMap<>();
     public static final Map<Integer, Element> EL_MAP = new HashMap<>();
@@ -30,13 +30,14 @@ public class ElementType {
     public static final int CS_LSS = 10; // Converts less than temp.
     public static final int CS_GTR = 11; // Converts greater than temp.
     public static final int CS_EQ = 12; // Converts equal to temp.
+    public static final Random random = new Random();
+
     public static final Element NONE, SPRK, FILL, ANT;
     public static final Element DUST, STNE, SALT, BCOL, PLUT;
     public static final Element METL, QRTZ, DMND, COAL, INSL, CLNE, ICE, VOID;
     public static final Element WATR, LAVA, LN_2, OIL;
     public static final Element PHOT, RADP;
     public static final Element GAS, WARP, FIRE, PLSM, STM;
-    public static final Random random = new Random();
 
     public static final ElementMovement em_phot = p -> {
         int ny = p.getY() + (int) p.getVy();
