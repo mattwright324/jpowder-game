@@ -54,7 +54,7 @@ public class Element extends Item {
     }
 
     public boolean heavierThan(Element e) {
-        return e.weight > weight;
+        return e.weight < weight;
     }
 
     public void setParticleBehaviour(ParticleBehaviour bh) {

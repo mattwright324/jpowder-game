@@ -64,14 +64,14 @@ public class Cell {
         return true;
     }
 
-    public boolean canDisplace(Particle p) {
-        var el = p.getEl();
-        for (Particle particle : parts) {
-            if (particle != null && el.heavierThan(particle.getEl())) {
-                return false;
+    public boolean canDisplace(Particle fromPart) {
+        var fromEl = fromPart.getEl();
+        for (Particle toPart : parts) {
+            if (toPart != null && fromEl.heavierThan(toPart.getEl())) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public boolean hasElement(Element element) {

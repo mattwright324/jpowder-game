@@ -1,8 +1,6 @@
 package io.mattw.jpowder.game;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -29,7 +27,8 @@ public class ElementType {
     public static final int CS_EQ = 12; // Converts equal to temp.
     public static final Random random = new Random();
 
-    public static final Element NONE, SPRK, FILL, ANT;
+    public static final Element NONE, WARM, COOL;
+    public static final Element SPRK, FILL, ANT;
     public static final Element DUST, STNE, SALT, BCOL, PLUT, BOMB;
     public static final Element METL, QRTZ, DMND, COAL, INSL, CLNE, ICE, VOID;
     public static final Element WATR, LAVA, LN_2, OIL;
@@ -105,7 +104,7 @@ public class ElementType {
             for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
-                    if ((o = Grid.getStackTop(p.getX() + w - 1, p.getY() + h - 1)) != null && o.burn()) {
+                    if ((o = Grid.getStackTop(p.getX() + w - 1, p.getY() + h - 1)) != null && o.doBurn()) {
                         o.morph(FIRE, Particle.MORPH_FULL, false, "FIRE BURN");
                         o.setLastUpdateId(p.getLastUpdateId());
                     }
@@ -187,7 +186,7 @@ public class ElementType {
             for (int w = 0; w < 3; w++) {
                 for (int h = 0; h < 3; h++) {
                     Particle o;
-                    if ((o = Grid.getStackTop(p.getX() + (w - 1), p.getY() + (h - 1))) != null && o.burn()) {
+                    if ((o = Grid.getStackTop(p.getX() + (w - 1), p.getY() + (h - 1))) != null && o.doBurn()) {
                         o.morph(FIRE, Particle.MORPH_KEEP_TEMP, false, "PLSM cool");
                         o.setLastUpdateId(p.getLastUpdateId());
                     }
@@ -374,23 +373,34 @@ public class ElementType {
         NONE = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
         NONE.setRemove(true);
 
+        WARM = create(100, "WARM", "Add temp to parts", Color.RED, WEIGHT_NONE);
+        WARM.setRemove(true);
+
+        COOL = create(101, "COOL", "Subtract temp to parts", Color.BLUE, WEIGHT_NONE);
+        COOL.setRemove(true);
+
         DUST = create(1, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER - 1);
+        DUST.setSandEffect(true);
         DUST.setMovement(em_powder);
         DUST.setFlammibility(0.6);
 
         STNE = create(2, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER);
+        STNE.setSandEffect(true);
         STNE.setMovement(em_powder);
 
         SALT = create(3, "SALT", "Salt", new Color(243, 243, 243), WEIGHT_POWDER - 1);
+        SALT.setSandEffect(true);
         SALT.setMovement(em_powder);
 
         BCOL = create(4, "BCOL", "Broken Coal", Color.GRAY.brighter(), WEIGHT_POWDER);
+        BCOL.setSandEffect(true);
         BCOL.setMovement(em_powder);
 
         METL = create(5, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID);
         METL.setConducts(true);
 
         QRTZ = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
+        QRTZ.setSandEffect(true);
         QRTZ.setTmpDecay(false);
         QRTZ.setParticleBehaviour(pb_qrtz);
 
@@ -520,6 +530,8 @@ public class ElementType {
 
         FIRE.addConvert(PLSM, CS_GTR, 1000);
         PLSM.addConvert(FIRE, CS_LSS, 1000);
+
+        DUST.addConvert(FIRE, CS_GTR, 80);
     }
 
     public static boolean exists(int id) {

@@ -52,7 +52,7 @@ public class Particle {
         this.life = el.getLife();
         this.celcius = el.getCelcius();
         this.deco = null;
-        if (el.isSandEffect()) {
+        if (el.isSandEffect() && deco == null) {
             addSandEffect();
         }
         if (el.getBehaviour() != null) {
@@ -64,11 +64,7 @@ public class Particle {
         return Grid.bigcell(x / 4, y / 4).getWall();
     }
 
-    public boolean display() {
-        return !isRemove() || el.isDisplay();
-    }
-
-    public boolean burn() {
+    public boolean doBurn() {
         return Math.random() < el.getFlammibility();
     }
 

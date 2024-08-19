@@ -201,7 +201,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
     public void drawCell(Cell cell) {
         Particle particle;
-        if (!cell.isStackEmpty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
+        if (!cell.isStackEmpty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null) {
             totalParts += cell.count();
 
             final var color = particle.getColor(view);
@@ -250,6 +250,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
             if (el == ElementType.NONE) {
                 Grid.remStackTop(x, y);
+            } else if (el == ElementType.WARM || el == ElementType.COOL) {
+                var top = Grid.getStackTop(x, y);
+                if (top != null) {
+                    if (el == ElementType.WARM) {
+                        top.setCelcius(top.getCelcius() + 10);
+                    } else {
+                        top.setCelcius(top.getCelcius() - 10);
+                    }
+                }
             } else if (mouseClickType == ElementType.SPRK) {
                 if (particle != null && particle.getEl().isConducts()) {
                     particle.setCtype(particle.getEl().getId());
