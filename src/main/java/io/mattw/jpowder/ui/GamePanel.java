@@ -103,30 +103,27 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         }
 
         game2d.setColor(Color.LIGHT_GRAY);
-        int sx = mouseStart.x * windowScale;
-        int w = (mouseStop.x - mouseStart.x) * windowScale;
-        int sy = mouseStart.y * windowScale;
-        int h = (mouseStop.y - mouseStart.y) * windowScale;
+        final var cellWidth = windowScale;
+        final var cellHeight = windowScale;
+        final var sx = mouseStart.x * windowScale;
+        final var w = (mouseStop.x - mouseStart.x) * windowScale;
+        final var sy = mouseStart.y * windowScale;
+        final var h = (mouseStop.y - mouseStart.y) * windowScale;
         if (mouseSquare) {
-
             game2d.setColor(new Color(244, 244, 244, 32));
             game2d.fillRect(sx, sy, w, h); // Size overlay
-
             for (int x = mouseStart.x; x <= mouseStop.x; x++) {
                 for (int y = mouseStart.y; y <= mouseStop.y; y++) {
-                    var edge = !isWithinDrawCircle(mouse, x + 1, y) || !isWithinDrawCircle(mouse, x, y + 1) ||
-                            !isWithinDrawCircle(mouse, x - 1, y) || !isWithinDrawCircle(mouse, x, y - 1);
-                    if (edge) {
+                    var edgeOfSquare = x - 1 < mouseStart.x || y - 1 < mouseStart.y || x + 1 > mouseStop.x || y + 1 > mouseStop.y;
+                    if (edgeOfSquare) {
                         game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F));
                         game2d.setColor(Color.LIGHT_GRAY);
+                        game2d.fillRect(x * windowScale, y * windowScale, cellWidth, cellHeight);
                     }
                 }
             }
             game2d.drawRect(sx, sy, w, h); // Size
         } else {
-            var cellWidth = windowScale;
-            var cellHeight = windowScale;
-
             game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.13f));
             game2d.setColor(new Color(244, 244, 244));
             game2d.fillOval(sx, sy, w, h);
