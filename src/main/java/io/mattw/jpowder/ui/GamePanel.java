@@ -30,7 +30,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private final InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     private final ActionMap am = getActionMap();
 
-    private ViewType view = ViewType.DEFAULT;
+    private ViewType view = ViewType.FANCY;
     private boolean showHudHelp = false;
     private boolean small = true;
     private Graphics2D hud2d;

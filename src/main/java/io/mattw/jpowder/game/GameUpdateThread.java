@@ -9,10 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Log4j2
@@ -21,7 +19,7 @@ public class GameUpdateThread extends Thread {
 
     private final static long FRAME_NS = (long) ((1000 / 40.0) * 1000000);
 
-    private final List<Particle> partsToAdd = new CopyOnWriteArrayList<>();
+    private final Queue<Particle> partsToAdd = new ConcurrentLinkedQueue<>();
     private final List<Particle> updateParticles = new CopyOnWriteArrayList<>();
     private final PerSecondCounter gameFps = new PerSecondCounter();
 
@@ -34,8 +32,9 @@ public class GameUpdateThread extends Thread {
     }
 
     private void update() {
-        updateParticles.addAll(partsToAdd);
-        partsToAdd.clear();
+        while (!partsToAdd.isEmpty()) {
+            updateParticles.add(partsToAdd.poll());
+        }
         updateParticles.removeIf(part -> part == null || part.remove());
 
         final var updateId = UUID.randomUUID().toString();
