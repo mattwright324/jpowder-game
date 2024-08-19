@@ -35,7 +35,7 @@ public class GameUpdateThread extends Thread {
         while (!partsToAdd.isEmpty()) {
             updateParticles.add(partsToAdd.poll());
         }
-        updateParticles.removeIf(part -> part == null || part.remove());
+        updateParticles.removeIf(part -> part == null || part.isRemove());
 
         final var updateId = UUID.randomUUID().toString();
         updateParticles.forEach(part -> {

@@ -65,7 +65,7 @@ public class Particle {
     }
 
     public boolean display() {
-        return !remove() || el.isDisplay();
+        return !isRemove() || el.isDisplay();
     }
 
     public boolean burn() {
@@ -116,10 +116,6 @@ public class Particle {
         setDeco(new Color(Math.abs(red) % 256, Math.abs(green) % 256, Math.abs(blue) % 256, color.getAlpha()));
     }
 
-    public boolean remove() {
-        return remove || (toWall() != null);
-    }
-
     public void update(String updateId) {
         this.lastUpdateId = updateId;
 
@@ -131,7 +127,7 @@ public class Particle {
             remove = true;
         }
 
-        if (remove() || wall != null && !wall.isAllowParts()) {
+        if (remove) {
             Grid.cell(x, y).removeParticle(this);
             return;
         }
@@ -210,7 +206,7 @@ public class Particle {
         if (!Grid.validCell(x, y, 4)) {
             setRemove(true);
         }
-        if (remove()) {
+        if (remove) {
             Grid.cell(x, y).removeParticle(this);
         }
     }
