@@ -30,7 +30,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private final InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     private final ActionMap am = getActionMap();
 
-    public ViewType view = ViewType.DEFAULT;
+    private ViewType view = ViewType.DEFAULT;
     private boolean showHudHelp = false;
     private boolean small = true;
     private Graphics2D hud2d;
@@ -39,7 +39,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     private boolean hud = true;
     private Item leftClickType = ElementType.DUST;
     private Item rightClickType = ElementType.NONE;
-    private int csize = 0;
+    private int totalParts = 0;
     private int drawSize = 15;
     private Point mouse = new Point(0, 0);
     private Point mouseDrag = new Point(0, 0);
@@ -95,14 +95,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                 drawBigCell(Grid.bigcell(w, h));
             }
         }
-        csize = 0;
+        totalParts = 0;
         for (int w = 0; w < WIDTH; w++) {
             for (int h = 0; h < HEIGHT; h++) {
                 drawCell(Grid.cell(w, h));
             }
         }
 
-        game2d.setColor(Color.LIGHT_GRAY);
         final var cellWidth = windowScale;
         final var cellHeight = windowScale;
         final var sx = mouseStart.x * windowScale;
@@ -122,7 +121,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                     }
                 }
             }
-            game2d.drawRect(sx, sy, w, h); // Size
         } else {
             game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.13f));
             game2d.setColor(new Color(244, 244, 244));
@@ -139,9 +137,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
                     }
                 }
             }
-            game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-            game2d.setColor(Color.LIGHT_GRAY);
         }
+        game2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        game2d.setColor(Color.LIGHT_GRAY);
+
         int mx = sx + w / 2;
         int my = sy + h / 2;
         game2d.drawRect(mx, my, windowScale - 1, windowScale - 1); // Center Dot
@@ -160,7 +159,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             int line = 1;
             int spacing = hud2d.getFontMetrics().getHeight();
             hud2d.drawString("FPS    " + drawFps.fps() + ", UPS    " + gameUpdateThread.getGameFps().fps(), 5, spacing * line++);
-            hud2d.drawString("Parts             " + csize, 5, spacing * line++);
+            hud2d.drawString("Parts             " + totalParts, 5, spacing * line++);
             hud2d.drawString("GamePanel         " + getWidth() + "x" + getHeight(), 5, spacing * line++); // As in nulls within a Cell's stack[]
             hud2d.drawString(leftClickType.getName() + " || " + rightClickType.getName(), 5, spacing * line++);
             if (showHudHelp) {
@@ -203,7 +202,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public void drawCell(Cell cell) {
         Particle particle;
         if (!cell.isStackEmpty() && (particle = Grid.getStackTop(cell.getX(), cell.getY())) != null && particle.display()) {
-            csize += cell.count();
+            totalParts += cell.count();
 
             final var color = particle.getColor(view);
             game2d.setColor(color);
@@ -236,12 +235,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
         Point end = new Point(start.x + size, start.y + size);
         for (int x = start.x; x <= end.x; x++) {
             for (int y = start.y; y <= end.y; y++) {
-                if (mouseSquare) {
+                if (mouseSquare || Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2)) <= (double) size / 2) {
                     placeAt(element, x, y);
-                } else {
-                    if (Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2)) <= (double) size / 2) {
-                        placeAt(element, x, y);
-                    }
                 }
             }
         }
@@ -263,8 +258,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
             } else if (particle != null && el != ElementType.CLNE && particle.getEl() == ElementType.CLNE) {
                 particle.setCtype(el.getId());
             } else if (cell.canMoveHere(el)) {
-                var part = Grid.cell(x, y).addNewHere(el);
-                // gameUpdateThread.getPartsToAdd().add(part);
+                Grid.cell(x, y).addNewHere(el);
             }
         }
         if (mouseClickType instanceof Wall && Grid.validBigCell(x / 4, y / 4, 0)) {

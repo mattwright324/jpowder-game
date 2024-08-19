@@ -12,6 +12,7 @@ public class Wall extends Item {
     // Pass-through flags.
     // private boolean air = false;
     private boolean allowParts = false;
+    private boolean removeParts = true;
     // private boolean remove = false;
 
     public Wall(String name, Color color) {

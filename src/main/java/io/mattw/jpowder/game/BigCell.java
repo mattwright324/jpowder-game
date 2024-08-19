@@ -3,7 +3,9 @@ package io.mattw.jpowder.game;
 import io.mattw.jpowder.ui.GamePanel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 @Getter
 @Setter
 public class BigCell {

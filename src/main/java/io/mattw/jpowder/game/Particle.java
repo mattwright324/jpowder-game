@@ -3,11 +3,13 @@ package io.mattw.jpowder.game;
 import io.mattw.jpowder.ui.MainWindow;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.awt.*;
 import java.util.Random;
 
+@ToString
 @Log4j2
 @Getter
 @Setter
@@ -23,8 +25,6 @@ public class Particle {
     private int y;
     private int pos = 0;
     private Element el;
-    // private long update = 50;
-    private long lastUpdate = System.currentTimeMillis();
 
     private int ctype = 0;
     private int tmp = 0;
@@ -127,10 +127,12 @@ public class Particle {
         if (wall != null && !wall.isAllowParts()) {
             log.debug("in wall");
         }
+        if (wall != null && wall.isRemoveParts()) {
+            remove = true;
+        }
 
         if (remove() || wall != null && !wall.isAllowParts()) {
             Grid.cell(x, y).removeParticle(this);
-            lastUpdate = System.currentTimeMillis();
             return;
         }
 
@@ -211,7 +213,6 @@ public class Particle {
         if (remove()) {
             Grid.cell(x, y).removeParticle(this);
         }
-        lastUpdate = System.currentTimeMillis();
     }
 
     public boolean tryMove(int nx, int ny) {

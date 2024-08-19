@@ -14,8 +14,10 @@ public class WallType {
 
         AIR = new Wall("WAir", new Color(128, 128, 255, 64));
         AIR.setAllowParts(true);
+        AIR.setRemoveParts(false);
         // AIR.setAir(true);
 
         WVOID = new Wall("WVoid", new Color(255, 128, 128, 64));
+        WVOID.setAllowParts(true);
     }
 }

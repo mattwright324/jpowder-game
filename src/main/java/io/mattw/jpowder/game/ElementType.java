@@ -30,7 +30,7 @@ public class ElementType {
     public static final Random random = new Random();
 
     public static final Element NONE, SPRK, FILL, ANT;
-    public static final Element DUST, STNE, SALT, BCOL, PLUT;
+    public static final Element DUST, STNE, SALT, BCOL, PLUT, BOMB;
     public static final Element METL, QRTZ, DMND, COAL, INSL, CLNE, ICE, VOID;
     public static final Element WATR, LAVA, LN_2, OIL;
     public static final Element PHOT, RADP;
@@ -325,6 +325,52 @@ public class ElementType {
         }
     };
 
+    public static final ParticleBehaviour pb_bomb = new ParticleBehaviour() {
+        private static final int RADIUS = 25;
+
+        @Override
+        public void init(Particle p) {
+
+        }
+
+        @Override
+        public void update(Particle p, String updateId) {
+            if (p.getLife() > 0) {
+                p.setRemove(true);
+                return;
+            }
+
+            int y = p.getY() + 1;
+            int x = p.getX() + (random.nextBoolean() ? -1 : 1);
+            if (!p.tryMove(x, y)) {
+                p.tryMove(p.getX(), y);
+            }
+            var explode = false;
+            for (int x1 = p.getX()-1; x1 <= p.getX()+1; x1++) {
+                for (int y1 = p.getY()-1; y1 <= p.getY()+1; y1++) {
+                    var top = Grid.getStackTop(x1, y1);
+                    if (top != null && top.getEl() != BOMB) {
+                        explode = true;
+
+                    }
+                }
+            }
+            if (explode) {
+                Point start = new Point(p.getX() - RADIUS / 2, p.getY() - RADIUS / 2);
+                Point end = new Point(start.x + RADIUS, start.y + RADIUS);
+                for (int x1 = start.x; x1 <= end.x; x1++) {
+                    for (int y1 = start.y; y1 <= end.y; y1++) {
+                        if (Math.sqrt(Math.pow(x1 - p.getX(), 2) + Math.pow(y1 - p.getY(), 2)) <= (double) RADIUS / 2) {
+                            Grid.remStackTop(x1, y1);
+                            var part = Grid.cell(x1, y1).addNewHere(BOMB);
+                            part.setLife(1);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     static {
         NONE = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
         NONE.setRemove(true);
@@ -451,6 +497,10 @@ public class ElementType {
         ANT.setParticleBehaviour(pb_ant);
 
         VOID = create(27, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);
+
+        BOMB = create(28, "BOMB", "Destroys parts on interaction", Color.YELLOW, 0);
+        BOMB.setGlow(true);
+        BOMB.setParticleBehaviour(pb_bomb);
     }
 
     static { // Conversions

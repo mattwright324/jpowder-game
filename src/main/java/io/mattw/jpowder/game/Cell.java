@@ -3,12 +3,14 @@ package io.mattw.jpowder.game;
 import io.mattw.jpowder.ui.GamePanel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@ToString
 @Getter
 @Setter
 public class Cell {
@@ -50,6 +52,10 @@ public class Cell {
     }
 
     public boolean canMoveHere(Element element) {
+        var wall = toWall();
+        if (wall != null && !wall.isAllowParts()) {
+            return false;
+        }
         for (var particle : parts) {
             if (particle != null && !element.isStackable()) {
                 return false;
@@ -94,6 +100,10 @@ public class Cell {
         particle.setX(x);
         particle.setY(y);
         parts.add(particle);
+    }
+
+    public Wall toWall() {
+        return Grid.bigcell(x / 4, y / 4).getWall();
     }
 
 }

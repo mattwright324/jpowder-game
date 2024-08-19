@@ -6,7 +6,7 @@ import static io.mattw.jpowder.game.ElementType.*;
 
 @Getter
 public enum ItemCategory {
-    POWDER("Powder", DUST, STNE, SALT, BCOL),
+    POWDER("Powder", DUST, STNE, SALT, BCOL, BOMB),
     LIQUID("Liquid", WATR, LAVA, LN_2, OIL),
     SOLID("Solid", METL, QRTZ, DMND, COAL, INSL, ICE, CLNE, VOID),
     GASSES("Gas", GAS, FIRE, PLSM, STM),
