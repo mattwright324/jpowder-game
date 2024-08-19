@@ -349,9 +349,8 @@ public class ElementType {
             for (int x1 = p.getX()-1; x1 <= p.getX()+1; x1++) {
                 for (int y1 = p.getY()-1; y1 <= p.getY()+1; y1++) {
                     var top = Grid.getStackTop(x1, y1);
-                    if (top != null && top.getEl() != BOMB) {
+                    if (top != null && !(top.getEl() == BOMB || top.getEl() == CLNE && top.getCtype() == BOMB.getId())) {
                         explode = true;
-
                     }
                 }
             }

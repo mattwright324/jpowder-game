@@ -120,13 +120,9 @@ public class Particle {
         this.lastUpdateId = updateId;
 
         var wall = toWall();
-        if (wall != null && !wall.isAllowParts()) {
-            log.debug("in wall");
-        }
         if (wall != null && wall.isRemoveParts()) {
             remove = true;
         }
-
         if (remove) {
             Grid.cell(x, y).removeParticle(this);
             return;
