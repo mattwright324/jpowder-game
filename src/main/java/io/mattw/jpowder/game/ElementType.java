@@ -17,9 +17,6 @@ public class ElementType {
     public static final double MIN_TEMP = -273.15;
     public static final double DEFAULT_TEMP = 22.0;
     public static final double MAX_TEMP = 9725.85;
-    public static final int DECAY_NONE = 0;
-    public static final int DECAY_DIE = 1;
-    public static final int DECAY_CTYPE = 2;
     public static final int WEIGHT_NONE = Integer.MIN_VALUE;
     public static final int WEIGHT_RADIO = 0;
     public static final int WEIGHT_GAS = 10;
@@ -359,7 +356,7 @@ public class ElementType {
 
         INSL = create(9, "INSL", "Insulator", new Color(170, 170, 170), WEIGHT_SOLID);
         INSL.setHeatTransfer(0);
-        INSL.setFlammibility(0.1);
+        INSL.setFlammibility(0.015);
 
         PLUT = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
         PLUT.setParticleBehaviour(pb_plut);
@@ -368,7 +365,7 @@ public class ElementType {
 
         SPRK = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
         SPRK.setParticleBehaviour(pb_sprk);
-        SPRK.setLifeDecayMode(DECAY_NONE);
+        SPRK.setLifeDecayMode(DecayMode.NONE);
         SPRK.setLife(4);
 
         WATR = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
@@ -404,6 +401,7 @@ public class ElementType {
         RADP.setCelcius(1982);
         RADP.setStackable(true);
         RADP.setGlow(true);
+        RADP.setLifeDecayMode(DecayMode.DIE);
 
         GAS = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
         GAS.setMovement(em_gas);
@@ -413,20 +411,20 @@ public class ElementType {
         WARP = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND - 1);
         WARP.setMovement(em_gas);
         WARP.setLife(500);
-        WARP.setLifeDecayMode(DECAY_DIE);
+        WARP.setLifeDecayMode(DecayMode.DIE);
 
         FIRE = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
         FIRE.setMovement(em_gas);
         FIRE.setParticleBehaviour(pb_fire);
         FIRE.setCelcius(450);
-        FIRE.setLifeDecayMode(DECAY_DIE);
+        FIRE.setLifeDecayMode(DecayMode.DIE);
         FIRE.setLife(120);
         FIRE.setGlow(true);
 
         PLSM = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
         PLSM.setParticleBehaviour(pb_plsm);
         PLSM.setCelcius(MAX_TEMP);
-        PLSM.setLifeDecayMode(DECAY_DIE);
+        PLSM.setLifeDecayMode(DecayMode.DIE);
         PLSM.setLife(120);
         PLSM.setGlow(true);
 

@@ -10,8 +10,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Log4j2
 @Getter
@@ -19,8 +21,8 @@ public class GameUpdateThread extends Thread {
 
     private final static long FRAME_NS = (long) ((1000 / 40.0) * 1000000);
 
-    private final List<Particle> partsToAdd = new ArrayList<>();
-    private final List<Particle> updateParticles = new ArrayList<>();
+    private final List<Particle> partsToAdd = new CopyOnWriteArrayList<>();
+    private final List<Particle> updateParticles = new CopyOnWriteArrayList<>();
     private final PerSecondCounter gameFps = new PerSecondCounter();
 
     private boolean paused = false;
@@ -36,7 +38,6 @@ public class GameUpdateThread extends Thread {
         partsToAdd.clear();
         updateParticles.removeIf(part -> part == null || part.remove());
 
-        // Collections.shuffle(updateParticles);
         final var updateId = UUID.randomUUID().toString();
         updateParticles.forEach(part -> {
             if (!updateId.equals(part.getLastUpdateId())) {

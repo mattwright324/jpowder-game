@@ -22,9 +22,9 @@ public class Element extends Item {
     private boolean glow = false;
     private long life = 0;
     private boolean lifeDecay = true;
-    private int lifeDecayMode = ElementType.DECAY_NONE;
+    private DecayMode lifeDecayMode = DecayMode.NONE;
     private boolean tmpDecay = true;
-    private int tmpDecayMode = ElementType.DECAY_NONE;
+    private DecayMode tmpDecayMode = DecayMode.NONE;
 
     private Conversion[] convs = new Conversion[0];
 

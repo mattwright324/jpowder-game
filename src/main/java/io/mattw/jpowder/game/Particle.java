@@ -175,13 +175,13 @@ public class Particle {
             }
             if (life - 1 == 0) {
                 switch (el.getLifeDecayMode()) {
-                    case (ElementType.DECAY_DIE):
+                    case DIE:
                         if (el.getBehaviour() != null) {
                             el.getBehaviour().destruct(this);
                         }
                         setRemove(true);
                         break;
-                    case (ElementType.DECAY_CTYPE):
+                    case MORPH_CTYPE:
                         morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true, "Particle life decay ctype");
                         break;
                 }
@@ -193,13 +193,13 @@ public class Particle {
             }
             if (tmp - 1 == 0) {
                 switch (el.getTmpDecayMode()) {
-                    case (ElementType.DECAY_DIE):
+                    case DIE:
                         if (el.getBehaviour() != null) {
                             el.getBehaviour().destruct(this);
                         }
                         setRemove(true);
                         break;
-                    case (ElementType.DECAY_CTYPE):
+                    case MORPH_CTYPE:
                         morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true, "Particle tmp decay ctype");
                         break;
                 }
@@ -219,6 +219,7 @@ public class Particle {
             return false;
         }
         if (!Grid.validCell(nx, ny, 0)) {
+            this.setRemove(true);
             return false;
         }
         var wall = toWall();
