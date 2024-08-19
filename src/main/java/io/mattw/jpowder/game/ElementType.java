@@ -416,6 +416,7 @@ public class ElementType {
         PLUT = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
         PLUT.setParticleBehaviour(pb_plut);
         PLUT.setMovement(em_powder);
+        PLUT.setLifeDecayMode(DecayMode.DESTRUCT);
         PLUT.setGlow(true);
 
         SPRK = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);

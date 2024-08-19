@@ -166,10 +166,12 @@ public class Particle {
             if (life - 1 == 0) {
                 switch (el.getLifeDecayMode()) {
                     case DIE:
+                        setRemove(true);
+                        break;
+                    case DESTRUCT:
                         if (el.getBehaviour() != null) {
                             el.getBehaviour().destruct(this);
                         }
-                        setRemove(true);
                         break;
                     case MORPH_CTYPE:
                         morph(ElementType.get(ctype), MORPH_KEEP_TEMP, true, "Particle life decay ctype");
