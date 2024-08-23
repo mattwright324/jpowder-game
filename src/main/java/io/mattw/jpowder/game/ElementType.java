@@ -555,6 +555,8 @@ public class ElementType {
         WATR.addConvert(STM, CS_GTR, 100);
         STM.addConvert(WATR, CS_LSS, 100);
 
+        BTRY.addConvert(PLSM, CS_GTR, 1200);
+
         FIRE.addConvert(PLSM, CS_GTR, 1000);
         PLSM.addConvert(FIRE, CS_LSS, 1000);
 
