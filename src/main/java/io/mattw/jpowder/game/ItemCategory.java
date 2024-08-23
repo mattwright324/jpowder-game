@@ -11,7 +11,7 @@ public enum ItemCategory {
     SOLID("Solid", METL, QRTZ, DMND, COAL, INSL, ICE, CLNE, VOID),
     GASSES("Gas", GAS, FIRE, PLSM, STM),
     RADIO("Radio", PHOT, RADP, PLUT, WARP),
-    TOOLS("Tools", NONE, WARM, COOL, SPRK, FILL, ANT, WallType.NONE, WallType.WALL, WallType.AIR, WallType.WVOID),
+    TOOLS("Tools", NONE, WARM, COOL, BTRY, SPRK, FILL, ANT, WallType.NONE, WallType.WALL, WallType.AIR, WallType.WVOID),
     ;
 
     private final String display;

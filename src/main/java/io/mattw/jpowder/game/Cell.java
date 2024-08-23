@@ -90,10 +90,32 @@ public class Cell {
         parts.remove(pos);
     }
 
-    public Particle addNewHere(Element element) {
-        var part = new Particle(element, x, y);
-        moveHere(part);
-        return part;
+    public Particle placeNewHere(Element el) {
+        Particle topPart = Grid.getStackTop(x, y);
+        if (el == ElementType.NONE) {
+            Grid.remStackTop(x, y);
+        } else if (el == ElementType.WARM || el == ElementType.COOL) {
+            var top = Grid.getStackTop(x, y);
+            if (top != null) {
+                if (el == ElementType.WARM) {
+                    top.setCelcius(top.getCelcius() + 10);
+                } else {
+                    top.setCelcius(top.getCelcius() - 10);
+                }
+            }
+        } else if (el == ElementType.SPRK) {
+            if (topPart != null && topPart.getEl().isConducts()) {
+                topPart.setCtype(topPart.getEl().getId());
+                topPart.morph(ElementType.SPRK, Particle.MORPH_KEEP_TEMP, true, "MOUSE_CLICK");
+            }
+        } else if (topPart != null && el != ElementType.CLNE && topPart.getEl() == ElementType.CLNE) {
+            topPart.setCtype(el.getId());
+        } else if (canMoveHere(el)) {
+            var part = new Particle(el, x, y);
+            moveHere(part);
+            return part;
+        }
+        return null;
     }
 
     public void moveHere(Particle particle) {

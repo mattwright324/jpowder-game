@@ -28,7 +28,7 @@ public class ElementType {
     public static final Random random = new Random();
 
     public static final Element NONE, WARM, COOL;
-    public static final Element SPRK, FILL, ANT;
+    public static final Element BTRY, SPRK, FILL, ANT;
     public static final Element DUST, STNE, SALT, BCOL, PLUT, BOMB;
     public static final Element METL, QRTZ, DMND, COAL, INSL, CLNE, ICE, VOID;
     public static final Element WATR, LAVA, LN_2, OIL;
@@ -175,6 +175,21 @@ public class ElementType {
             }
         }
     };
+    public static final ParticleBehaviour pb_btry = new ParticleBehaviour() {
+        @Override
+        public void init(Particle p) {
+
+        }
+
+        @Override
+        public void update(Particle p, String updateId) {
+            for (int x = p.getX() - 1; x <= p.getX() + 1; x++) {
+                for (int y = p.getY() - 1; y <= p.getY() + 1; y++) {
+                    Grid.cell(x, y).placeNewHere(SPRK);
+                }
+            }
+        }
+    };
     public static final ParticleBehaviour pb_plsm = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(p.getLife() + random.nextInt(50));
@@ -209,7 +224,7 @@ public class ElementType {
                     if (Grid.cell(p.getX() + w, p.getY() + h).isStackEmpty()) {
                         int x = p.getX() + w;
                         int y = p.getY() + h;
-                        Grid.cell(x, y).addNewHere(get(p.getCtype()));
+                        Grid.cell(x, y).placeNewHere(get(p.getCtype()));
                     } else {
                         Particle o;
                         if ((o = Grid.getStackTop(p.getX() + w, p.getY() + h)) != null) {
@@ -259,22 +274,22 @@ public class ElementType {
 
         public void set(int x, int y) {
             if (Grid.validCell(x, y, 0) && Grid.cell(x, y).canMoveHere(FILL)) {
-                Grid.cell(x, y).addNewHere(FILL);
+                Grid.cell(x, y).placeNewHere(FILL);
             }
         }
     };
     public static final ParticleBehaviour pb_ant = new ParticleBehaviour() {
         public void init(Particle p) {
             p.setLife(180);
-            p.setTmp(1); // tmp 0 = dead, 1 = right, 2 = left
+            p.setTmp(1);
         }
 
         public void update(Particle p, String updateId) { // TODO Works ok but doesn't act as Langton's Ant should.
             if (p.getTmp() == 0) {
-                p.setDeco(Color.GRAY);
+                p.setDeco(Color.RED);
             }
             if (p.getTmp() == 1 || p.getTmp() == 2) {
-                int angle = 0;
+                var angle = p.getLife();
                 if (p.getTmp() == 1) {
                     p.setLife(p.getLife() - 90);
                     angle = (int) p.getLife();
@@ -290,6 +305,7 @@ public class ElementType {
                     angle = angle - 270;
                 }
                 p.setLife(angle);
+
                 int x = p.getX();
                 int y = p.getY();
                 int nx = p.getX();
@@ -306,20 +322,24 @@ public class ElementType {
                 if (angle == 270) {
                     ny += 1;
                 }
-                // logger.info("life: {}, angle: {}, x.y: {}.{} -> nx.ny: {}.{}", p.getLife(), angle, x, y, nx, ny);
-                Particle o = Grid.getStackTop(nx, ny);
-                if (o == null) {
-                    p.setTmp(1);
-                    p.tryMove(nx, ny);
 
+                // tmp=1 empty/white square move forward right and add element in previous cell
+                // tmp=2 populated/black square move forward left and remove element in previous cell
+
+                var nextCellPart = Grid.getStackTop(nx, ny);
+                if (nextCellPart != null && p.getEl().heavierThan(nextCellPart.getEl())) {
+                    Grid.remStackTop(nx, ny);
+                }
+
+                p.tryMove(nx, ny);
+
+                if (p.getTmp() == 1) {
                     Particle dead = new Particle(ElementType.COAL, x, y);
                     dead.setTmp(0);
                     Grid.cell(x, y).moveHere(dead);
-                } else {
-                    p.setTmp(2);
-                    p.tryMove(nx, ny);
-                    Grid.remStackTop(x, y);
                 }
+
+                p.setTmp(nextCellPart == null ? 1 : 2);
             }
         }
     };
@@ -360,7 +380,7 @@ public class ElementType {
                     for (int y1 = start.y; y1 <= end.y; y1++) {
                         if (Math.sqrt(Math.pow(x1 - p.getX(), 2) + Math.pow(y1 - p.getY(), 2)) <= (double) RADIUS / 2) {
                             Grid.remStackTop(x1, y1);
-                            var part = Grid.cell(x1, y1).addNewHere(BOMB);
+                            var part = Grid.cell(x1, y1).placeNewHere(BOMB);
                             part.setLife(1);
                         }
                     }
@@ -370,88 +390,94 @@ public class ElementType {
     };
 
     static {
-        NONE = create(0, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
+        int id = 0;
+
+        NONE = create(id++, "NONE", "Erase", Color.BLACK, WEIGHT_NONE);
         NONE.setRemove(true);
 
-        WARM = create(100, "WARM", "Add temp to parts", Color.RED, WEIGHT_NONE);
+        WARM = create(id++, "WARM", "Add temp to parts", Color.RED, WEIGHT_NONE);
         WARM.setRemove(true);
 
-        COOL = create(101, "COOL", "Subtract temp to parts", Color.BLUE, WEIGHT_NONE);
+        COOL = create(id++, "COOL", "Subtract temp to parts", Color.BLUE, WEIGHT_NONE);
         COOL.setRemove(true);
 
-        DUST = create(1, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER - 1);
+        DUST = create(id++, "DUST", "Dust", new Color(162, 168, 9), WEIGHT_POWDER - 1);
         DUST.setSandEffect(true);
         DUST.setMovement(em_powder);
         DUST.setFlammibility(0.6);
 
-        STNE = create(2, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER);
+        STNE = create(id++, "STNE", "Stone", Color.LIGHT_GRAY, WEIGHT_POWDER);
         STNE.setSandEffect(true);
         STNE.setMovement(em_powder);
 
-        SALT = create(3, "SALT", "Salt", new Color(243, 243, 243), WEIGHT_POWDER - 1);
+        SALT = create(id++, "SALT", "Salt", new Color(243, 243, 243), WEIGHT_POWDER - 1);
         SALT.setSandEffect(true);
         SALT.setMovement(em_powder);
 
-        BCOL = create(4, "BCOL", "Broken Coal", Color.GRAY.brighter(), WEIGHT_POWDER);
+        BCOL = create(id++, "BCOL", "Broken Coal", Color.GRAY.brighter(), WEIGHT_POWDER);
         BCOL.setSandEffect(true);
         BCOL.setMovement(em_powder);
 
-        METL = create(5, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID);
+        METL = create(id++, "METL", "Metal", new Color(112, 122, 255), WEIGHT_SOLID);
         METL.setConducts(true);
 
-        QRTZ = create(6, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
+        QRTZ = create(id++, "QRTZ", "Quartz", new Color(120, 226, 237), WEIGHT_SOLID);
         QRTZ.setSandEffect(true);
         QRTZ.setTmpDecay(false);
         QRTZ.setParticleBehaviour(pb_qrtz);
 
-        DMND = create(7, "DMND", "Diamond", new Color(32, 248, 228), WEIGHT_DMND);
+        DMND = create(id++, "DMND", "Diamond", new Color(32, 248, 228), WEIGHT_DMND);
 
-        COAL = create(8, "COAL", "Coal", Color.GRAY, WEIGHT_SOLID);
+        COAL = create(id++, "COAL", "Coal", Color.GRAY, WEIGHT_SOLID);
         COAL.setFlammibility(0.2);
 
-        INSL = create(9, "INSL", "Insulator", new Color(170, 170, 170), WEIGHT_SOLID);
+        INSL = create(id++, "INSL", "Insulator", new Color(170, 170, 170), WEIGHT_SOLID);
         INSL.setHeatTransfer(0);
         INSL.setFlammibility(0.015);
 
-        PLUT = create(10, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
+        PLUT = create(id++, "PLUT", "Plutonium", new Color(0, 179, 21), WEIGHT_POWDER);
         PLUT.setParticleBehaviour(pb_plut);
         PLUT.setMovement(em_powder);
         PLUT.setLifeDecayMode(DecayMode.DESTRUCT);
         PLUT.setGlow(true);
 
-        SPRK = create(11, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
+        BTRY = create(id++, "BTRY", "Battery", new Color(20, 127, 127), WEIGHT_SOLID);
+        BTRY.setParticleBehaviour(pb_btry);
+        BTRY.setFlammibility(0.015);
+
+        SPRK = create(id++, "SPRK", "Spark", Color.YELLOW, WEIGHT_SOLID);
         SPRK.setParticleBehaviour(pb_sprk);
         SPRK.setLifeDecayMode(DecayMode.NONE);
         SPRK.setLife(4);
 
-        WATR = create(12, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
+        WATR = create(id++, "WATR", "Water", Color.BLUE, WEIGHT_LIQUID);
         WATR.setMovement(em_liquid);
         WATR.setConducts(true);
         WATR.setGlow(true);
 
-        LAVA = create(13, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
+        LAVA = create(id++, "LAVA", "Lava", Color.ORANGE, WEIGHT_LIQUID);
         LAVA.setMovement(em_liquid);
         LAVA.setParticleBehaviour(pb_lava);
         LAVA.setCelcius(1522);
         LAVA.setGlow(true);
 
-        LN_2 = create(14, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
+        LN_2 = create(id++, "LN2", "Liquid Nitrogen", new Color(190, 226, 237), WEIGHT_LIQUID);
         LN_2.setMovement(em_liquid);
         LN_2.setCelcius(MIN_TEMP);
         LN_2.setGlow(true);
 
-        OIL = create(15, "OIL", "Oil", Color.GREEN.darker(), WEIGHT_LIQUID);
+        OIL = create(id++, "OIL", "Oil", Color.GREEN.darker(), WEIGHT_LIQUID);
         OIL.setMovement(em_liquid);
         OIL.setFlammibility(0.3);
         OIL.setGlow(true);
 
-        PHOT = create(16, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
+        PHOT = create(id++, "PHOT", "Light", Color.WHITE, WEIGHT_RADIO);
         PHOT.setMovement(em_phot);
         PHOT.setParticleBehaviour(pb_phot);
         PHOT.setStackable(true);
         PHOT.setGlow(true);
 
-        RADP = create(17, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
+        RADP = create(id++, "RADP", "Radioactive Particle", Color.MAGENTA, WEIGHT_RADIO);
         RADP.setMovement(em_radioactive);
         RADP.setParticleBehaviour(pb_radio);
         RADP.setCelcius(1982);
@@ -459,17 +485,17 @@ public class ElementType {
         RADP.setGlow(true);
         RADP.setLifeDecayMode(DecayMode.DIE);
 
-        GAS = create(18, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
+        GAS = create(id++, "GAS", "Gas", new Color(208, 180, 208), WEIGHT_GAS);
         GAS.setMovement(em_gas);
         GAS.setFlammibility(0.8);
         GAS.setGlow(true);
 
-        WARP = create(19, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND - 1);
+        WARP = create(id++, "WARP", "Warp", new Color(32, 32, 32), WEIGHT_DMND - 1);
         WARP.setMovement(em_gas);
         WARP.setLife(500);
         WARP.setLifeDecayMode(DecayMode.DIE);
 
-        FIRE = create(20, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
+        FIRE = create(id++, "FIRE", "Fire", Color.RED, WEIGHT_GAS);
         FIRE.setMovement(em_gas);
         FIRE.setParticleBehaviour(pb_fire);
         FIRE.setCelcius(450);
@@ -477,38 +503,38 @@ public class ElementType {
         FIRE.setLife(120);
         FIRE.setGlow(true);
 
-        PLSM = create(21, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
+        PLSM = create(id++, "PLSM", "Plasma", new Color(217, 151, 219), WEIGHT_GAS);
         PLSM.setParticleBehaviour(pb_plsm);
         PLSM.setCelcius(MAX_TEMP);
         PLSM.setLifeDecayMode(DecayMode.DIE);
         PLSM.setLife(120);
         PLSM.setGlow(true);
 
-        CLNE = create(22, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
+        CLNE = create(id++, "CLNE", "Clone", Color.YELLOW, WEIGHT_SOLID);
         CLNE.setParticleBehaviour(pb_clne);
 
-        STM = create(23, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
+        STM = create(id++, "STM", "Steam", new Color(172, 177, 242), WEIGHT_GAS);
         STM.setMovement(em_gas);
         STM.setGlow(true);
 
-        ICE = create(24, "ICE", "Ice", new Color(200, 200, 255), WEIGHT_SOLID);
+        ICE = create(id++, "ICE", "Ice", new Color(200, 200, 255), WEIGHT_SOLID);
         ICE.setCelcius(-25);
 
-        FILL = create(25, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
+        FILL = create(id++, "FILL", "Filler", Color.LIGHT_GRAY, WEIGHT_DMND);
         FILL.setTmpDecay(false);
         FILL.setHeatTransfer(0.5);
         FILL.setParticleBehaviour(pb_fill);
         FILL.setCelcius(9999);
         FILL.setFlammibility(0.1);
 
-        ANT = create(26, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
+        ANT = create(id++, "ANT", "Langton's Ant", Color.GREEN, WEIGHT_DMND);
         ANT.setTmpDecay(false);
         ANT.setLifeDecay(false);
         ANT.setParticleBehaviour(pb_ant);
 
-        VOID = create(27, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);
+        VOID = create(id++, "VOID", "Removes interacting particles", new Color(255, 96, 96), WEIGHT_DMND);
 
-        BOMB = create(28, "BOMB", "Destroys parts on interaction", Color.YELLOW, 0);
+        BOMB = create(id++, "BOMB", "Destroys parts on interaction", Color.YELLOW, 0);
         BOMB.setGlow(true);
         BOMB.setParticleBehaviour(pb_bomb);
     }

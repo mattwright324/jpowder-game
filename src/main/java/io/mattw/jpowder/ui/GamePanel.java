@@ -245,30 +245,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
     public void placeAt(Item mouseClickType, int x, int y) {
         if (mouseClickType instanceof Element && Grid.validCell(x, y, 0)) {
             Element el = (Element) mouseClickType;
-            Cell cell = Grid.cell(x, y);
-            Particle particle = Grid.getStackTop(x, y);
 
-            if (el == ElementType.NONE) {
-                Grid.remStackTop(x, y);
-            } else if (el == ElementType.WARM || el == ElementType.COOL) {
-                var top = Grid.getStackTop(x, y);
-                if (top != null) {
-                    if (el == ElementType.WARM) {
-                        top.setCelcius(top.getCelcius() + 10);
-                    } else {
-                        top.setCelcius(top.getCelcius() - 10);
-                    }
-                }
-            } else if (mouseClickType == ElementType.SPRK) {
-                if (particle != null && particle.getEl().isConducts()) {
-                    particle.setCtype(particle.getEl().getId());
-                    particle.morph(ElementType.SPRK, Particle.MORPH_KEEP_TEMP, true, "MOUSE_CLICK");
-                }
-            } else if (particle != null && el != ElementType.CLNE && particle.getEl() == ElementType.CLNE) {
-                particle.setCtype(el.getId());
-            } else if (cell.canMoveHere(el)) {
-                Grid.cell(x, y).addNewHere(el);
-            }
+            Grid.cell(x, y).placeNewHere(el);
         }
         if (mouseClickType instanceof Wall && Grid.validBigCell(x / 4, y / 4, 0)) {
             Wall wall = (Wall) mouseClickType;
