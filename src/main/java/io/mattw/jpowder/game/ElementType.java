@@ -536,6 +536,8 @@ public class ElementType {
 
         BOMB = create(id++, "BOMB", "Destroys parts on interaction", Color.YELLOW, 0);
         BOMB.setGlow(true);
+        BOMB.setCelcius(9999);
+        BOMB.setHeatTransfer(1);
         BOMB.setParticleBehaviour(pb_bomb);
     }
 
