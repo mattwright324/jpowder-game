@@ -91,7 +91,12 @@ public class Cell {
     }
 
     public Particle placeNewHere(Element el) {
-        Particle topPart = Grid.getStackTop(x, y);
+        var wall = toWall();
+        if (wall != null && !wall.isAllowParts()) {
+            return null;
+        }
+
+        var topPart = Grid.getStackTop(x, y);
         if (el == ElementType.NONE) {
             Grid.remStackTop(x, y);
         } else if (el == ElementType.WARM || el == ElementType.COOL) {

@@ -381,7 +381,9 @@ public class ElementType {
                         if (Math.sqrt(Math.pow(x1 - p.getX(), 2) + Math.pow(y1 - p.getY(), 2)) <= (double) RADIUS / 2) {
                             Grid.remStackTop(x1, y1);
                             var part = Grid.cell(x1, y1).placeNewHere(BOMB);
-                            part.setLife(1);
+                            if (part != null) {
+                                part.setLife(1);
+                            }
                         }
                     }
                 }
